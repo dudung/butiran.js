@@ -1,0 +1,7 @@
+[20190528]
+0239 Reduced libraries are cleaned and compiled properly.
+0251 Create repository in Github.
+0256 Confuse with directory structure, still though.
+0259 Create app/examples for non-app examples and testing.
+0304 Craete app/examples/0000_hello.
+0318 Try to update repository in Github.
