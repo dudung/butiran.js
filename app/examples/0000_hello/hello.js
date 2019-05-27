@@ -5,9 +5,10 @@
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
 	
-	20190528 Start this example
-	0307 Create in app/examples/0000_hello
-	0317 Finish example for the use of sum of two vectors
+	20190528
+	0306 Start this example.
+	0307 Create in app/examples/0000_hello.
+	0317 Finish example for the use of sum of two vectors.
 */
 
 // Execute main function
