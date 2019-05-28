@@ -14,8 +14,9 @@
 var params;
 var taIn, taOut, caOut;
 var btLoad, btRead, btStart, btInfo;
-var tbeg, tend, dt, t, Tdata, Tproc, proc;
+var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var B, m, q, D, r, v;
+var digit;
 
 
 // Execute main function
@@ -24,8 +25,8 @@ main();
 
 // Define main function
 function main() {
-	createVisualElements();
 	initParams();
+	createVisualElements();
 }
 
 
@@ -33,28 +34,53 @@ function main() {
 function initParams() {
 	var p = "";
 	p += "# Environment\n";
-	p += "BFLD 0.000 0.000 2.000\n";
+	p += "BFLD 0.0000 0.0000 2.0000\n";
 	p += "\n";
 	p += "# Particle\n";
-	p += "MASS 0.100\n";
-	p += "CHRG 3.141\n";
+	p += "MASS 0.1000\n";
+	p += "CHRG 3.1415\n";
 	p += "DIAM 0.010\n";
-	p += "POST 1.000 0.000 0.000\n";
-	p += "VELO 0.000 1.000 0.000\n";
+	p += "POST 1.0000 0.0000 0.0000\n";
+	p += "VELO 0.0000 1.0000 0.0000\n";
 	p += "\n";
 	p += "# Iteration\n";
-	p += "TBEG 0.000\n";
-	p += "TEND 1.000\n";
-	p += "TSTP 0.001\n";
-	p += "TDAT 0.010\n";
+	p += "TBEG 0.0000\n";
+	p += "TEND 1.0000\n";
+	p += "TSTP 0.0010\n";
+	p += "TDAT 0.0100\n";
 	p += "TPRC 100\n";
 	params = p;
+	
+	digit = 4;
 }
 
 
 // Load parameters
 function loadParams() {
+	clearText(taIn);
 	addText(params).to(taIn);
+}
+
+
+// Read parameters
+function readParams() {
+B = getValue("BFLD").from(taIn);
+m = getValue("MASS").from(taIn);
+q = getValue("CHRG").from(taIn);
+D = getValue("DIAM").from(taIn);
+r = getValue("POST").from(taIn);
+v = getValue("VELO").from(taIn);
+
+tbeg = parseFloat(getValue("TBEG").from(taIn));
+tend = parseFloat(getValue("TEND").from(taIn));
+dt = parseFloat(getValue("TSTP").from(taIn));
+Tdata = parseFloat(getValue("TDAT").from(taIn));
+Tproc = parseInt(getValue("TPRC").from(taIn));
+
+iter = 0;
+Niter = Math.floor(Tdata / dt);
+
+t = tbeg;
 }
 
 
@@ -64,7 +90,7 @@ function createVisualElements() {
 	taIn = document.createElement("textarea");
 	with(taIn.style) {
 		overflowY = "scroll";
-		width = "194px";
+		width = "214px";
 		height = "200px";
 	}
 	
@@ -72,7 +98,7 @@ function createVisualElements() {
 	taOut = document.createElement("textarea");
 	with(taOut.style) {
 		overflowY = "scroll";
-		width = "194px";
+		width = "214px";
 		height = "200px";
 	}
 	
@@ -130,7 +156,7 @@ function createVisualElements() {
 	// Create div for left part
 	var dvLeft = document.createElement("div");
 	with(dvLeft.style) {
-		width = "200px";
+		width = "220px";
 		height = "442px";
 		border = "1px solid #eee";
 		background = "#eee";
@@ -170,6 +196,7 @@ function buttonClick() {
 	break;
 	case "Read":
 		btStart.disabled = false;
+		readParams();
 	break;
 	case "Start":
 		if(btStart.innerHTML == "Start") {
@@ -195,19 +222,34 @@ function buttonClick() {
 
 // Perform simulation
 function simulate() {
-	addText("He\n").to(taOut);
+	if(iter >= Niter) {
+		iter = 0;
+	}
+	
+	if(iter == 0) {
+		var tt = t.toFixed(digit);
+		addText(tt + "\n").to(taOut);
+	}
+	
+	if(t >= tend) {
+		btLoad.disabled = false;
+		btRead.disabled = false;
+		btStart.disabled = true;
+		btInfo.disabled = false;
+		btStart.innerHTML = "Start";
+		clearInterval(proc);
+		addText("\n").to(taOut);
+	}
+	
+	iter++;
+	t += dt;
 }
 
 
 // Clear a Textarea
 function clearText() {
-	var result = {
-		Of: function() {
-			var ta = arguments[0];
-			ta.value = "";
-		}
-	}
-	return result;
+	var ta = arguments[0];
+	ta.value = "";
 }
 
 
@@ -231,7 +273,21 @@ function getValue() {
 	var result = {
 		from: function() {
 			var ta = arguments[0];
-			
+			var lines = ta.value.split("\n");
+			var Nl = lines.length;
+			for(var l = 0; l < Nl; l++) {
+				var words = lines[l].split(" ");
+				var Nw = words.length;
+				var value;
+				if(words[0].indexOf(key) == 0) {
+					if(Nw == 2) {
+						value = words[1];
+					} else if(Nw == 4) {
+						value = new Vect3(words[1], words[2], words[3]);
+					}
+					return value;
+				}
+			}
 		}
 	}
 	return result;	
