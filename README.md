@@ -1,5 +1,8 @@
 # butiran.js
-Simulation of simple granular particles system
+Simulation of physical system based on granular particles (en: granular particle, id: butiran) or granular-like particles, e.g. unphysical entity such as an agent.
+
+## Library of butiran can be downloaded from
+* [dist/butiran.min.js](https://github.com/dudung/butiran.js/blob/master/dist/butiran.min.js) (17 KB)
 
 ## Application
 1. **cppcmf.js** | Charged particle in perpendicular constant magnetic field<br>
