@@ -323,8 +323,7 @@ function draw() {
 			var DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
 			var D = DX - X;
 			var Y = lintrans(y, [ymin, ymax], [YMIN, YMAX]);
-			console.log(X, Y, D);
-						
+			
 			cx.beginPath();
 			cx.strokeStyle = o.c;
 			cx.arc(X, Y, D, 0, 2 * Math.PI);
