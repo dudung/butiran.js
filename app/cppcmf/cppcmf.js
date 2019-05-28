@@ -13,9 +13,9 @@
 	
 	References
 	1. Dani Irawan, Sparisoma Viridi, Siti Nurul Khotimah,
-     Fourier Dzar Eljabbar Latief, and Novitrian, "Modeling
-	   and characterization of charged particle trajectories
-     in an oscillating magnetic field", AIP Conference
+		 Fourier Dzar Eljabbar Latief, and Novitrian, "Modeling
+		 and characterization of charged particle trajectories
+		 in an oscillating magnetic field", AIP Conference
 		 Proceedings [AIP Conf. Proc.], vol. 1656, no. 1,
 		 p. 060009, 17 April 2015, url
 		 https://doi.org/10.1063/1.4917140
