@@ -10,6 +10,7 @@
 	1222 Finish at campus, proposed color c --> c1, c2.
 	1658 Implement correction from [1] and it works.
 	1705 Add text for info button.
+	1755 Finish update README.md for this app.
 	
 	References
 	1. Dani Irawan, Sparisoma Viridi, Siti Nurul Khotimah,
