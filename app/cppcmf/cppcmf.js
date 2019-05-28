@@ -15,10 +15,9 @@ var params;
 var taIn, taOut, caOut;
 var btLoad, btRead, btStart, btInfo;
 var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
-var B, m, q, D, r, v;
 var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
-
+var o, magnetic;
 
 // Execute main function
 main();
@@ -69,12 +68,12 @@ function loadParams() {
 
 // Read parameters
 function readParams() {
-B = getValue("BFLD").from(taIn);
-m = getValue("MASS").from(taIn);
-q = getValue("CHRG").from(taIn);
-D = getValue("DIAM").from(taIn);
-r = getValue("POST").from(taIn);
-v = getValue("VELO").from(taIn);
+var B = getValue("BFLD").from(taIn);
+var m = getValue("MASS").from(taIn);
+var q = getValue("CHRG").from(taIn);
+var D = getValue("DIAM").from(taIn);
+var r = getValue("POST").from(taIn);
+var v = getValue("VELO").from(taIn);
 
 tbeg = getValue("TBEG").from(taIn);
 tend = getValue("TEND").from(taIn);
@@ -96,6 +95,16 @@ ymax = rmax.y;
 zmax = rmax.z;
 
 t = tbeg;
+
+o = new Grain();
+o.m = m;
+o.q = q;
+o.D = D;
+o.r = r;
+o.v = v;
+
+magnetic = new Magnetic();
+magnetic.setField(B);
 }
 
 
@@ -122,7 +131,7 @@ function createVisualElements() {
 	with(btLoad) {
 		innerHTML = "Load";
 		id = "Load";
-		style.width = "50px";
+		style.width = "55px";
 		disabled = false;
 		addEventListener("click", buttonClick);
 	}
@@ -132,7 +141,7 @@ function createVisualElements() {
 	with(btRead) {
 		innerHTML = "Read";
 		id = "Read";
-		style.width = "50px";
+		style.width = "55px";
 		disabled = true;
 		addEventListener("click", buttonClick);
 	}
@@ -142,7 +151,7 @@ function createVisualElements() {
 	with(btStart) {
 		innerHTML = "Start";
 		id = "Start";
-		style.width = "50px";
+		style.width = "55px";
 		disabled = true;
 		addEventListener("click", buttonClick);
 	}
@@ -152,7 +161,7 @@ function createVisualElements() {
 	with(btInfo) {
 		innerHTML = "Info";
 		id = "Info";
-		style.width = "50px";
+		style.width = "55px";
 		disabled = false;
 		addEventListener("click", buttonClick);
 	}
@@ -243,8 +252,17 @@ function simulate() {
 	
 	if(iter == 0) {
 		var tt = t.toFixed(digit);
-		addText(tt + "\n").to(taOut);
+		var xx = o.r.x.toFixed(digit);
+		var yy = o.r.y.toFixed(digit);
+		var text = tt + " " + xx + " " + yy;
+		addText(text + "\n").to(taOut);
 	}
+	
+	var FB = magnetic.force(o);
+	var F = FB;
+	var a = Vect3.div(F, o.m);
+	o.v = Vect3.add(o.v, Vect3.mul(a, dt));
+	o.r = Vect3.add(o.r, Vect3.mul(o.v, dt));
 	
 	if(t >= tend) {
 		btLoad.disabled = false;
