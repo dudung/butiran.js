@@ -1,6 +1,5 @@
 /*
 	cppcmf.js
-	
 	Charged particle in perpendicular constant magnetic field
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
@@ -9,6 +8,17 @@
 	0446 Start this app.
 	0754 Continue at campus.
 	1222 Finish at campus, proposed color c --> c1, c2.
+	1658 Implement correction from [1] and it works.
+	1705 Add text for info button.
+	
+	References
+	1. Dani Irawan, Sparisoma Viridi, Siti Nurul Khotimah,
+	   Fourier Dzar Eljabbar Latief, and Novitrian, "Modeling
+		 and characterization of charged particle trajectories
+		 in an oscillating magnetic field", AIP Conference
+		 Proceedings [AIP Conf. Proc.], vol. 1656, no. 1,
+		 p. 060009, 17 April 2015, url
+		 https://doi.org/10.1063/1.4917140
 */
 
 // Define global variables
@@ -19,7 +29,7 @@ var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
-var o, magnetic;
+var o, magnetic, corv;
 
 // Execute main function
 main();
@@ -55,6 +65,10 @@ function initParams() {
 	p += "# Coordinates\n";
 	p += "RMIN -0.020 -0.020 -0.020\n";
 	p += "RMAX +0.020 +0.020 +0.020\n";
+	p += "\n";
+	p += "# Method\n";
+	p += "CORV 0\n";
+	
 	params = p;
 	
 	digit = 4;
@@ -85,6 +99,8 @@ Tproc = getValue("TPRC").from(taIn);
 
 var rmin = getValue("RMIN").from(taIn);
 var rmax = getValue("RMAX").from(taIn);
+
+corv = getValue("CORV").from(taIn);
 
 iter = 0;
 Niter = Math.floor(Tdata / dt);
@@ -248,6 +264,18 @@ function buttonClick() {
 		}
 	break;
 	case "Info":
+		var info = "";
+		info += "cppcmf.js\n";
+		info += "Charged particle in perpendicular ";
+		info += "constant magnetic field\n";
+		info += "Sparisoma Viridi\n";
+		info += "https://github.com/dudung/butiran.js\n"
+		info += "Load  load parameters\n";
+		info += "Read  read parameters\n";
+		info += "Start start simulation\n";
+		info += "Info  show this messages\n";
+		info += "\n";
+		addText(info).to(taOut);
 	break;
 	default:
 	}
@@ -277,7 +305,13 @@ function simulate() {
 	var F = FB;
 	var a = Vect3.div(F, o.m);
 	o.v = Vect3.add(o.v, Vect3.mul(a, dt));
+	if(corv != 0) {
+		var un = o.q * magnetic.B.len() * dt / o.m;
+		var alpha = 1 / Math.sqrt(1 + un * un);
+		o.v = Vect3.mul(o.v, alpha);
+	}
 	o.r = Vect3.add(o.r, Vect3.mul(o.v, dt));
+	
 	
 	clearCanvas(caOut);
 	draw(o).onCanvas(caOut);
