@@ -9,20 +9,29 @@
 	0446 Start this app.
 */
 
+// Define global variables
+var taIn, taOut, caOut;
+var btClear, btLoad, btRead, btStart, btInfo;
+
+
 // Execute main function
 main();
 
 
 // Define main function
 function main() {
-	var r = new Vect3(1, -2, 3);
-	var s = new Vect3(-1, 2, 7);
-	console.log(
-		"Hello, r = " + r.strval()
-		+ " and s = " + s.strval()
-		+ "!"
-	);
+	createVisualElements();
+}
+
+
+// Create visual elements
+function createVisualElements() {
+	taIn = document.createElement("textarea");
+	taIn.style.overflowY = "scroll";
+	with taIn {
+		
+	}
 	
-	var t = Vect3.add(r, s);
-	console.log("Sum of you are t = r + s = " + t.strval());
+	
+	document.body.append(taIn);
 }
