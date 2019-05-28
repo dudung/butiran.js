@@ -19,10 +19,11 @@
 var params;
 var taIn, taOut, caOut;
 var btLoad, btRead, btStart, btInfo;
-var dq, ds;
+var ds, segments;
 var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
+var proc, Tproc, iter, Niter;
 
 // Execute main function
 main();
@@ -40,11 +41,26 @@ function initParams() {
 	var p = "";
 	p += "# Step\n";
 	p += "SSTP 0.0100\n";
-	p += "QSTP 0.0628\n";
+	p += "\n";
+	p += "# Iteration\n";
+	p += "TPRC 1\n";
+	p += "\n";
+	p += "# Coordinates\n";
+	p += "RMIN -10 -10 -10\n";
+	p += "RMAX +10 +10 +10\n";
 	p += "\n";
 	p += "# Segments\n";
-	p += "100 0.0000 0.0000\n";
-	p += "100 0.0000 0.7854\n";
+	p += "0.0000 0.0000 4.0000\n";
+	p += "0.0000 0.2500 1.5708\n"; // R = 2
+	p += "0.2500 0.2500 6.0000\n";
+	p += "0.2500 0.3750 1.1781\n"; // R = 3
+	p += "0.3750 0.3750 2.0000\n";
+	p += "0.3750 0.5000 2.3562\n"; // R = 6
+	p += "0.5000 0.5000 1.0000\n";
+	p += "0.5000 0.7500 3.1416\n"; // R = 2
+	p += "0.7500 0.7500 1.0000\n";
+	p += "0.7500 0.0000 1.5708\n"; // R = 1
+	p += "0.0000 0.0000 2.0000\n";
 	
 	params = p;
 	
@@ -62,7 +78,8 @@ function loadParams() {
 // Read parameters
 function readParams() {
 var ds = getValue("SSTP").from(taIn);
-var dq = getValue("QSTP").from(taIn);
+
+var Tproc = getValue("TPRC").from(taIn);
 
 var rmin = getValue("RMIN").from(taIn);
 var rmax = getValue("RMAX").from(taIn);
@@ -80,6 +97,49 @@ YMIN = caOut.height;
 YMAX = 0;
 ZMIN = -1;
 ZMAX = 1;
+
+segments = getBlockValue("# Segments").from(taIn);
+iter = 0;
+Niter = segments.length;
+
+}
+
+
+// Get block of value form a textarea
+function getBlockValue() {
+	var pattern = arguments[0];
+	var results = {
+		from: function() {
+			var ta = arguments[0];
+			var lines = ta.value.split("\n");
+			var Nl = lines.length;
+			
+			var lbeg = -1;
+			var lend = -1;
+			for(var l = 0; l < Nl; l++) {
+				if(lines[l].indexOf(pattern) == 0) {
+					lbeg = l + 1;
+				}
+				if(lines[l].length == 0 && l > lbeg) {
+					lend = l - 1;
+				}
+			}
+			
+			var block = [];
+			for(var l = lbeg; l <= lend; l++) {
+				var words = lines[l].split(" ");
+				var r = new Vect3(
+					parseFloat(words[0]),
+					parseFloat(words[1]),
+					parseFloat(words[2])
+				);
+				block.push(r);
+			}
+			
+			return block;
+		}
+	};
+	return results;
 }
 
 
@@ -232,39 +292,13 @@ function buttonClick() {
 
 // Perform simulation
 function simulate() {
-	if(iter >= Niter) {
-		iter = 0;
-	}
 	
-	if(t == tbeg) {
-		//       0.0740 -0.0009 -0.0162
-		addText("#t      x       y\n").to(taOut);
-	}
-	
-	if(iter == 0) {
-		var tt = t.toFixed(digit);
-		var xx = o.r.x.toFixed(digit);
-		var yy = o.r.y.toFixed(digit);
-		var text = tt + " " + xx + " " + yy;
-		addText(text + "\n").to(taOut);
-	}
-	
-	var FB = magnetic.force(o);
-	var F = FB;
-	var a = Vect3.div(F, o.m);
-	o.v = Vect3.add(o.v, Vect3.mul(a, dt));
-	if(corv != 0) {
-		var un = o.q * magnetic.B.len() * dt / o.m;
-		var alpha = 1 / Math.sqrt(1 + un * un);
-		o.v = Vect3.mul(o.v, alpha);
-	}
-	o.r = Vect3.add(o.r, Vect3.mul(o.v, dt));
-	
+	addText(iter + "\n").to(taOut);
 	
 	clearCanvas(caOut);
-	draw(o).onCanvas(caOut);
+	//draw(o).onCanvas(caOut);
 	
-	if(t >= tend) {
+	if(iter >= Niter - 1) {
 		btLoad.disabled = false;
 		btRead.disabled = false;
 		btStart.disabled = true;
@@ -275,7 +309,6 @@ function simulate() {
 	}
 	
 	iter++;
-	t += dt;
 }
 
 
