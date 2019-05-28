@@ -48,8 +48,8 @@ function initParams() {
 	p += "TBEG 0.0000\n";
 	p += "TEND 1.0000\n";
 	p += "TSTP 0.0010\n";
-	p += "TDAT 0.0100\n";
-	p += "TPRC 100\n";
+	p += "TDAT 0.1000\n";
+	p += "TPRC 1\n";
 	p += "\n";
 	p += "# Coordinates\n";
 	p += "RMIN -0.020 -0.020 -0.020\n";
