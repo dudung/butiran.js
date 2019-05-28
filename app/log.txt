@@ -6,3 +6,4 @@
 0304 Craete app/examples/0000_hello.
 0318 Try to update repository in Github.
 0448 Start cppcmf app.
+1220 Finish at campus and grains requires c1 and c2 color.

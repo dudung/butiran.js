@@ -8,6 +8,7 @@
 	20190528
 	0446 Start this app.
 	0754 Continue at campus.
+	1222 Finish at campus, proposed color c --> c1, c2.
 */
 
 // Define global variables
@@ -17,6 +18,7 @@ var btLoad, btRead, btStart, btInfo;
 var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
+var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var o, magnetic;
 
 // Execute main function
@@ -39,7 +41,7 @@ function initParams() {
 	p += "# Particle\n";
 	p += "MASS 0.1000\n";
 	p += "CHRG 3.1415\n";
-	p += "DIAM 0.010\n";
+	p += "DIAM 0.001\n";
 	p += "POST 0.0159 0.0000 0.0000\n";
 	p += "VELO 0.0000 1.0000 0.0000\n";
 	p += "\n";
@@ -102,9 +104,17 @@ o.q = q;
 o.D = D;
 o.r = r;
 o.v = v;
+o.c = "#f00";
 
 magnetic = new Magnetic();
 magnetic.setField(B);
+
+XMIN = 0;
+XMAX = caOut.width;
+YMIN = caOut.height;
+YMAX = 0;
+ZMIN = -1;
+ZMAX = 1;
 }
 
 
@@ -298,8 +308,27 @@ function clearCanvas(caOut) {
 
 // Draw grain on canvas
 function draw() {
+	var o = arguments[0];
 	var result = {
 		onCanvas: function() {
+			var ca = arguments[0];
+			var cx = ca.getContext("2d");
+			
+			var x = o.r.x;
+			var dx = x + o.D;
+			var y = o.r.y;
+			
+			var lintrans = Transformation.linearTransform;
+			var X = lintrans(x, [xmin, xmax], [XMIN, XMAX]);
+			var DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
+			var D = DX - X;
+			var Y = lintrans(y, [ymin, ymax], [YMIN, YMAX]);
+			console.log(X, Y, D);
+						
+			cx.beginPath();
+			cx.strokeStyle = o.c;
+			cx.arc(X, Y, D, 0, 2 * Math.PI);
+			cx.stroke();
 		}
 	};
 	return result;
