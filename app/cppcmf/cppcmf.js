@@ -17,6 +17,7 @@ var btLoad, btRead, btStart, btInfo;
 var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var B, m, q, D, r, v;
 var digit;
+var xmin, ymin, zmin, xmax, ymaz, zmax;
 
 
 // Execute main function
@@ -40,7 +41,7 @@ function initParams() {
 	p += "MASS 0.1000\n";
 	p += "CHRG 3.1415\n";
 	p += "DIAM 0.010\n";
-	p += "POST 1.0000 0.0000 0.0000\n";
+	p += "POST 0.0159 0.0000 0.0000\n";
 	p += "VELO 0.0000 1.0000 0.0000\n";
 	p += "\n";
 	p += "# Iteration\n";
@@ -49,6 +50,10 @@ function initParams() {
 	p += "TSTP 0.0010\n";
 	p += "TDAT 0.0100\n";
 	p += "TPRC 100\n";
+	p += "\n";
+	p += "# Coordinates\n";
+	p += "RMIN -0.020 -0.020 -0.020\n";
+	p += "RMAX +0.020 +0.020 +0.020\n";
 	params = p;
 	
 	digit = 4;
@@ -71,14 +76,24 @@ D = getValue("DIAM").from(taIn);
 r = getValue("POST").from(taIn);
 v = getValue("VELO").from(taIn);
 
-tbeg = parseFloat(getValue("TBEG").from(taIn));
-tend = parseFloat(getValue("TEND").from(taIn));
-dt = parseFloat(getValue("TSTP").from(taIn));
-Tdata = parseFloat(getValue("TDAT").from(taIn));
-Tproc = parseInt(getValue("TPRC").from(taIn));
+tbeg = getValue("TBEG").from(taIn);
+tend = getValue("TEND").from(taIn);
+dt = getValue("TSTP").from(taIn);
+Tdata = getValue("TDAT").from(taIn);
+Tproc = getValue("TPRC").from(taIn);
+
+var rmin = getValue("RMIN").from(taIn);
+var rmax = getValue("RMAX").from(taIn);
 
 iter = 0;
 Niter = Math.floor(Tdata / dt);
+
+xmin = rmin.x;
+ymin = rmin.y;
+zmin = rmin.z;
+xmax = rmax.x;
+ymax = rmax.y;
+zmax = rmax.z;
 
 t = tbeg;
 }
@@ -281,9 +296,13 @@ function getValue() {
 				var value;
 				if(words[0].indexOf(key) == 0) {
 					if(Nw == 2) {
-						value = words[1];
+						value = parseFloat(words[1]);
 					} else if(Nw == 4) {
-						value = new Vect3(words[1], words[2], words[3]);
+						value = new Vect3(
+							parseFloat(words[1]),
+							parseFloat(words[2]),
+							parseFloat(words[3])
+						);
 					}
 					return value;
 				}
