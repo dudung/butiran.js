@@ -293,6 +293,9 @@ function buttonClick() {
 // Perform simulation
 function simulate() {
 	
+	if(iter == 0) {
+		addText("#s" + "\n").to(taOut);
+	}
 	addText(iter + "\n").to(taOut);
 	
 	clearCanvas(caOut);
