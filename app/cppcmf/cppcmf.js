@@ -250,6 +250,11 @@ function simulate() {
 		iter = 0;
 	}
 	
+	if(t == tbeg) {
+		//       0.0740 -0.0009 -0.0162
+		addText("#t      x       y\n").to(taOut);
+	}
+	
 	if(iter == 0) {
 		var tt = t.toFixed(digit);
 		var xx = o.r.x.toFixed(digit);
@@ -264,6 +269,9 @@ function simulate() {
 	o.v = Vect3.add(o.v, Vect3.mul(a, dt));
 	o.r = Vect3.add(o.r, Vect3.mul(o.v, dt));
 	
+	clearCanvas(caOut);
+	draw(o).onCanvas(caOut);
+	
 	if(t >= tend) {
 		btLoad.disabled = false;
 		btRead.disabled = false;
@@ -276,6 +284,25 @@ function simulate() {
 	
 	iter++;
 	t += dt;
+}
+
+
+// Clear canvas
+function clearCanvas(caOut) {
+	var width = caOut.width;
+	var height = caOut.height;
+	var cx = caOut.getContext("2d");
+	cx.clearRect(0, 0, width, height);
+}
+
+
+// Draw grain on canvas
+function draw() {
+	var result = {
+		onCanvas: function() {
+		}
+	};
+	return result;
 }
 
 
@@ -295,7 +322,7 @@ function addText() {
 			ta.value += text;
 			ta.scrollTop = ta.scrollHeight;
 		}
-	}
+	};
 	return result;
 }
 
@@ -326,6 +353,6 @@ function getValue() {
 				}
 			}
 		}
-	}
+	};
 	return result;	
 }
