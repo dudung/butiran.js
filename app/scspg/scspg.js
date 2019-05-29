@@ -8,6 +8,7 @@
 	2037 Start this app.
 	20190529
 	0824 Continue at campus.
+	0833 Note: an 
 	
 	References
 	1. Sparisoma Viridi, Siti Nurul Khotimah, "SCSPG (Semi-
@@ -354,7 +355,7 @@ function draw() {
 				cx.arc(X, Y, D, 0, 2 * Math.PI);
 				cx.stroke();
 			} else if(o instanceof Vect3) {
-				console.log("ok");
+				var thetai = 
 			}
 			
 		}

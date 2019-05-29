@@ -2338,7 +2338,7 @@ module.exports = {
 	path.js
 	Path in the form of straight line or circular arc
 	
-	Sparisoma Viridi | dudung@gmail.com
+	Sparisoma Viridi | https://github.com/dudung/butiran.js
 	
 	20190529
 	0838 Create this library based on lib/math/polynomial
@@ -2377,7 +2377,7 @@ class Path {
 	}
 }
 
-// Export module -- 20180520.0647 ok
+// Export module -- 20190529.0848 ok
 module.exports = function() {
 	return Path;
 };
