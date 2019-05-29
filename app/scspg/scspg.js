@@ -10,6 +10,8 @@
 	0824 Continue at campus.
 	0926 Test Path class and it works.
 	0944 Get good result for this stage.
+	1046 Finish making an example of 26 segmented paths.
+	1101 Finalize this app and update Github.
 	
 	References
 	1. Sparisoma Viridi, Siti Nurul Khotimah, "SCSPG (Semi-
@@ -28,7 +30,7 @@ var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var proc, Tproc, iter, Niter;
-var x, y;
+var x, y, sx, sy;
 
 // Execute main function
 main();
@@ -51,20 +53,20 @@ function initParams() {
 	p += "TPRC 100\n";
 	p += "\n";
 	p += "# Coordinates\n";
-	p += "RORG 1 1 1\n";
+	p += "RORG 2 1 1\n";
 	p += "RMIN -1 -1 -1\n";
 	p += "RMAX 21 21 21\n";
 	p += "\n";
 	p += "# Segments\n";
-	p += "0.0000 0.0000 17.000 #f00\n";
+	p += "0.0000 0.0000 15.000 #f00\n";
 	p += "0.0000 0.2500 3.1416 #00f\n"; // R = 2
-	p += "0.2500 0.2500 6.0000 #f00\n";
+	p += "0.2500 0.2500 9.0000 #f00\n";
 	p += "0.2500 0.3750 3.1416 #00f\n"; // R = 4
 	p += "0.3750 0.3750 4.0000 #f00\n";
 	p += "0.3750 0.5000 4.7124 #00f\n"; // R = 6
-	p += "0.5000 0.5000 4.0000 #f00\n";
+	p += "0.5000 0.5000 2.0000 #f00\n";
 	p += "0.5000 0.7500 3.1416 #00f\n"; // R = 2
-	p += "0.7500 0.7500 4.0000 #f00\n";
+	p += "0.7500 0.7500 7.0000 #f00\n";
 	p += "0.7500 1.0000 1.5708 #00f\n"; // R = 1
 	p += "0.0000 0.0000 4.0000 #f00\n";
 	p += "0.0000 -0.250 3.1416 #00f\n"; // R = 2
@@ -73,9 +75,15 @@ function initParams() {
 	p += "-0.500 -0.500 8.0000 #f00\n";
 	p += "0.5000 0.0000 6.2832 #00f\n"; // R = 4
 	p += "0.0000 0.2500 1.5708 #f00\n"; // R = 1
-	p += "0.2500 0.2500 10.000 #00f\n";
-	p += "0.2500 0.7500 7.8540 #f00\n"; // R = 4
-	p += "0.7500 0.7500 15.000 #00f\n";
+	p += "0.2500 0.2500 9.5000 #00f\n";
+	p += "0.2500 0.7500 7.5398 #f00\n"; // R = 2.4
+	p += "0.7500 0.7500 3.0000 #00f\n";
+	p += "0.7500 1.0000 1.5708 #f00\n"; // R = 1
+	p += "0.0000 -0.500 3.1416 #00f\n"; // R = 1
+	p += "0.5000 0.7500 1.5708 #f00\n"; // R = 1
+	p += "0.7500 0.7500 3.0000 #00f\n";
+	p += "0.7500 0.7500 4.9000 #f00\n";
+	p += "0.7500 1.0000 1.5708 #00f\n"; // R = 1
 	
 	params = p;
 	
@@ -92,34 +100,37 @@ function loadParams() {
 
 // Read parameters
 function readParams() {
-ds = getValue("SSTP").from(taIn);
+	ds = getValue("SSTP").from(taIn);
 
-Tproc = getValue("TPRC").from(taIn);
+	Tproc = getValue("TPRC").from(taIn);
 
-var rmin = getValue("RMIN").from(taIn);
-var rmax = getValue("RMAX").from(taIn);
-var rorg = getValue("RORG").from(taIn);
+	var rmin = getValue("RMIN").from(taIn);
+	var rmax = getValue("RMAX").from(taIn);
+	var rorg = getValue("RORG").from(taIn);
 
-xmin = rmin.x;
-ymin = rmin.y;
-zmin = rmin.z;
-xmax = rmax.x;
-ymax = rmax.y;
-zmax = rmax.z;
+	xmin = rmin.x;
+	ymin = rmin.y;
+	zmin = rmin.z;
+	xmax = rmax.x;
+	ymax = rmax.y;
+	zmax = rmax.z;
 
-XMIN = 0;
-XMAX = caOut.width;
-YMIN = caOut.height;
-YMAX = 0;
-ZMIN = -1;
-ZMAX = 1;
+	XMIN = 0;
+	XMAX = caOut.width;
+	YMIN = caOut.height;
+	YMAX = 0;
+	ZMIN = -1;
+	ZMAX = 1;
 
-paths = getBlockValue("# Segments").from(taIn);
-iter = 0;
-Niter = paths.length;
+	paths = getBlockValue("# Segments").from(taIn);
+	iter = 0;
+	Niter = paths.length;
 
-x = rorg.x;
-y = rorg.y;
+	x = rorg.x;
+	y = rorg.y;
+
+	sx = [];
+	sy = [];
 }
 
 
@@ -316,7 +327,7 @@ function simulate() {
 	  clearCanvas(caOut);
 		addText("#s" + "\n").to(taOut);
 	}
-	addText(iter + "\n").to(taOut);
+	addText(iter + " ").to(taOut);
 	
 	draw(paths[iter]).onCanvas(caOut);
 	
@@ -327,6 +338,25 @@ function simulate() {
 		btInfo.disabled = false;
 		btStart.innerHTML = "Start";
 		clearInterval(proc);
+		addText("\n\n").to(taOut);
+		
+		var N = sx.length;
+		addText("#x      y\n").to(taOut);
+		for(var i = 0; i < 2; i++) {
+			var strxy = "";
+			strxy += sx[i].toFixed(digit) + " ";
+			strxy += sy[i].toFixed(digit) + "\n";
+			addText(strxy).to(taOut);
+		}
+		addText("..\n").to(taOut);
+		for(var i = N - 2; i < N; i++) {
+			var strxy = "";
+			strxy += sx[i].toFixed(digit) + " ";
+			strxy += sy[i].toFixed(digit) + "\n";
+			addText(strxy).to(taOut);
+		}
+		addText("Lines = " + N + "\n").to(taOut);
+		
 		addText("\n").to(taOut);
 	}
 	
@@ -382,10 +412,12 @@ function draw() {
 					var dx = ds * Math.cos(q);		
 					x += dx;
 					xx.push(x);
+					sx.push(x);
 					
 					var dy = ds * Math.sin(q);		
 					y += dy;
 					yy.push(y);
+					sy.push(y);
 					
 					q += dq;
 				}
