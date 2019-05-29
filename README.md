@@ -6,7 +6,7 @@ Library of butiran.js can be downloaded from
 * [dist/butiran.min.js](https://github.com/dudung/butiran.js/blob/master/dist/butiran.min.js) (17 KB)
 
 ## Application
-1. **scspg.js** | Semi-circle segmented path generator | 201906xx<br>
+1. **scspg.js** | Spherical particle floating on waving fluid surface | 201906xx<br>
    `refs` https://doi.org/10.21009/SPEKTRA.033.01<br>
    `code` https://github.com/dudung/butiran.js/blob/master/app/spfwfs/spfwfs.js<br>
    `demo` https://raw.githack.com/dudung/butiran.js/master/app/spfwfs/spfwfs.html
