@@ -1,5 +1,5 @@
 /*
-	scsgp.js
+	scspg.js
 	Semi-circle segmented path generator
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
