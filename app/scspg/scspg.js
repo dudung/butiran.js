@@ -6,6 +6,8 @@
 	
 	20190528
 	2037 Start this app.
+	20190529
+	0824 Continue at campus.
 	
 	References
 	1. Sparisoma Viridi, Siti Nurul Khotimah, "SCSPG (Semi-
@@ -24,6 +26,7 @@ var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var proc, Tproc, iter, Niter;
+var x, y;
 
 // Execute main function
 main();
@@ -43,7 +46,7 @@ function initParams() {
 	p += "SSTP 0.0100\n";
 	p += "\n";
 	p += "# Iteration\n";
-	p += "TPRC 1\n";
+	p += "TPRC 100\n";
 	p += "\n";
 	p += "# Coordinates\n";
 	p += "RMIN -10 -10 -10\n";
@@ -79,7 +82,7 @@ function loadParams() {
 function readParams() {
 var ds = getValue("SSTP").from(taIn);
 
-var Tproc = getValue("TPRC").from(taIn);
+Tproc = getValue("TPRC").from(taIn);
 
 var rmin = getValue("RMIN").from(taIn);
 var rmax = getValue("RMAX").from(taIn);
@@ -102,6 +105,8 @@ segments = getBlockValue("# Segments").from(taIn);
 iter = 0;
 Niter = segments.length;
 
+x = 0;
+y = 0;
 }
 
 
@@ -299,7 +304,7 @@ function simulate() {
 	addText(iter + "\n").to(taOut);
 	
 	clearCanvas(caOut);
-	//draw(o).onCanvas(caOut);
+	draw(segments[iter]).onCanvas(caOut);
 	
 	if(iter >= Niter - 1) {
 		btLoad.disabled = false;
@@ -332,20 +337,26 @@ function draw() {
 			var ca = arguments[0];
 			var cx = ca.getContext("2d");
 			
-			var x = o.r.x;
-			var dx = x + o.D;
-			var y = o.r.y;
 			
-			var lintrans = Transformation.linearTransform;
-			var X = lintrans(x, [xmin, xmax], [XMIN, XMAX]);
-			var DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
-			var D = DX - X;
-			var Y = lintrans(y, [ymin, ymax], [YMIN, YMAX]);
+			if(o instanceof Grain) {
+				var x = o.r.x;
+				var dx = x + o.D;
+				var y = o.r.y;
+				
+				var lintrans = Transformation.linearTransform;
+				var X = lintrans(x, [xmin, xmax], [XMIN, XMAX]);
+				var DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
+				var D = DX - X;
+				var Y = lintrans(y, [ymin, ymax], [YMIN, YMAX]);
+				
+				cx.beginPath();
+				cx.strokeStyle = o.c;
+				cx.arc(X, Y, D, 0, 2 * Math.PI);
+				cx.stroke();
+			} else if(o instanceof Vect3) {
+				console.log("ok");
+			}
 			
-			cx.beginPath();
-			cx.strokeStyle = o.c;
-			cx.arc(X, Y, D, 0, 2 * Math.PI);
-			cx.stroke();
 		}
 	};
 	return result;

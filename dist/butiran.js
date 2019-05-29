@@ -36,17 +36,32 @@
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -129,6 +144,10 @@
 	0223 Remove lib/ui.
 	0230 Resort storing libraries in window.
 	0232 Rename butiran.js to main.js as main library of butiran.
+	0238 Test compiling after cleaning and ok.
+	
+	20190528
+	0844 Add lib/math/path for scspg app.
 */
 
 // lib
@@ -163,6 +182,7 @@ var Pile = __webpack_require__(18)();
 var Integration = __webpack_require__(19);
 var Polynomial = __webpack_require__(20)();
 var Transformation = __webpack_require__(21);
+var Path = __webpack_require__(22)();
 
 // Store information 
 if(typeof window !== 'undefined') {
@@ -197,6 +217,7 @@ if(typeof window !== 'undefined') {
 	window["Pile"] = Pile;
 	
 	// lib/math
+	window["Path"] = Path;
 	window["Polynomial"] = Polynomial;
 	window["Integration"] = Integration;
 	window["Transformation"] = Transformation;
@@ -2306,6 +2327,59 @@ module.exports = {
 	linearTransform: function(x, src, dest) {
 		return linearTransform(x, src, dest);
 	},
+};
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports) {
+
+/*
+	path.js
+	Path in the form of straight line or circular arc
+	
+	Sparisoma Viridi | dudung@gmail.com
+	
+	20190529
+	0838 Create this library based on lib/math/polynomial
+*/
+
+// Define class of Path
+class Path {
+	
+	// Define constructor
+	constructor() {
+		this.qi = arguments[0];
+		this.qf = arguments[1];
+		this.l = arguments[0];
+	}
+	
+	// Set initial angle
+	setQi() {
+		this.qi = arguments[0];
+		this.calcOrder();
+	}
+	
+	// Set final angle
+	setQf() {
+		this.qf = arguments[0];
+	}
+	
+	// Set angles
+	setQ() {
+		this.qi = arguments[0];
+		this.qf = arguments[1];
+	}
+	
+	// Set length
+	setL() {
+		this.l = arguments[0];
+	}
+}
+
+// Export module -- 20180520.0647 ok
+module.exports = function() {
+	return Path;
 };
 
 

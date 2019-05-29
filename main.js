@@ -55,6 +55,9 @@
 	0230 Resort storing libraries in window.
 	0232 Rename butiran.js to main.js as main library of butiran.
 	0238 Test compiling after cleaning and ok.
+	
+	20190528
+	0844 Add lib/math/path for scspg app.
 */
 
 // lib
@@ -89,6 +92,7 @@ var Pile = require('./lib/grid/pile')();
 var Integration = require('./lib/math/integration');
 var Polynomial = require('./lib/math/polynomial')();
 var Transformation = require('./lib/math/transformation');
+var Path = require('./lib/math/path')();
 
 // Store information 
 if(typeof window !== 'undefined') {
@@ -123,6 +127,7 @@ if(typeof window !== 'undefined') {
 	window["Pile"] = Pile;
 	
 	// lib/math
+	window["Path"] = Path;
 	window["Polynomial"] = Polynomial;
 	window["Integration"] = Integration;
 	window["Transformation"] = Transformation;
