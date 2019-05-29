@@ -8,7 +8,8 @@
 	2037 Start this app.
 	20190529
 	0824 Continue at campus.
-	0833 Note: an 
+	0926 Test Path class and it works.
+	0944 Get good result for this stage.
 	
 	References
 	1. Sparisoma Viridi, Siti Nurul Khotimah, "SCSPG (Semi-
@@ -22,7 +23,7 @@
 var params;
 var taIn, taOut, caOut;
 var btLoad, btRead, btStart, btInfo;
-var ds, segments;
+var ds, paths;
 var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
@@ -50,21 +51,21 @@ function initParams() {
 	p += "TPRC 100\n";
 	p += "\n";
 	p += "# Coordinates\n";
-	p += "RMIN -10 -10 -10\n";
-	p += "RMAX +10 +10 +10\n";
+	p += "RMIN -1 -1 -1\n";
+	p += "RMAX 21 21 21\n";
 	p += "\n";
 	p += "# Segments\n";
-	p += "0.0000 0.0000 4.0000\n";
-	p += "0.0000 0.2500 1.5708\n"; // R = 2
-	p += "0.2500 0.2500 6.0000\n";
-	p += "0.2500 0.3750 1.1781\n"; // R = 3
-	p += "0.3750 0.3750 2.0000\n";
-	p += "0.3750 0.5000 2.3562\n"; // R = 6
-	p += "0.5000 0.5000 1.0000\n";
-	p += "0.5000 0.7500 3.1416\n"; // R = 2
-	p += "0.7500 0.7500 1.0000\n";
-	p += "0.7500 0.0000 1.5708\n"; // R = 1
-	p += "0.0000 0.0000 2.0000\n";
+	p += "0.0000 0.0000 18.000 #faa\n";
+	p += "0.0000 0.2500 3.1416 #f99\n"; // R = 2
+	p += "0.2500 0.2500 6.0000 #f88\n";
+	p += "0.2500 0.3750 1.1781 #f77\n"; // R = 3
+	p += "0.3750 0.3750 2.0000 #f66\n";
+	p += "0.3750 0.5000 2.3562 #f55\n"; // R = 6
+	p += "0.5000 0.5000 1.0000 #f44\n";
+	p += "0.5000 0.7500 3.1416 #f33\n"; // R = 2
+	p += "0.7500 0.7500 1.0000 #f22\n";
+	p += "0.7500 0.0000 1.5708 #f11\n"; // R = 1
+	p += "0.0000 0.0000 2.0000 #f00\n";
 	
 	params = p;
 	
@@ -81,7 +82,7 @@ function loadParams() {
 
 // Read parameters
 function readParams() {
-var ds = getValue("SSTP").from(taIn);
+ds = getValue("SSTP").from(taIn);
 
 Tproc = getValue("TPRC").from(taIn);
 
@@ -102,9 +103,9 @@ YMAX = 0;
 ZMIN = -1;
 ZMAX = 1;
 
-segments = getBlockValue("# Segments").from(taIn);
+paths = getBlockValue("# Segments").from(taIn);
 iter = 0;
-Niter = segments.length;
+Niter = paths.length;
 
 x = 0;
 y = 0;
@@ -134,12 +135,13 @@ function getBlockValue() {
 			var block = [];
 			for(var l = lbeg; l <= lend; l++) {
 				var words = lines[l].split(" ");
-				var r = new Vect3(
+				var p = new Path(
 					parseFloat(words[0]),
 					parseFloat(words[1]),
-					parseFloat(words[2])
+					parseFloat(words[2]),
+					words[3]
 				);
-				block.push(r);
+				block.push(p);
 			}
 			
 			return block;
@@ -300,12 +302,12 @@ function buttonClick() {
 function simulate() {
 	
 	if(iter == 0) {
+	  clearCanvas(caOut);
 		addText("#s" + "\n").to(taOut);
 	}
 	addText(iter + "\n").to(taOut);
 	
-	clearCanvas(caOut);
-	draw(segments[iter]).onCanvas(caOut);
+	draw(paths[iter]).onCanvas(caOut);
 	
 	if(iter >= Niter - 1) {
 		btLoad.disabled = false;
@@ -337,27 +339,69 @@ function draw() {
 		onCanvas: function() {
 			var ca = arguments[0];
 			var cx = ca.getContext("2d");
-			
+			var lintrans = Transformation.linearTransform;
 			
 			if(o instanceof Grain) {
-				var x = o.r.x;
-				var dx = x + o.D;
-				var y = o.r.y;
+				var xg = o.r.x;
+				var dx = xg + o.D;
+				var yg = o.r.y;
 				
-				var lintrans = Transformation.linearTransform;
-				var X = lintrans(x, [xmin, xmax], [XMIN, XMAX]);
+				var X = lintrans(xg, [xmin, xmax], [XMIN, XMAX]);
 				var DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
 				var D = DX - X;
-				var Y = lintrans(y, [ymin, ymax], [YMIN, YMAX]);
+				var Y = lintrans(yg, [ymin, ymax], [YMIN, YMAX]);
 				
 				cx.beginPath();
 				cx.strokeStyle = o.c;
 				cx.arc(X, Y, D, 0, 2 * Math.PI);
 				cx.stroke();
-			} else if(o instanceof Vect3) {
-				var thetai = 
+			} else if(o instanceof Path) {
+				var qi = o.qi * 2 * Math.PI;
+				var qf = o.qf * 2 * Math.PI;
+				var L = o.l;
+				var color = o.c;
+				
+				var N = Math.floor(L / ds);
+				var q = qi;
+				var dq = (qf - qi) / N;
+				
+				var xx = [];
+				var yy = [];
+				for(i = 0; i < N; i++) {
+					var dx = ds * Math.cos(q);		
+					x += dx;
+					xx.push(x);
+					
+					var dy = ds * Math.sin(q);		
+					y += dy;
+					yy.push(y);
+					
+					q += dq;
+				}
+				
+				cx.beginPath();
+				cx.strokeStyle = color;
+				for(i = 0; i < N; i++) {
+					var X = lintrans(xx[i], [xmin, xmax], [XMIN, XMAX]);
+					var Y = lintrans(yy[i], [ymin, ymax], [YMIN, YMAX]);
+					if(i == 0) {
+						cx.moveTo(X, Y);
+					} else {
+						cx.lineTo(X, Y);
+					}
+				}
+				cx.stroke();
+				
+				cx.beginPath();
+				var X = lintrans(xx[0], [xmin, xmax], [XMIN, XMAX]);
+				var Y = lintrans(yy[0], [ymin, ymax], [YMIN, YMAX]);
+				cx.strokeStyle = "#000";
+				cx.arc(X, Y, 2, 0, 2 * Math.PI);
+				console.log(X, Y);
+				cx.stroke();
+				
+			} else {
 			}
-			
 		}
 	};
 	return result;
