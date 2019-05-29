@@ -304,7 +304,7 @@ function buttonClick() {
 	break;
 	case "Info":
 		var info = "";
-		info += "scsgp.js\n";
+		info += "scspg.js\n";
 		info += "Semi-circle segmented path generator\n";
 		info += "Sparisoma Viridi\n";
 		info += "https://github.com/dudung/butiran.js\n"
