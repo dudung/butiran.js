@@ -10,3 +10,7 @@ Library of butiran.js can be downloaded from
    `refs` https://doi.org/10.1063/1.4917140<br>
    `code` https://github.com/dudung/butiran.js/blob/master/app/cppcmf/cppcmf.js<br>
    `demo` https://raw.githack.com/dudung/butiran.js/master/app/cppcmf/cppcmf.html
+2. **scsgp.js** | Semi-circle segmented path generator | 20190529<br>
+   `refs` https://arxiv.org/abs/1203.0796v1<br>
+   `code` https://github.com/dudung/butiran.js/blob/master/app/cppcmf/scsgp.js<br>
+   `demo` https://raw.githack.com/dudung/butiran.js/master/app/cppcmf/scsgp.html
