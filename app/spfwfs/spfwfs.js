@@ -23,13 +23,21 @@
 	20181120
 	Change to JS.
 	20190529
-	1129 Change name from md_spfwfss to spfwfs and start to move to app (new butiran.js).
+	1129 Change name from md_spfwfss to spfwfs and start to
+	move to app (new butiran.js).
 	20190530
-	1025 Migrate to (new) butiran.js library and add a reference.
+	1025 Migrate to (new) butiran.js library and add a
+	reference.
 	1310 Finish drawing wave.
+	1724 Draw initial position as circle with background only.
 	
 	References
-	1. Sparisoma Viridi, Nurhayati, Johri Sabaryati, Dewi Muliyati, "Two-Dimensional Dynamics of Spherical Grain Floating on the Propagating Wave Fluid Surface", SPEKTRA: Jurnal Fisika dan Aplikasinya [], vol. 3, no. 3, pp. , December 2018, url https://doi.org/10.21009/SPEKTRA.033.01
+	1. Sparisoma Viridi, Nurhayati, Johri Sabaryati,
+		 Dewi Muliyati, "Two-Dimensional Dynamics of Spherical
+		 Grain Floating on the Propagating Wave Fluid Surface",
+		 SPEKTRA: Jurnal Fisika dan Aplikasinya [], vol. 3,
+		 no. 3, pp. , December 2018, url
+		 https://doi.org/10.21009/SPEKTRA.033.01
 */
 
 // Define global variables
@@ -42,6 +50,7 @@ var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var wA, wT, wL, wX, wY;
+var o, o0;
 
 // Execute main function
 main();
@@ -135,7 +144,12 @@ o.q = 0;
 o.D = D;
 o.r = r;
 o.v = v;
-o.c = "#f00";
+o.c = ["#f00"];
+
+o0 = new Grain();
+o0.D = D;
+o0.r = new Vect3(r);
+o0.c = ["#fff", "#fcc"];
 
 XMIN = 0;
 XMAX = caOut.width;
@@ -366,9 +380,10 @@ function simulate() {
 	p = createWave(t);
 	o.r.y = waveFunction(o.r.x, t);
 		
-	clearCanvas(caOut);
-	draw(p).onCanvas(caOut);
+	clearCanvas(caOut);	
+	draw(o0).onCanvas(caOut);
 	draw(o).onCanvas(caOut);
+	draw(p).onCanvas(caOut);
 	
 	if(t >= tend) {
 		btLoad.disabled = false;
@@ -414,8 +429,20 @@ function draw() {
 				var Y = lintrans(yg, [ymin, ymax], [YMIN, YMAX]);
 				
 				cx.beginPath();
-				cx.strokeStyle = o.c;
-				cx.lineWidth = "1";
+				if(o.c instanceof Array) {
+					cx.strokeStyle = o.c[0];
+					if(o.c.length > 1) {
+						cx.fillStyle = o.c[1];
+					}
+				} else {
+					cx.strokeStyle = o.c;
+				}
+				
+				if(o.c instanceof Array && o.c.length > 1) {
+					cx.arc(X, Y, D, 0, 2 * Math.PI);
+					cx.fill();
+				}
+				cx.lineWidth = "2";
 				cx.arc(X, Y, D, 0, 2 * Math.PI);
 				cx.stroke();
 			} else if(o instanceof Path) {
