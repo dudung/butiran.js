@@ -36,10 +36,11 @@ var params;
 var taIn, taOut, caOut;
 var btLoad, btRead, btStart, btInfo;
 var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
+var dx;
 var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
-var wA, wT, wphi, wlmd;
+var wA, wT, wL, wX, wY;
 
 // Execute main function
 main();
@@ -57,9 +58,9 @@ function initParams() {
 	var p = "";
 	p += "# Environment\n";
 	p += "WAMP 0.1000\n";
-	p += "WPER 1.0000\n";
-	p += "WPHI 0.0000\n";
-	p += "WLMD 0.0000\n";
+	p += "WTIM 1.0000\n";
+	p += "WLEN 0.1000\n";
+	p += "LSTP 0.0100\n";
 	p += "\n";
 	p += "# Particle\n";
 	p += "MASS 0.1000\n";
@@ -69,8 +70,8 @@ function initParams() {
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0000\n";
-	p += "TEND 1.0000\n";
-	p += "TSTP 0.0010\n";
+	p += "TEND 4.0000\n";
+	p += "TSTP 0.0100\n";
 	p += "TDAT 0.1000\n";
 	p += "TPRC 1\n";
 	p += "\n";
@@ -104,6 +105,13 @@ tend = getValue("TEND").from(taIn);
 dt = getValue("TSTP").from(taIn);
 Tdata = getValue("TDAT").from(taIn);
 Tproc = getValue("TPRC").from(taIn);
+
+wA = getValue("WAMP").from(taIn);
+wT = getValue("WTIM").from(taIn);
+wL = getValue("WLEN").from(taIn);
+dx = getValue("LSTP").from(taIn);
+wX = [];
+wY = [];
 
 var rmin = getValue("RMIN").from(taIn);
 var rmax = getValue("RMAX").from(taIn);
@@ -285,6 +293,30 @@ function buttonClick() {
 }
 
 
+// Create wave
+function createWave() {
+	var t = arguments[0];
+	
+	var A = wA;
+	var T = wT;
+	var lambda = wL;
+	var omega = 2 * Math.PI / T;
+	var k = 2 * Math.PI / lambda;
+	
+	var x = [];
+	var y = [];
+	
+	var N = (xmax - xmin) / dx;
+	for(var i = 0; i < N; i++) {
+		var xx = xmin + i * dx;
+		var yy = A * sin(k * x - omega * t);
+		
+		x.push(xx);
+		y.push(yy);
+	}
+}
+
+
 // Perform simulation
 function simulate() {
 	if(iter >= Niter) {
@@ -314,6 +346,8 @@ function simulate() {
 	}
 	o.r = Vect3.add(o.r, Vect3.mul(o.v, dt));
 	*/
+	
+	var wave = createWave(t);
 	
 	clearCanvas(caOut);
 	draw(o).onCanvas(caOut);
