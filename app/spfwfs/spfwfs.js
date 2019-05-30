@@ -1,5 +1,5 @@
 /*
-	md_spfwfss.js
+	spfwfss.js
 	Spherical particle floating on waving fluid surface
 	
 	Sparisoma Viridi | dudung@gmail.com
@@ -24,6 +24,8 @@
 	Change to JS.
 	20190529
 	1129 Change name from md_spfwfss to spfwfs and start to move to app (new butiran.js).
+	20190530
+	1025 Migrate to (new) butiran.js library and add a reference.
 	
 	References
 	1. Sparisoma Viridi, Nurhayati, Johri Sabaryati, Dewi Muliyati, "Two-Dimensional Dynamics of Spherical Grain Floating on the Propagating Wave Fluid Surface", SPEKTRA: Jurnal Fisika dan Aplikasinya [], vol. 3, no. 3, pp. , December 2018, url https://doi.org/10.21009/SPEKTRA.033.01
@@ -37,7 +39,7 @@ var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
-var o, magnetic, corv;
+var wA, wT, wphi, wlmd;
 
 // Execute main function
 main();
@@ -54,28 +56,28 @@ function main() {
 function initParams() {
 	var p = "";
 	p += "# Environment\n";
-	p += "BFLD 0.0000 0.0000 -2.0000\n";
+	p += "WAMP 0.1000\n";
+	p += "WPER 1.0000\n";
+	p += "WPHI 0.0000\n";
+	p += "WLMD 0.0000\n";
 	p += "\n";
 	p += "# Particle\n";
 	p += "MASS 0.1000\n";
-	p += "CHRG 3.1415\n";
-	p += "DIAM 0.001\n";
-	p += "POST 0.0159 0.0000 0.0000\n";
+	p += "DIAM 0.1000\n";
+	p += "POST 0.0000 0.0000 0.0000\n";
 	p += "VELO 0.0000 1.0000 0.0000\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0000\n";
-	p += "TEND 0.1000\n";
-	p += "TSTP 0.0001\n";
-	p += "TDAT 0.0020\n";
+	p += "TEND 1.0000\n";
+	p += "TSTP 0.0010\n";
+	p += "TDAT 0.1000\n";
 	p += "TPRC 1\n";
 	p += "\n";
 	p += "# Coordinates\n";
-	p += "RMIN -0.020 -0.020 -0.020\n";
-	p += "RMAX +0.020 +0.020 +0.020\n";
+	p += "RMIN -1.000 -1.000 -1.000\n";
+	p += "RMAX +1.000 +1.000 +1.000\n";
 	p += "\n";
-	p += "# Method\n";
-	p += "CORV 0\n";
 	
 	params = p;
 	
@@ -92,9 +94,7 @@ function loadParams() {
 
 // Read parameters
 function readParams() {
-var B = getValue("BFLD").from(taIn);
 var m = getValue("MASS").from(taIn);
-var q = getValue("CHRG").from(taIn);
 var D = getValue("DIAM").from(taIn);
 var r = getValue("POST").from(taIn);
 var v = getValue("VELO").from(taIn);
@@ -107,8 +107,6 @@ Tproc = getValue("TPRC").from(taIn);
 
 var rmin = getValue("RMIN").from(taIn);
 var rmax = getValue("RMAX").from(taIn);
-
-corv = getValue("CORV").from(taIn);
 
 iter = 0;
 Niter = Math.floor(Tdata / dt);
@@ -124,14 +122,11 @@ t = tbeg;
 
 o = new Grain();
 o.m = m;
-o.q = q;
+o.q = 0;
 o.D = D;
 o.r = r;
 o.v = v;
 o.c = "#f00";
-
-magnetic = new Magnetic();
-magnetic.setField(B);
 
 XMIN = 0;
 XMAX = caOut.width;
@@ -273,11 +268,11 @@ function buttonClick() {
 	break;
 	case "Info":
 		var info = "";
-		info += "cppcmf.js\n";
-		info += "Charged particle in perpendicular ";
-		info += "constant magnetic field\n";
-		info += "Sparisoma Viridi\n";
-		info += "https://github.com/dudung/butiran.js\n"
+		info += "spfwfss.js\n";
+		info += "Spherical particle floating on waving fluid ";
+		info += "surface\n";
+		info += "Sparisoma Viridi, Nuryahati, Johri Sabaryati, Dewi Muliyai\n";
+		info += "https://github.com/dudung/butiran.js\n";
 		info += "Load  load parameters\n";
 		info += "Read  read parameters\n";
 		info += "Start start simulation\n";
@@ -303,12 +298,11 @@ function simulate() {
 	
 	if(iter == 0) {
 		var tt = t.toFixed(digit);
-		var xx = o.r.x.toFixed(digit);
-		var yy = o.r.y.toFixed(digit);
-		var text = tt + " " + xx + " " + yy;
-		addText(text + "\n").to(taOut);
+		var info = tt + "\n";
+		addText(info).to(taOut);
 	}
 	
+	/*
 	var FB = magnetic.force(o);
 	var F = FB;
 	var a = Vect3.div(F, o.m);
@@ -319,7 +313,7 @@ function simulate() {
 		o.v = Vect3.mul(o.v, alpha);
 	}
 	o.r = Vect3.add(o.r, Vect3.mul(o.v, dt));
-	
+	*/
 	
 	clearCanvas(caOut);
 	draw(o).onCanvas(caOut);
