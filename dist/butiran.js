@@ -2407,7 +2407,7 @@ class Points {
 	}
 	
 	addSeries() {
-		this.data.push[[0]];
+		this.data.push(arguments[0]);
 	}
 }
 

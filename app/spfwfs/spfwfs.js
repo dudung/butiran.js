@@ -26,6 +26,7 @@
 	1129 Change name from md_spfwfss to spfwfs and start to move to app (new butiran.js).
 	20190530
 	1025 Migrate to (new) butiran.js library and add a reference.
+	1310 Finish drawing wave.
 	
 	References
 	1. Sparisoma Viridi, Nurhayati, Johri Sabaryati, Dewi Muliyati, "Two-Dimensional Dynamics of Spherical Grain Floating on the Propagating Wave Fluid Surface", SPEKTRA: Jurnal Fisika dan Aplikasinya [], vol. 3, no. 3, pp. , December 2018, url https://doi.org/10.21009/SPEKTRA.033.01
@@ -57,9 +58,9 @@ function main() {
 function initParams() {
 	var p = "";
 	p += "# Environment\n";
-	p += "WAMP 0.1000\n";
+	p += "WAMP 0.0500\n";
 	p += "WTIM 1.0000\n";
-	p += "WLEN 0.1000\n";
+	p += "WLEN 1.0000\n";
 	p += "LSTP 0.0100\n";
 	p += "\n";
 	p += "# Particle\n";
@@ -70,10 +71,10 @@ function initParams() {
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0000\n";
-	p += "TEND 4.0000\n";
+	p += "TEND 100.00\n";
 	p += "TSTP 0.0100\n";
 	p += "TDAT 0.1000\n";
-	p += "TPRC 1\n";
+	p += "TPRC 5\n";
 	p += "\n";
 	p += "# Coordinates\n";
 	p += "RMIN -1.000 -1.000 -1.000\n";
@@ -293,9 +294,10 @@ function buttonClick() {
 }
 
 
-// Create wave
-function createWave() {
-	var t = arguments[0];
+// Define wave function
+function waveFunction() {
+	var x = arguments[0];
+	var t = arguments[1];
 	
 	var A = wA;
 	var T = wT;
@@ -303,17 +305,31 @@ function createWave() {
 	var omega = 2 * Math.PI / T;
 	var k = 2 * Math.PI / lambda;
 	
+	var y = A * Math.sin(k * x - omega * t);
+	return y;
+}
+
+
+// Create wave
+function createWave() {
+	var t = arguments[0];
+	
 	var x = [];
 	var y = [];
 	
 	var N = (xmax - xmin) / dx;
 	for(var i = 0; i < N; i++) {
 		var xx = xmin + i * dx;
-		var yy = A * sin(k * x - omega * t);
+		var yy = waveFunction(xx, t);
 		
 		x.push(xx);
 		y.push(yy);
 	}
+	
+	var p = new Points();
+	p.addSeries(x);
+	p.addSeries(y);
+	return p;
 }
 
 
@@ -347,9 +363,11 @@ function simulate() {
 	o.r = Vect3.add(o.r, Vect3.mul(o.v, dt));
 	*/
 	
-	var wave = createWave(t);
-	
+	p = createWave(t);
+	o.r.y = waveFunction(o.r.x, t);
+		
 	clearCanvas(caOut);
+	draw(p).onCanvas(caOut);
 	draw(o).onCanvas(caOut);
 	
 	if(t >= tend) {
@@ -376,28 +394,93 @@ function clearCanvas(caOut) {
 }
 
 
-// Draw grain on canvas
+// Draw Grain, Path, Points on canvas
 function draw() {
 	var o = arguments[0];
 	var result = {
 		onCanvas: function() {
 			var ca = arguments[0];
 			var cx = ca.getContext("2d");
-			
-			var x = o.r.x;
-			var dx = x + o.D;
-			var y = o.r.y;
-			
 			var lintrans = Transformation.linearTransform;
-			var X = lintrans(x, [xmin, xmax], [XMIN, XMAX]);
-			var DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
-			var D = DX - X;
-			var Y = lintrans(y, [ymin, ymax], [YMIN, YMAX]);
 			
-			cx.beginPath();
-			cx.strokeStyle = o.c;
-			cx.arc(X, Y, D, 0, 2 * Math.PI);
-			cx.stroke();
+			if(o instanceof Grain) {
+				var xg = o.r.x;
+				var dx = xg + o.D;
+				var yg = o.r.y;
+				
+				var X = lintrans(xg, [xmin, xmax], [XMIN, XMAX]);
+				var DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
+				var D = DX - X;
+				var Y = lintrans(yg, [ymin, ymax], [YMIN, YMAX]);
+				
+				cx.beginPath();
+				cx.strokeStyle = o.c;
+				cx.lineWidth = "1";
+				cx.arc(X, Y, D, 0, 2 * Math.PI);
+				cx.stroke();
+			} else if(o instanceof Path) {
+				var qi = o.qi * 2 * Math.PI;
+				var qf = o.qf * 2 * Math.PI;
+				var L = o.l;
+				var color = o.c;
+				
+				var N = Math.floor(L / ds);
+				var q = qi;
+				var dq = (qf - qi) / N;
+				
+				var xx = [];
+				var yy = [];
+				for(i = 0; i < N; i++) {
+					var dx = ds * Math.cos(q);		
+					x += dx;
+					xx.push(x);
+					sx.push(x);
+					
+					var dy = ds * Math.sin(q);		
+					y += dy;
+					yy.push(y);
+					sy.push(y);
+					
+					q += dq;
+				}
+				
+				cx.beginPath();
+				cx.strokeStyle = color;
+				cx.lineWidth = "1";
+				for(i = 0; i < N; i++) {
+					var X = lintrans(xx[i], [xmin, xmax], [XMIN, XMAX]);
+					var Y = lintrans(yy[i], [ymin, ymax], [YMIN, YMAX]);
+					if(i == 0) {
+						cx.moveTo(X, Y);
+					} else {
+						cx.lineTo(X, Y);
+					}
+				}
+				cx.stroke();
+				
+				cx.beginPath();
+				var X = lintrans(xx[0], [xmin, xmax], [XMIN, XMAX]);
+				var Y = lintrans(yy[0], [ymin, ymax], [YMIN, YMAX]);
+				cx.strokeStyle = "#000";
+				cx.arc(X, Y, 2, 0, 2 * Math.PI);
+				cx.stroke();
+				
+			} else if(o instanceof Points) {
+				var N = o.data[0].length;
+				cx.beginPath();
+				cx.lineWidth = "2";
+				cx.strokeStyle = "#00f";
+				for(var i = 0; i < N; i++) {
+					var X = lintrans(o.data[0][i], [xmin, xmax], [XMIN, XMAX]);
+					var Y = lintrans(o.data[1][i], [ymin, ymax], [YMIN, YMAX]);
+					if(i == 0) {
+						cx.moveTo(X, Y);
+					} else {
+						cx.lineTo(X, Y);
+					}
+				}
+				cx.stroke();
+			}
 		}
 	};
 	return result;
