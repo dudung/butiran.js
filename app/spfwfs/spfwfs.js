@@ -24,8 +24,13 @@
 	Change to JS.
 	20190529
 	1129 Change name from md_spfwfss to spfwfs and start to move to app (new butiran.js).
+	
+	References
+	1. Sparisoma Viridi, Nurhayati, Johri Sabaryati, Dewi Muliyati, "Two-Dimensional Dynamics of Spherical Grain Floating on the Propagating Wave Fluid Surface", SPEKTRA: Jurnal Fisika dan Aplikasinya [], vol. 3, no. 3, pp. , December 2018, url https://doi.org/10.21009/SPEKTRA.033.01
 */
 
+
+/*
 // Define some global variables
 var rhop, D, r, v;
 var rhof, Amp, freq, lamda, phi0, Tempf, etaf, dirf;
@@ -472,4 +477,4 @@ function drawResults() {
 	tabs2.graphic("xy").setLineColor("#f00");	
 	tabs2.graphic("xy").lines(rxp, ryp);
 }
-
+*/
