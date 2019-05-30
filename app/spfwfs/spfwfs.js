@@ -30,6 +30,7 @@
 	reference.
 	1310 Finish drawing wave.
 	1724 Draw initial position as circle with background only.
+	1829 Add physical parameters for forces;
 	
 	References
 	1. Sparisoma Viridi, Nurhayati, Johri Sabaryati,
@@ -49,7 +50,7 @@ var dx;
 var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
-var wA, wT, wL, wX, wY;
+var wA, wT, wL;
 var o, o0;
 
 // Execute main function
@@ -71,6 +72,7 @@ function initParams() {
 	p += "WTIM 1.0000\n";
 	p += "WLEN 1.0000\n";
 	p += "LSTP 0.0100\n";
+	p += "RHOF 1000.0\n";
 	p += "\n";
 	p += "# Particle\n";
 	p += "MASS 0.1000\n";
@@ -105,11 +107,6 @@ function loadParams() {
 
 // Read parameters
 function readParams() {
-var m = getValue("MASS").from(taIn);
-var D = getValue("DIAM").from(taIn);
-var r = getValue("POST").from(taIn);
-var v = getValue("VELO").from(taIn);
-
 tbeg = getValue("TBEG").from(taIn);
 tend = getValue("TEND").from(taIn);
 dt = getValue("TSTP").from(taIn);
@@ -120,23 +117,17 @@ wA = getValue("WAMP").from(taIn);
 wT = getValue("WTIM").from(taIn);
 wL = getValue("WLEN").from(taIn);
 dx = getValue("LSTP").from(taIn);
-wX = [];
-wY = [];
-
-var rmin = getValue("RMIN").from(taIn);
-var rmax = getValue("RMAX").from(taIn);
+var rhof = getValue("RHOF").from(taIn);
 
 iter = 0;
 Niter = Math.floor(Tdata / dt);
 
-xmin = rmin.x;
-ymin = rmin.y;
-zmin = rmin.z;
-xmax = rmax.x;
-ymax = rmax.y;
-zmax = rmax.z;
-
 t = tbeg;
+
+var m = getValue("MASS").from(taIn);
+var D = getValue("DIAM").from(taIn);
+var r = getValue("POST").from(taIn);
+var v = getValue("VELO").from(taIn);
 
 o = new Grain();
 o.m = m;
@@ -150,6 +141,16 @@ o0 = new Grain();
 o0.D = D;
 o0.r = new Vect3(r);
 o0.c = ["#fff", "#fcc"];
+
+var rmin = getValue("RMIN").from(taIn);
+var rmax = getValue("RMAX").from(taIn);
+
+xmin = rmin.x;
+ymin = rmin.y;
+zmin = rmin.z;
+xmax = rmax.x;
+ymax = rmax.y;
+zmax = rmax.z;
 
 XMIN = 0;
 XMAX = caOut.width;
