@@ -58,6 +58,9 @@
 	
 	20190528
 	0844 Add lib/math/path for scspg app.
+	
+	20190530
+	1222 Add lib/data/points for spfwfs app.
 */
 
 // lib
@@ -93,6 +96,9 @@ var Integration = require('./lib/math/integration');
 var Polynomial = require('./lib/math/polynomial')();
 var Transformation = require('./lib/math/transformation');
 var Path = require('./lib/math/path')();
+
+// lib/data
+var Points = require('./lib/data/points')();
 
 // Store information 
 if(typeof window !== 'undefined') {
@@ -131,4 +137,7 @@ if(typeof window !== 'undefined') {
 	window["Polynomial"] = Polynomial;
 	window["Integration"] = Integration;
 	window["Transformation"] = Transformation;
+	
+	// data/points
+	window["Points"] = Points;
 }
