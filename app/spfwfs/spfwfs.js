@@ -31,6 +31,8 @@
 	1310 Finish drawing wave.
 	1724 Draw initial position as circle with background only.
 	1829 Add physical parameters for forces;
+	20190531
+	0631 Update Github, still problem on surfing.
 	
 	References
 	1. Sparisoma Viridi, Nurhayati, Johri Sabaryati,
@@ -393,8 +395,10 @@ function simulate() {
 		
 	// Calculate buoyant force
 	var V = (Math.PI / 6) * o.D * o.D * o.D;
+	var yA = waveFunction(o.r.x + 0.5 * o.D, t);
+	var yB = waveFunction(o.r.x - 0.5 * o.D, t);
 	var yf = waveFunction(o.r.x, t);
-	var Fb = buoyant.force(o, yf);
+	var Fb = buoyant.force(o, yA, yB, yf);
 	F = Vect3.add(F, Fb);
 	
 	// Calculate drag force
@@ -486,6 +490,17 @@ function draw() {
 				var xg = o.r.x;
 				var dx = xg + o.D;
 				var yg = o.r.y;
+				
+				var xwidth = xmax - xmin;
+				
+				while(xg > xmax) {
+					xmin += xwidth;
+					xmax += xwidth;
+				}
+				while(xg < xmin) {
+					xmin -= xwidth;
+					xmax -= xwidth;
+				}
 				
 				var X = lintrans(xg, [xmin, xmax], [XMIN, XMAX]);
 				var DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
