@@ -75,7 +75,7 @@ function initParams() {
 	p += "RHOF 1000.0\n";
 	p += "\n";
 	p += "# Particle\n";
-	p += "MASS 0.1000\n";
+	p += "RHOG 0.1000\n";
 	p += "DIAM 0.1000\n";
 	p += "POST 0.0000 0.0000 0.0000\n";
 	p += "VELO 0.0000 1.0000 0.0000\n";
@@ -121,13 +121,15 @@ var rhof = getValue("RHOF").from(taIn);
 
 iter = 0;
 Niter = Math.floor(Tdata / dt);
-
 t = tbeg;
 
-var m = getValue("MASS").from(taIn);
+var rhog = getValue("RHOG").from(taIn);
 var D = getValue("DIAM").from(taIn);
 var r = getValue("POST").from(taIn);
 var v = getValue("VELO").from(taIn);
+
+var V = (Math.PI / 6) * D * D * D;
+var m = rhog * V;
 
 o = new Grain();
 o.m = m;
