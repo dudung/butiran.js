@@ -52,6 +52,7 @@ var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var wA, wT, wL;
 var o, o0;
+var buoyant, gravitational, drag;
 
 // Execute main function
 main();
@@ -73,19 +74,22 @@ function initParams() {
 	p += "WLEN 1.0000\n";
 	p += "LSTP 0.0100\n";
 	p += "RHOF 1000.0\n";
+	p += "ETAF 8.9E-4\n";
+	p += "TEMF 298\n";
+	p += "GACC 0 -9.8067 0\n";
 	p += "\n";
 	p += "# Particle\n";
-	p += "RHOG 0.1000\n";
+	p += "RHOG 500.0\n";
 	p += "DIAM 0.1000\n";
 	p += "POST 0.0000 0.0000 0.0000\n";
-	p += "VELO 0.0000 1.0000 0.0000\n";
+	p += "VELO 0.0000 0.0000 0.0000\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0000\n";
 	p += "TEND 90.000\n";
-	p += "TSTP 0.0100\n";
+	p += "TSTP 0.0050\n";
 	p += "TDAT 0.1000\n";
-	p += "TPRC 5\n";
+	p += "TPRC 1\n";
 	p += "\n";
 	p += "# Coordinates\n";
 	p += "RMIN -1.000 -1.000 -1.000\n";
@@ -117,7 +121,6 @@ wA = getValue("WAMP").from(taIn);
 wT = getValue("WTIM").from(taIn);
 wL = getValue("WLEN").from(taIn);
 dx = getValue("LSTP").from(taIn);
-var rhof = getValue("RHOF").from(taIn);
 
 iter = 0;
 Niter = Math.floor(Tdata / dt);
@@ -143,6 +146,21 @@ o0 = new Grain();
 o0.D = D;
 o0.r = new Vect3(r);
 o0.c = ["#fff", "#fcc"];
+
+var rhof = getValue("RHOF").from(taIn);
+var etaf = getValue("ETAF").from(taIn);
+var Temf = getValue("TEMF").from(taIn);
+var g = getValue("GACC").from(taIn);
+
+buoyant = new Buoyant();
+buoyant.setFluidDensity(rhof);
+buoyant.setGravity(g);
+
+gravitational = new Gravitational();
+gravitational.setField(g);
+
+drag = new Drag();
+drag.setConstants(0, 3 * Math.PI * etaf * D, 0);
 
 var rmin = getValue("RMIN").from(taIn);
 var rmax = getValue("RMAX").from(taIn);
@@ -366,48 +384,33 @@ function simulate() {
 		var info = tt + "\n";
 		addText(info).to(taOut);
 	}
+		
+	var F = new Vect3();
 	
-	/*
-	var FB = magnetic.force(o);
-	var F = FB;
+	// Calculate gravitational force
+	var Fg = gravitational.force(o);
+	F = Vect3.add(F, Fg);
+		
+	// Calculate buoyant force
+	var V = (Math.PI / 6) * o.D * o.D * o.D;
+	var yf = waveFunction(o.r.x, t);
+	var Fb = buoyant.force(o, yf);
+	F = Vect3.add(F, Fb);
+	
+	// Calculate drag force
+	var vf = new Vect3(0, 0, 0);
+	drag.setField(vf);
+	var Fd = drag.force(o)
+	F = Vect3.add(F, Fd);
+	
+	// Apply Newton second law of motion
 	var a = Vect3.div(F, o.m);
+	
+	// Implement Euler algorithm
 	o.v = Vect3.add(o.v, Vect3.mul(a, dt));
-	if(corv != 0) {
-		var un = o.q * magnetic.B.len() * dt / o.m;
-		var alpha = 1 / Math.sqrt(1 + un * un);
-		o.v = Vect3.mul(o.v, alpha);
-	}
 	o.r = Vect3.add(o.r, Vect3.mul(o.v, dt));
-	*/
 	
-	p = createWave(t);
-	o.r.y = waveFunction(o.r.x, t);
-	
-	/*
-	// Define fluid surface function
-	function yFluid(x, t) {
-		var omega = 2 * Math.PI * freq;
-		var k = 2 * Math.PI / lambda * dirf;
-		var y = Amp * Math.sin(omega * t - k * x + phi0);
-		return y;
-	}
-	
-	// Define time derivation of fluid surface
-	function vyFluid(x, t) {
-		var omega = 2 * Math.PI * freq;
-		var k = 2 * Math.PI / lambda * dirf;
-		var y = omega * Amp * Math.cos(omega * t - k * x + phi0);
-		return y;
-	}
-	
-	// Format time t
-	t = +t.toFixed(10);
-	
-	// Calculate mass
-	var R = 0.5 * D;
-	var V = (4 * Math.PI / 3) * R * R * R;
-	var m = rhop * V;
-	
+	/*	
 	// Calculate gravitational force
 	var FG = Vect3.mul(m, GField);
 	
@@ -437,54 +440,10 @@ function simulate() {
 	}
 	var FB = Vect3.mul(fB, nGaccent);
 	
-	// Calculate drag force
-	var Db;
-	if(r.y < yff) {
-		Db = D;
-	} else if(yff <= r.y && r.y <= yff + 0.5 * D) {
-		var RR = 0.5 * D;
-		var R2 = RR * RR - (r.y - yff) * (r.y - yff);
-		Db = 2 * Math.sqrt(R2);
-	} else {
-		Db = 0;
-	}
-	var b = 3 * Math.PI * etaf * Db;
-	var omega = 2 * Math.PI * freq;
-	var k = 2 * Math.PI / lambda * dirf;
-	var vfx = omega / k * 0;
-	var vfy = vyFluid(r.x, t);
-	var vf = new Vect3(vfx, vfy, 0);
-	var FD = Vect3.mul(-b, Vect3.sub(v, vf));
-	
-	// Apply Newton second law of motion
-	var F = Vect3.add(FG, FB, FD);
-	var a = Vect3.div(F, m);
-	
-	// Integrate using Euler algorithm
-	v = Vect3.add(v, Vect3.mul(a, dt));
-	r = Vect3.add(r, Vect3.mul(v, dt));
-	
-	
-	// Set periodic boundary condition
-	var PERIODIC_BC = false;
-	if(PERIODIC_BC) {
-		if(r.x > coordMax.x) {
-			r.x = coordMin.x + (r.x - coordMax.x);
-		}
-		if(r.x < coordMin.x) {
-			r.x = coordMax.x + (r.x - coordMin.x);
-		}
-	}
-
-	v.x = +v.x.toFixed(10);
-	v.y = +v.y.toFixed(10);
-	v.z = +v.z.toFixed(10);
-	r.x = +r.x.toFixed(10);
-	r.y = +r.y.toFixed(10);
-	r.z = +r.z.toFixed(10);
 	*/
-
-
+	
+	p = createWave(t);
+	
 	clearCanvas(caOut);	
 	draw(o0).onCanvas(caOut);
 	draw(o).onCanvas(caOut);
@@ -669,3 +628,73 @@ function getValue() {
 	};
 	return result;	
 }
+
+/*
+	// Define fluid surface function
+	function yFluid(x, t) {
+		var omega = 2 * Math.PI * freq;
+		var k = 2 * Math.PI / lambda * dirf;
+		var y = Amp * Math.sin(omega * t - k * x + phi0);
+		return y;
+	}
+
+	// Define time derivation of fluid surface
+	function vyFluid(x, t) {
+		var omega = 2 * Math.PI * freq;
+		var k = 2 * Math.PI / lambda * dirf;
+		var y = omega * Amp * Math.cos(omega * t - k * x + phi0);
+		return y;
+	}
+
+	// Format time t
+	t = +t.toFixed(10);
+
+	// Calculate mass
+	var R = 0.5 * D;
+	var V = (4 * Math.PI / 3) * R * R * R;
+	var m = rhop * V;	
+	// Apply Newton second law of motion
+	var F = Vect3.add(FG, FB, FD);
+	var a = Vect3.div(F, m);
+	
+	// Integrate using Euler algorithm
+	v = Vect3.add(v, Vect3.mul(a, dt));
+	r = Vect3.add(r, Vect3.mul(v, dt));
+	
+	// Set periodic boundary condition
+	var PERIODIC_BC = false;
+	if(PERIODIC_BC) {
+		if(r.x > coordMax.x) {
+			r.x = coordMin.x + (r.x - coordMax.x);
+		}
+		if(r.x < coordMin.x) {
+			r.x = coordMax.x + (r.x - coordMin.x);
+		}
+	}
+
+	// Calculate drag force
+	var Db;
+	if(r.y < yff) {
+		Db = D;
+	} else if(yff <= r.y && r.y <= yff + 0.5 * D) {
+		var RR = 0.5 * D;
+		var R2 = RR * RR - (r.y - yff) * (r.y - yff);
+		Db = 2 * Math.sqrt(R2);
+	} else {
+		Db = 0;
+	}
+	var b = 3 * Math.PI * etaf * Db;
+	var omega = 2 * Math.PI * freq;
+	var k = 2 * Math.PI / lambda * dirf;
+	var vfx = omega / k * 0;
+	var vfy = vyFluid(r.x, t);
+	var vf = new Vect3(vfx, vfy, 0);
+	var FD = Vect3.mul(-b, Vect3.sub(v, vf));
+	
+	v.x = +v.x.toFixed(10);
+	v.y = +v.y.toFixed(10);
+	v.z = +v.z.toFixed(10);
+	r.x = +r.x.toFixed(10);
+	r.y = +r.y.toFixed(10);
+	r.z = +r.z.toFixed(10);
+*/

@@ -659,14 +659,41 @@ class Buoyant {
 	
 	// Calculate buoyant force due to immersed volume V
 	force() {
-		var V = arguments[0];
-		var dir = this.g.neg();
-		if(arguments.length > 1) {
-			dir = arguments[1];
+		var f = new Vect3;
+		if(arguments[0] instanceof Grain) {
+			if(arguments.length == 1) {
+				// Fully immersed in water
+				var D = arguments[0].D;
+				var V = (Math.PI / 6) * D * D * D;
+				var g = this.g.len();
+				var rhof = this.rho;
+				var n = this.g.unit().neg();
+				f = Vect3.mul(rhof * g * V, n);
+			} else if(arguments.length == 2) {
+				// Only in -gacc direction
+				var D = arguments[0].D;
+				var yf = arguments[1];
+				var y = arguments[0].r.y;
+				
+				var V = 0;
+				if(y < yf - 0.5 * D) {
+					V = (Math.PI / 6) * D * D * D;
+				} else if(yf - 0.5 * D <= y && y <= yf + 0.5 * D) {
+					var dy = yf - y;
+					var V1 = 0.25 * D * D * (dy + 0.5 * D);
+					var V2 = -(1/3) * (dy * dy * dy + D * D * D / 8);
+					V = Math.PI * (V1 + V2);
+				} else {
+					V = 0;
+				}
+				var g = this.g.len();
+				var rhof = this.rho;
+				var n = this.g.unit().neg();
+				f = Vect3.mul(rhof * g * V, n);				
+			} else if(arguments.length == 3) {
+				// Make an angle with -gacc direction
+			}
 		}
-		var rho = this.rho;
-		var g = this.g.len();
-		var f = Vect3.mul(dir, rho * g * V);
 		return f;
 	}
 }
@@ -710,7 +737,7 @@ class Drag {
 	}
 	
 	// Set constants
-	setConstant(c0, c1, c2) {
+	setConstants(c0, c1, c2) {
 		this.c0 = c0;
 		this.c1 = c1;
 		this.c2 = c2;
