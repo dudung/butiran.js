@@ -29,6 +29,7 @@
 	for its visited events and possibility of economic
 	benefits
 	1621 Add select for choosing scenario.
+	1724 Finish this stage.
 	
 	References
 	1. S Viridi, P Premadi, P Aditiawati, E S Maqdir,
