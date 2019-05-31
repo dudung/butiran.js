@@ -36,6 +36,8 @@
 	0834 Try to fix periodic b.c. problem in viewing.
 	1037 Still problem of continuity: work for particle but not
 	for wave.
+	1046 Fix b.c. between canvas.
+	1124 Show data t, x, and y in taOut.
 	
 	References
 	1. Sparisoma Viridi, Nurhayati, Johri Sabaryati,
@@ -74,9 +76,9 @@ function main() {
 function initParams() {
 	var p = "";
 	p += "# Environment\n";
-	p += "WAMP 0.0500\n";
-	p += "WTIM 1.0000\n";
-	p += "WLEN 1.0000\n";
+	p += "WAMP 0.0200\n";
+	p += "WTIM 1.75000\n";
+	p += "WLEN 1.25000\n";
 	p += "LSTP 0.0100\n";
 	p += "RHOF 1000.0\n";
 	p += "ETAF 8.9E-4\n";
@@ -97,8 +99,8 @@ function initParams() {
 	p += "TPRC 1\n";
 	p += "\n";
 	p += "# Coordinates\n";
-	p += "RMIN -1.000 -0.250 -1.000\n";
-	p += "RMAX +1.000 +0.250 +1.000\n";
+	p += "RMIN -2.000 -0.125 -1.000\n";
+	p += "RMAX +2.000 +0.125 +1.000\n";
 	p += "\n";
 	
 	params = p;
@@ -178,7 +180,7 @@ ymax = rmax.y;
 zmax = rmax.z;
 
 var xlength = xmax - xmin;
-caOut1.xmin = xmin - xlength;
+caOut1.xmin = xmin - 1.5 * xlength;
 caOut1.xmax = caOut1.xmin + xlength;
 caOut2.xmin = caOut1.xmax
 caOut2.xmax = caOut2.xmin + xlength;
@@ -398,9 +400,10 @@ function createWave() {
 	var x = [];
 	var y = [];
 	
-	var N = 4 * (xmax - xmin) / dx;
+	var xlength = xmax - xmin;
+	var N = 4 * xlength / dx;
 	for(var i = 0; i <= N; i++) {
-		var xx = 2 * xmin + i * dx;
+		var xx = xmin - 1.5 * xlength + i * dx;
 		var yy = waveFunction(xx, t);
 		
 		x.push(xx);
@@ -427,7 +430,9 @@ function simulate() {
 	
 	if(iter == 0) {
 		var tt = t.toFixed(digit);
-		var info = tt + "\n";
+		var xx = o.r.x.toFixed(digit);
+		var yy = o.r.y.toFixed(digit);
+		var info = tt + " " + xx + " " + yy + "\n";
 		addText(info).to(taOut);
 	}
 		
@@ -458,52 +463,28 @@ function simulate() {
 	o.v = Vect3.add(o.v, Vect3.mul(a, dt));
 	o.r = Vect3.add(o.r, Vect3.mul(o.v, dt));
 	
-	/*	
-	// Calculate gravitational force
-	var FG = Vect3.mul(m, GField);
-	
-	// Calculate buoyant force
-	var xA = r.x + 0.5 * D;
-	var yA = yFluid(xA, t);
-	var xB = r.x - 0.5 * D;
-	var yB = yFluid(xB, t);
-	var rA = new Vect3(xA, yA, 0);
-	var rB = new Vect3(xB, yB, 0);
-	var rAB = Vect3.sub(rA, rB);
-	var nAB = rAB.unit();
-	var nG = GField.unit();
-	var nGaccent = Vect3.cross(Vect3.cross(nG, nAB), nAB);
-	var fB;
-	var yff = yFluid(r.x, t);
-	if(r.y < yff - 0.5 * D) {
-		fB = (Math.PI / 6) * rhof * D * D * D * GField.len();
-		nGaccent = Vect3.mul(-1, nG);
-	} else if(yff - 0.5 * D <= r.y && r.y <= yff + 0.5 * D) {
-		var dy = yff - r.y;
-		var term1 = 0.25 * D * D * (dy + 0.5 * D);
-		var term2 = -(1/3) * (dy * dy * dy + D * D * D / 8);
-		fB = Math.PI * rhof * (term1 + term2) * GField.len();
-	} else {
-		fB = 0;
-	}
-	var FB = Vect3.mul(fB, nGaccent);
-	
-	*/
-	
+	// Create wave curve
 	p = createWave(t);
 	
+	// Clear all canvas
 	clearCanvas(caOut1);	
 	clearCanvas(caOut2);
 	clearCanvas(caOut3);
 	clearCanvas(caOut4);
 	
+	// Draw object initial position
+	draw(o0).onCanvas(caOut1);
 	draw(o0).onCanvas(caOut2);
+	draw(o0).onCanvas(caOut3);
+	draw(o0).onCanvas(caOut4);
 	
+	// Draw object in all canvas
 	draw(o).onCanvas(caOut1);
 	draw(o).onCanvas(caOut2);
 	draw(o).onCanvas(caOut3);
 	draw(o).onCanvas(caOut4);
-
+	
+	// Draw wave in all canvas
 	draw(p).onCanvas(caOut1);
 	draw(p).onCanvas(caOut2);
 	draw(p).onCanvas(caOut3);
@@ -547,21 +528,15 @@ function draw() {
 				var dx = xg + o.D;
 				var yg = o.r.y;
 				
-				/*
-				var xwidth = xmax - xmin;
-				
-				while(xg > xmax) {
-					xmin += xwidth;
-					xmax += xwidth;
+				var X, DX;
+				if(ca.xmin == undefined) {
+					X = lintrans(xg, [xmin, xmax], [XMIN, XMAX]);
+					DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
+				} else {
+					X = lintrans(xg, [ca.xmin, ca.xmax], [XMIN, XMAX]);
+					DX = lintrans(dx, [ca.xmin, ca.xmax], [XMIN, XMAX]);
 				}
-				while(xg < xmin) {
-					xmin -= xwidth;
-					xmax -= xwidth;
-				}
-				*/
 				
-				var X = lintrans(xg, [ca.xmin, ca.xmax], [XMIN, XMAX]);
-				var DX = lintrans(dx, [ca.xmin, ca.xmax], [XMIN, XMAX]);
 				var D = DX - X;
 				var Y = lintrans(yg, [ymin, ymax], [YMIN, YMAX]);
 				
@@ -635,8 +610,16 @@ function draw() {
 				cx.lineWidth = "2";
 				cx.strokeStyle = "#00f";
 				for(var i = 0; i <= N; i++) {
-					var X = lintrans(o.data[0][i], [xmin, xmax], [XMIN, XMAX]);
-					var Y = lintrans(o.data[1][i], [ymin, ymax], [YMIN, YMAX]);
+					var X;
+					if(ca.xmin == undefined) {
+						X = lintrans(o.data[0][i], [xmin, xmax],
+							[XMIN, XMAX]);
+					} else {
+						X = lintrans(o.data[0][i], [ca.xmin, ca.xmax],
+							[XMIN, XMAX]);
+					}
+					var Y = lintrans(o.data[1][i], [ymin, ymax],
+						[YMIN, YMAX]);
 					if(i == 0) {
 						cx.moveTo(X, Y);
 					} else {
