@@ -28,6 +28,7 @@
 	Simulation of rest area along highway between two cities
 	for its visited events and possibility of economic
 	benefits
+	1621 Add select for choosing scenario.
 	
 	References
 	1. S Viridi, P Premadi, P Aditiawati, E S Maqdir,
@@ -63,6 +64,7 @@ function main() {
 	createAndArrangeElements();
 	
 	// Initiate parameters
+	scenario = -1;
 	initParams();
 		
 	// Draw system
@@ -73,7 +75,7 @@ function main() {
 // Initiate parameters
 function initParams() {
 	// Scenario (-1), 0-4, 10-22
-	scenario = 22;
+	//scenario = 22;
 
 	Tproc = 10;
 	
@@ -94,7 +96,7 @@ function initParams() {
 	LRLday = 0;
 	RA1day = 0;
 	RA2day = 0;
-	document.title += " " + scenario;
+	//document.title += " " + scenario;
 
 	W = createWorldMatrix();
 	A = createAgentMatrix();
@@ -129,6 +131,7 @@ function initParams() {
 		[0, 1, []],
 	];
 	digit = 3;
+	tout("\n");	
 	tout("# it ii  LLR LRL RA1 RA2 L\n");	
 }
 
@@ -415,17 +418,39 @@ function createAndArrangeElements() {
 	var div = document.createElement("div");
 	div.style.width = "802px";
 	div.style.float = "left";
-	div.style.border = "1px solid red";
+	div.style.border = "1px solid #aaa";
 	
 	var div2 = document.createElement("div");
 	div2.style.width = "92px";
 	div2.style.height = "200px";
 	div2.style.float = "left";
-	div2.style.border = "1px solid red";
+	div2.style.border = "1px solid #aaa";
+	
+	var scenText = [
+		-1,
+		0, 1, 2, 3, 4,
+		10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22
+	];
+	var selIn = document.createElement("select");
+	for(var i = 0; i < scenText.length; i++) {
+		var opt = document.createElement("option");
+		opt.text = "Scenario " + scenText[i];
+		selIn.options.add(opt);
+	}
+	selIn.addEventListener("change", function() {
+		var sidx = selIn.selectedIndex;
+		var sval = selIn.value;
+		var scenNum = parseInt(sval.split(" ")[1]);
+		scenario = scenNum;
+		//console.log(scenario);
+		initParams();
+		drawSystem();
+	});
 	
 	document.body.append(div);
 		div.append(can);
 		div.append(div2);
+			div2.append(selIn);
 			div2.append(btnStart);
 		div.append(ta);
 		div.append(canG);
