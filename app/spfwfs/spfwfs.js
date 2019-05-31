@@ -13,9 +13,11 @@
 	20180714
 	Continue creating the application.
 	20180802
-	Fix water viscosity value from 1 Pa.s to 1 mPa.s and it does not work. Still use the previous value.
+	Fix water viscosity value from 1 Pa.s to 1 mPa.s and
+	it does not work. Still use the previous value.
 	Add direction of fluid surface wave with dirf.
-	Modify fluid velocity, whose components is from vibration and traveling wave.
+	Modify fluid velocity, whose components is from vibration
+	and traveling wave.
 	20180929
 	Change name according to new naming convention.
 	CDN https://rawgit.com/dudung/butiran/master/app
@@ -38,6 +40,8 @@
 	for wave.
 	1046 Fix b.c. between canvas.
 	1124 Show data t, x, and y in taOut.
+	1243 Cleaning code and test effect of drag.
+	1311 Impememnt dy/dt for drag but has no effect.
 	
 	References
 	1. Sparisoma Viridi, Nurhayati, Johri Sabaryati,
@@ -451,7 +455,9 @@ function simulate() {
 	F = Vect3.add(F, Fb);
 	
 	// Calculate drag force
-	var vf = new Vect3(0, 0, 0);
+	var dy = waveFunction(o.r.x, t + dt)
+		- waveFunction(o.r.x, t);
+	var vf = new Vect3(0, dy / dt, 0);
 	drag.setField(vf);
 	var Fd = drag.force(o)
 	F = Vect3.add(F, Fd);
@@ -684,73 +690,3 @@ function getValue() {
 	};
 	return result;	
 }
-
-/*
-	// Define fluid surface function
-	function yFluid(x, t) {
-		var omega = 2 * Math.PI * freq;
-		var k = 2 * Math.PI / lambda * dirf;
-		var y = Amp * Math.sin(omega * t - k * x + phi0);
-		return y;
-	}
-
-	// Define time derivation of fluid surface
-	function vyFluid(x, t) {
-		var omega = 2 * Math.PI * freq;
-		var k = 2 * Math.PI / lambda * dirf;
-		var y = omega * Amp * Math.cos(omega * t - k * x + phi0);
-		return y;
-	}
-
-	// Format time t
-	t = +t.toFixed(10);
-
-	// Calculate mass
-	var R = 0.5 * D;
-	var V = (4 * Math.PI / 3) * R * R * R;
-	var m = rhop * V;	
-	// Apply Newton second law of motion
-	var F = Vect3.add(FG, FB, FD);
-	var a = Vect3.div(F, m);
-	
-	// Integrate using Euler algorithm
-	v = Vect3.add(v, Vect3.mul(a, dt));
-	r = Vect3.add(r, Vect3.mul(v, dt));
-	
-	// Set periodic boundary condition
-	var PERIODIC_BC = false;
-	if(PERIODIC_BC) {
-		if(r.x > coordMax.x) {
-			r.x = coordMin.x + (r.x - coordMax.x);
-		}
-		if(r.x < coordMin.x) {
-			r.x = coordMax.x + (r.x - coordMin.x);
-		}
-	}
-
-	// Calculate drag force
-	var Db;
-	if(r.y < yff) {
-		Db = D;
-	} else if(yff <= r.y && r.y <= yff + 0.5 * D) {
-		var RR = 0.5 * D;
-		var R2 = RR * RR - (r.y - yff) * (r.y - yff);
-		Db = 2 * Math.sqrt(R2);
-	} else {
-		Db = 0;
-	}
-	var b = 3 * Math.PI * etaf * Db;
-	var omega = 2 * Math.PI * freq;
-	var k = 2 * Math.PI / lambda * dirf;
-	var vfx = omega / k * 0;
-	var vfy = vyFluid(r.x, t);
-	var vf = new Vect3(vfx, vfy, 0);
-	var FD = Vect3.mul(-b, Vect3.sub(v, vf));
-	
-	v.x = +v.x.toFixed(10);
-	v.y = +v.y.toFixed(10);
-	v.z = +v.z.toFixed(10);
-	r.x = +r.x.toFixed(10);
-	r.y = +r.y.toFixed(10);
-	r.z = +r.z.toFixed(10);
-*/
