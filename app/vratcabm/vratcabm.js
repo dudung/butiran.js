@@ -43,7 +43,7 @@
 */
 
 // Define global variables
-var can, btnStart, ta, canG;
+var can, btnStart, ta, canG, selIn;
 var proc, Tproc;
 var W, D1, D2, D3, D4, A, C;
 var colors, symbols;
@@ -94,7 +94,7 @@ function initParams() {
 	LRLday = 0;
 	RA1day = 0;
 	RA2day = 0;
-	document.title += " " + scenario;
+	//document.title += " " + scenario;
 
 	W = createWorldMatrix();
 	A = createAgentMatrix();
@@ -415,17 +415,30 @@ function createAndArrangeElements() {
 	var div = document.createElement("div");
 	div.style.width = "802px";
 	div.style.float = "left";
-	div.style.border = "1px solid red";
+	div.style.border = "1px solid #aaa";
 	
 	var div2 = document.createElement("div");
 	div2.style.width = "92px";
 	div2.style.height = "200px";
 	div2.style.float = "left";
-	div2.style.border = "1px solid red";
+	div2.style.border = "1px solid #aaa";
+	
+	selIn = document.createElement("select");
+	var optText = [
+		-1,
+		0, 1, 2, 3, 4,
+		10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22
+	];
+	for(var i = 0; i < optText.length; i++) {
+		var opt = document.createElement("option");
+		opt.text = "Scenario " + optText[i];
+		selIn.options.add(opt);
+	}
 	
 	document.body.append(div);
 		div.append(can);
 		div.append(div2);
+			div2.append(selIn);
 			div2.append(btnStart);
 		div.append(ta);
 		div.append(canG);
