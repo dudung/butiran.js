@@ -33,6 +33,9 @@
 	1829 Add physical parameters for forces;
 	20190531
 	0631 Update Github, still problem on surfing.
+	0834 Try to fix periodic b.c. problem in viewing.
+	1037 Still problem of continuity: work for particle but not
+	for wave.
 	
 	References
 	1. Sparisoma Viridi, Nurhayati, Johri Sabaryati,
@@ -45,7 +48,7 @@
 
 // Define global variables
 var params;
-var taIn, taOut, caOut;
+var taIn, taOut, caOut1, caOut2, caOut3, caOut4;
 var btLoad, btRead, btStart, btInfo;
 var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var dx;
@@ -94,8 +97,8 @@ function initParams() {
 	p += "TPRC 1\n";
 	p += "\n";
 	p += "# Coordinates\n";
-	p += "RMIN -1.000 -1.000 -1.000\n";
-	p += "RMAX +1.000 +1.000 +1.000\n";
+	p += "RMIN -1.000 -0.250 -1.000\n";
+	p += "RMAX +1.000 +0.250 +1.000\n";
 	p += "\n";
 	
 	params = p;
@@ -174,9 +177,19 @@ xmax = rmax.x;
 ymax = rmax.y;
 zmax = rmax.z;
 
+var xlength = xmax - xmin;
+caOut1.xmin = xmin - xlength;
+caOut1.xmax = caOut1.xmin + xlength;
+caOut2.xmin = caOut1.xmax
+caOut2.xmax = caOut2.xmin + xlength;
+caOut3.xmin = caOut2.xmax
+caOut3.xmax = caOut3.xmin + xlength;
+caOut4.xmin = caOut3.xmax
+caOut4.xmax = caOut4.xmin + xlength;
+
 XMIN = 0;
-XMAX = caOut.width;
-YMIN = caOut.height;
+XMAX = caOut1.width;
+YMIN = caOut1.height;
 YMAX = 0;
 ZMIN = -1;
 ZMAX = 1;
@@ -242,12 +255,40 @@ function createVisualElements() {
 	}
 	
 	// Create canvas for output
-	caOut = document.createElement("canvas");
-	caOut.width = "439";
-	caOut.height = "439";
-	with(caOut.style) {
-		width = caOut.width +  "px";
-		height = caOut.height +  "px";
+	var canHeight = "105";	
+	caOut1 = document.createElement("canvas");
+	caOut1.width = "439";
+	caOut1.height = canHeight;
+	with(caOut1.style) {
+		width = caOut1.width +  "px";
+		height = caOut1.height +  "px";
+		border = "1px solid #aaa";
+		background = "#fff";
+	}
+	caOut2 = document.createElement("canvas");
+	caOut2.width = "439";
+	caOut2.height = canHeight;
+	with(caOut2.style) {
+		width = caOut2.width +  "px";
+		height = caOut2.height +  "px";
+		border = "1px solid #aaa";
+		background = "#fff";
+	}
+	caOut3 = document.createElement("canvas");
+	caOut3.width = "439";
+	caOut3.height = canHeight;
+	with(caOut3.style) {
+		width = caOut3.width +  "px";
+		height = caOut3.height +  "px";
+		border = "1px solid #aaa";
+		background = "#fff";
+	}
+	caOut4 = document.createElement("canvas");
+	caOut4.width = "439";
+	caOut4.height = canHeight;
+	with(caOut4.style) {
+		width = caOut4.width +  "px";
+		height = caOut4.height +  "px";
 		border = "1px solid #aaa";
 		background = "#fff";
 	}
@@ -281,7 +322,10 @@ function createVisualElements() {
 		dvLeft.append(btStart);
 		dvLeft.append(btInfo);
 	document.body.append(dvRight);
-		dvRight.append(caOut);
+		dvRight.append(caOut1);
+		dvRight.append(caOut2);
+		dvRight.append(caOut3);
+		dvRight.append(caOut4);
 }
 
 
@@ -354,9 +398,9 @@ function createWave() {
 	var x = [];
 	var y = [];
 	
-	var N = (xmax - xmin) / dx;
-	for(var i = 0; i < N; i++) {
-		var xx = xmin + i * dx;
+	var N = 4 * (xmax - xmin) / dx;
+	for(var i = 0; i <= N; i++) {
+		var xx = 2 * xmin + i * dx;
 		var yy = waveFunction(xx, t);
 		
 		x.push(xx);
@@ -448,10 +492,22 @@ function simulate() {
 	
 	p = createWave(t);
 	
-	clearCanvas(caOut);	
-	draw(o0).onCanvas(caOut);
-	draw(o).onCanvas(caOut);
-	draw(p).onCanvas(caOut);
+	clearCanvas(caOut1);	
+	clearCanvas(caOut2);
+	clearCanvas(caOut3);
+	clearCanvas(caOut4);
+	
+	draw(o0).onCanvas(caOut2);
+	
+	draw(o).onCanvas(caOut1);
+	draw(o).onCanvas(caOut2);
+	draw(o).onCanvas(caOut3);
+	draw(o).onCanvas(caOut4);
+
+	draw(p).onCanvas(caOut1);
+	draw(p).onCanvas(caOut2);
+	draw(p).onCanvas(caOut3);
+	draw(p).onCanvas(caOut4);
 	
 	if(t >= tend) {
 		btLoad.disabled = false;
@@ -491,6 +547,7 @@ function draw() {
 				var dx = xg + o.D;
 				var yg = o.r.y;
 				
+				/*
 				var xwidth = xmax - xmin;
 				
 				while(xg > xmax) {
@@ -501,9 +558,10 @@ function draw() {
 					xmin -= xwidth;
 					xmax -= xwidth;
 				}
+				*/
 				
-				var X = lintrans(xg, [xmin, xmax], [XMIN, XMAX]);
-				var DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
+				var X = lintrans(xg, [ca.xmin, ca.xmax], [XMIN, XMAX]);
+				var DX = lintrans(dx, [ca.xmin, ca.xmax], [XMIN, XMAX]);
 				var D = DX - X;
 				var Y = lintrans(yg, [ymin, ymax], [YMIN, YMAX]);
 				
@@ -576,7 +634,7 @@ function draw() {
 				cx.beginPath();
 				cx.lineWidth = "2";
 				cx.strokeStyle = "#00f";
-				for(var i = 0; i < N; i++) {
+				for(var i = 0; i <= N; i++) {
 					var X = lintrans(o.data[0][i], [xmin, xmax], [XMIN, XMAX]);
 					var Y = lintrans(o.data[1][i], [ymin, ymax], [YMIN, YMAX]);
 					if(i == 0) {
