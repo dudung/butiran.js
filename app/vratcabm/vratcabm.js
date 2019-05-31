@@ -45,7 +45,7 @@
 */
 
 // Define global variables
-var can, btnStart, ta, canG;
+var can, btnStart, ta, canG, selIn;
 var proc, Tproc;
 var W, D1, D2, D3, D4, A, C;
 var colors, symbols;
@@ -369,9 +369,11 @@ function buttonClick() {
 	if(target.innerHTML == "Start") {
 		target.innerHTML = "Stop";
 		proc = setInterval(simulate, Tproc);
+		selIn.disabled = true;
 	} else if(target.innerHTML == "Stop"){
 		target.innerHTML = "Start";
 		clearInterval(proc);
+		selIn.disabled = false;
 	}
 }
 
@@ -400,6 +402,7 @@ function createAndArrangeElements() {
 	btnStart.style.width = "92px";
 	btnStart.style.float = "left";
 	btnStart.addEventListener("click", buttonClick);
+	btnStart.disabled = true;
 	
 	ta = document.createElement("textarea");
 	ta.style.width = "250px";
@@ -432,7 +435,7 @@ function createAndArrangeElements() {
 		0, 1, 2, 3, 4,
 		10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22
 	];
-	var selIn = document.createElement("select");
+	selIn = document.createElement("select");
 	for(var i = 0; i < scenText.length; i++) {
 		var opt = document.createElement("option");
 		opt.text = "Scenario " + scenText[i];
@@ -446,6 +449,7 @@ function createAndArrangeElements() {
 		//console.log(scenario);
 		initParams();
 		drawSystem();
+		btnStart.disabled = false;
 	});
 	
 	document.body.append(div);
