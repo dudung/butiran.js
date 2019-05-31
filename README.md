@@ -18,7 +18,7 @@ Library of butiran.js can be downloaded from
    `refs` https://doi.org/10.21009/SPEKTRA.033.01<br>
    `code` https://github.com/dudung/butiran.js/blob/master/app/spfwfs/spfwfs.js<br>
    `demo` https://raw.githack.com/dudung/butiran.js/master/app/spfwfs/spfwfs.html
-4. **vratcabm.js** | Visiting rest area between two cities with ABM | 20190601<br>
+4. **vratcabm.js** | Visiting rest area between two cities with agent-based model | 20190601<br>
    `refs` https://doi.org/10.17605/osf.io/92aze<br>
    `code` https://github.com/dudung/butiran.js/blob/master/app/vratcabm/vratcabm.js<br>
    `demo` https://raw.githack.com/dudung/butiran.js/master/app/vratcabm/vratcabm.html
