@@ -53,7 +53,7 @@ function initParams() {
 	p += "EENV +0.00 +0.00 +0.00\n";
 	p += "BENV +0.00 +0.00 -1.00\n";
 	p += "VENV -0.00 -0.00 +0.00\n";
-	p += "BCXX 0\n";
+	p += "BCXX 1\n";
 	p += "\n";
 	p += "# Interactions\n";
 	p += "GINT 1\n";
