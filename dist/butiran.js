@@ -1065,6 +1065,8 @@ module.exports = function() {
 	gravitation.js libraries.
 	Value of gamma and its implementation is still a subject
 	for discussion.
+	20190601
+	1610 Change setConstant to setConstants.
 */
 
 // Require classes
@@ -1083,7 +1085,7 @@ class Normal {
 	}
 	
 	// Set constants
-	setConstant(k, gamma) {
+	setConstants(k, gamma) {
 		this.k = k;
 		this.gamma = gamma;
 	}
@@ -1137,6 +1139,9 @@ module.exports = function() {
 	20180603
 	Create this library from previous force.js and
 	normal.js libraries.
+	20190601
+	1608 Change setConstant to setConstants.
+	1625 Fix comment normal to spring.
 */
 
 // Require classes
@@ -1161,7 +1166,7 @@ class Spring {
 	}
 	
 	// Set constants
-	setConstant(k, gamma) {
+	setConstants(k, gamma) {
 		this.k = k;
 		this.gamma = gamma;
 	}
@@ -1176,7 +1181,7 @@ class Spring {
 		this.o = o;
 	}
 	
-	// Calculate normal force
+	// Calculate spring force
 	force() {
 		// Set default value to (0, 0, 0)
 		var f = new Vect3;

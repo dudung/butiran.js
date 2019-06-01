@@ -14,6 +14,7 @@
 	20190601
 	0851 Continue at home.
 	1025 Add magnetic force.
+	1611 Test G, E, B, D from enviroment and seems ok.
 */
 
 // Define global variables
@@ -25,7 +26,8 @@ var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var o, N;
-var g, E, B, v;
+var grav1, elec1, magn1, drag1;
+var grav2, elec2, magn2, norm2, sprn2;
 
 // Execute main function
 main();
@@ -41,22 +43,29 @@ function main() {
 // Initialize parameters
 function initParams() {
 	var p = "";
-	p += "# Environment\n";
-	p += "GENV +1.00 +0.00 +0.00\n";
-	p += "EENV +0.00 +1.00 +0.00\n";
-	p += "BENV +0.00 +0.00 +1.00\n";
-	p += "VENV -0.71 -0.71 +0.00\n";
+	p += "# Environments\n";
+	p += "GENV +0.00 +0.00 +0.00\n";
+	p += "EENV +0.00 +0.00 +0.00\n";
+	p += "BENV +0.00 +0.00 +0.00\n";
+	p += "VENV -0.00 -0.00 +0.00\n";
+	p += "\n";
+	p += "# Interactions\n";
+	p += "GINT 1.000\n";
+	p += "EINT 1.000\n";
+	p += "BINT 1.000\n";
+	p += "NINT 1E4 0.1\n";
+	p += "SINT 10 0.1\n";
 	p += "\n";
 	p += "# Particles\n";
 	p += "MASS 1\n";
 	p += "CHRG 1\n";
-	p += "DIAM 2\n";
+	p += "DIAM 10\n";
 	p += "NUMP 4\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0\n";
 	p += "TEND 100.0\n";
-	p += "TSTP 0.1\n";
+	p += "TSTP 0.01\n";
 	p += "TDAT 0.1\n";
 	p += "TPRC 10\n";
 	p += "\n";
@@ -81,10 +90,45 @@ function loadParams() {
 // Read parameters
 function readParams() {
 	// Get parameters of enviroment
-	g = getValue("GENV").from(taIn);
-	E = getValue("EENV").from(taIn);
-	B = getValue("BENV").from(taIn);
-	v = getValue("VENV").from(taIn);
+	var g = getValue("GENV").from(taIn);
+	var E = getValue("EENV").from(taIn);
+	var B = getValue("BENV").from(taIn);
+	var v = getValue("VENV").from(taIn);
+	
+	grav1 = new Gravitational;
+	grav1.setField(g)
+
+	elec1 = new Electrostatic;
+	elec1.setField(E);
+	
+	magn1 = new Magnetic;
+	magn1.setField(B);
+	
+	drag1 = new Drag;
+	drag1.setField(v);
+	drag1.setConstants(0, 0.05, 0);
+	
+	// Get parameters of interaction
+	var cG = getValue("GINT").from(taIn);
+	var cE = getValue("EINT").from(taIn);
+	var cB = getValue("BINT").from(taIn);
+	var cN = getValue("NINT").from(taIn);
+	var cS = getValue("SINT").from(taIn);
+	
+	grav2 = new Gravitational;
+	grav2.setConstant(cG)
+
+	elec2 = new Electrostatic;
+	elec2.setConstant(cE);
+	
+	magn2 = new Magnetic;
+	magn2.setConstant(cB);
+	
+	norm2 = new Normal;
+	norm2.setConstants(cN[0], cN[1]);
+	
+	sprn2 = new Spring;
+	sprn2.setConstants(cS[0], cS[1]);
 	
 	// Get parameters of iteration
 	tbeg = getValue("TBEG").from(taIn);
@@ -125,8 +169,8 @@ function readParams() {
 	
 	t = tbeg;
 	o = [];
-	var Lx = 10;
-	var Ly = 10;
+	var Lx = 25;
+	var Ly = 25;
 	var Ny = Math.ceil(Math.sqrt(N));
 	var Nx = N / Ny;
 	var i = 0;
@@ -309,8 +353,6 @@ function buttonClick() {
 	default:
 	}
 }
-	
-	
 
 
 // Perform simulation
@@ -338,21 +380,36 @@ function simulate() {
 	var a = [];
 	for(var i = 0; i < N; i++) {
 		
-		var v = o[i].v;
-		var r = o[i].r;
-		var q = o[i].q;
+		var F = new Vect3;
 		var m = o[i].m;
 		
-		var FB = Vect3.mul(q, Vect3.cross(v, B));
-
-		/*
-		var un = o.q * magnetic.B.len() * dt / o.m;
-		var alpha = 1 / Math.sqrt(1 + un * un);
-		*/
-
-		
-		var F = new Vect3;
+		var FG = grav1.force(o[i]);
+		var FE = elec1.force(o[i]);
+		var FB = magn1.force(o[i]);
+		var FD = drag1.force(o[i]);
+	
+		F = Vect3.add(F, FG);
+		F = Vect3.add(F, FE);
 		F = Vect3.add(F, FB);
+		F = Vect3.add(F, FD);
+		
+		
+		
+		for(var j = 0; j < N; j++) {
+			if(j != i) {
+				var FG = grav2.force(o[i], o[j]);
+				var FE = elec2.force(o[i], o[j]);
+				var FB = magn2.force(o[i], o[j]);
+				var FN = norm2.force(o[i], o[j]);
+				var FS = sprn2.force(o[i], o[j]);
+				
+				F = Vect3.add(F, FG);
+				//F = Vect3.add(F, FE);
+				//F = Vect3.add(F, FB);
+				F = Vect3.add(F, FN);
+				//F = Vect3.add(F, FS);
+			}
+		}
 		
 		a.push(Vect3.div(F, m));		
 	}
@@ -439,11 +496,11 @@ function draw() {
 				}
 				
 				if(o.c instanceof Array && o.c.length > 1) {
-					cx.arc(X, Y, D, 0, 2 * Math.PI);
+					cx.arc(X, Y, 0.5 * D, 0, 2 * Math.PI);
 					cx.fill();
 				}
 				cx.lineWidth = "2";
-				cx.arc(X, Y, D, 0, 2 * Math.PI);
+				cx.arc(X, Y, D, 0.5 * 0, 2 * Math.PI);
 				cx.stroke();
 			} else if(o instanceof Path) {
 				var qi = o.qi * 2 * Math.PI;
@@ -564,6 +621,10 @@ function getValue() {
 							parseFloat(words[2]),
 							parseFloat(words[3])
 						);
+					} else if(Nw == 3) {
+						value = [];
+						value.push(parseFloat(words[1]));
+						value.push(parseFloat(words[2]));
 					}
 					return value;
 				}
