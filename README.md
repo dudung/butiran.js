@@ -22,7 +22,7 @@ Library of butiran.js can be downloaded from
    `refs` https://doi.org/10.17605/osf.io/92aze<br>
    `code` https://github.com/dudung/butiran.js/blob/master/app/vratcabm/vratcabm.js<br>
    `demo` https://raw.githack.com/dudung/butiran.js/master/app/vratcabm/vratcabm.html
-5. **ssspp.js** | Simulation of single self-propelled particle | 20190531<br>
+5. **ssspp.js** | Simulation of single self-propelled particle | 20190601<br>
    `refs` <br>
    `code` https://github.com/dudung/butiran.js/blob/master/app/ssspp/ssspp.js<br>
    `demo` https://raw.githack.com/dudung/butiran.js/master/app/ssspp/ssspp.html
