@@ -42,8 +42,9 @@ function initParams() {
 	p += "BCXX 1\n";
 	p += "\n";
 	p += "# Interactions\n";
+	p += "NINT 2000 0.1\n";
 	p += "SINT 1 0.1\n";
-	p += "GINT 0\n";
+	p += "GINT 1000\n";
 	p += "\n";
 	p += "# Particles\n";
 	p += "MASS 1\n";
@@ -85,14 +86,18 @@ function readParams() {
 	// Get parameters of enviroment
 	var eta = getValue("ETAF").from(taIn);
 	bc = getValue("BCXX").from(taIn);
-		
+	
 	drag1 = new Drag;
-	drag1.setField(v);
+	drag1.setField(new Vect3);
 	drag1.setConstants(eta.x, eta.y, eta.z);
 	
 	// Get parameters of interaction
+	var kN = getValue("NINT").from(taIn);
 	var kS = getValue("SINT").from(taIn);
 	var kG = getValue("GINT").from(taIn);
+	
+	norm2 = new Normal;
+	norm2.setConstants(kN[0], kN[1]);
 	
 	grav2 = new Gravitational;
 	grav2.setConstant(kG)
@@ -393,21 +398,16 @@ function simulate() {
 		
 		var FD = drag1.force(o[i]);
 	
-		F = Vect3.add(F, FG);
-		F = Vect3.add(F, FE);
-		F = Vect3.add(F, FB);
 		F = Vect3.add(F, FD);
 		
 		for(var j = 0; j < N; j++) {
 			if(j != i) {
-				var FG = grav2.force(o[i], o[j]);
-				var FE = elec2.force(o[i], o[j]);
+				var FN = norm2.force(o[i], o[j]);
 				var FS = sprn2.force(o[i], o[j]);
+				var FG = grav2.force(o[i], o[j]);
 				
-				F = Vect3.add(F, FG);
-				F = Vect3.add(F, FE);
-				F = Vect3.add(F, FB);
 				F = Vect3.add(F, FN);
+				F = Vect3.add(F, FG);
 				F = Vect3.add(F, FS);
 			}
 		}
