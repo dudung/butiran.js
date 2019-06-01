@@ -1,6 +1,6 @@
 /*
 	ssspp.js
-	Simulation of single self-propelled particles
+	Simulation of single self-propelled particle
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
 	Ariq Dhia Irfanudin | 1157030004@student.uinsgd.ac.id
