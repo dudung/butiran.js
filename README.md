@@ -25,6 +25,6 @@ Library of butiran.js can be downloaded from
 5. **ssspp.js** | Simulation of single self-propelled particle | 20190531<br>
    `refs` <br>
    `code` https://github.com/dudung/butiran.js/blob/master/app/ssspp/ssspp.js<br>
-   `demo` https://raw.githack.com/dudung/butiran.js/master/app/vratcabm/ssspp.html
+   `demo` https://raw.githack.com/dudung/butiran.js/master/app/ssspp/ssspp.html
 
 
