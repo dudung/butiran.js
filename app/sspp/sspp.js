@@ -46,21 +46,22 @@ function initParams() {
 	p += "# Environments\n";
 	p += "GENV +0.00 +0.00 +0.00\n";
 	p += "EENV +0.00 +0.00 +0.00\n";
-	p += "BENV +0.00 +0.00 +0.00\n";
+	p += "BENV +0.00 +0.00 -1.00\n";
 	p += "VENV -0.00 -0.00 +0.00\n";
 	p += "\n";
 	p += "# Interactions\n";
-	p += "GINT 1.000\n";
-	p += "EINT 1.000\n";
-	p += "BINT 1.000\n";
-	p += "NINT 1E4 0.1\n";
-	p += "SINT 10 0.1\n";
+	p += "GINT 0\n";
+	p += "EINT 0\n";
+	p += "BINT 0\n";
+	p += "NINT 1E+3 1E-1\n";
+	p += "SINT 0E+2 0E-1\n";
 	p += "\n";
 	p += "# Particles\n";
 	p += "MASS 1\n";
 	p += "CHRG 1\n";
-	p += "DIAM 10\n";
-	p += "NUMP 4\n";
+	p += "DIAM 5\n";
+	p += "VELO 20\n";
+	p += "NUMP 36\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0\n";
@@ -165,23 +166,25 @@ function readParams() {
 	var m = getValue("MASS").from(taIn);
 	var q = getValue("CHRG").from(taIn);
 	var D = getValue("DIAM").from(taIn);
+	var v = getValue("VELO").from(taIn);
 	N = getValue("NUMP").from(taIn);
 	
 	t = tbeg;
 	o = [];
-	var Lx = 25;
-	var Ly = 25;
+	var Lx = 20;
+	var Ly = 20;
 	var Ny = Math.ceil(Math.sqrt(N));
 	var Nx = N / Ny;
 	var i = 0;
 	for(var iy = 0; iy < Ny; iy++) {
 		for(var ix = 0; ix < Nx; ix++) {		
 			
-			var x = (ix - Nx/2) * Lx + xo;
-			var y = (iy - Ny/2) * Ly + yo;
+			var x = ((ix + 0.5) - 0.5 * Nx) * Lx + xo;
+			var y = ((iy + 0.5) - 0.5 * Ny) * Ly + yo;
 			
-			var vx = Math.random() * 2 - 1; 
-			var vy = Math.random() * 2 - 1; 
+			var theta = Math.random() * 2 * Math.PI;
+			var vx = v * Math.cos(theta); 
+			var vy = v * Math.sin(theta); 
 			
 			var oi = new Grain();
 			oi.m = m;
@@ -363,12 +366,34 @@ function simulate() {
 	
 	if(t == tbeg) {
 		//       0.0740 -0.0009 -0.0162
-		addText("#t      x       y\n").to(taOut);
+		addText("#t      xcom    ycom    K\n").to(taOut);
 	}
 	
+	var K = 0;
+	var xcom = 0;
+	var ycom = 0;
+	for(var i = 0; i < N; i++) {
+		xcom += o[i].r.x;
+		ycom += o[i].r.y;
+		var m = o[i].m;
+		var v = o[i].v.len();
+		K += 0.5 * m * v * v;
+	}
+	xcom /= N;
+	ycom /= N;
+	
 	if(iter == 0) {
-		var tt = t.toFixed(digit);
-		var text = tt + "\n";
+		//var tt = t.toFixed(digit);
+		var tt = t.toFixed(1);
+		var xx = xcom.toFixed(2);
+		xx = (xcom >= 0) ? "+" + xx : xx;
+		var yy = ycom.toFixed(2);
+		yy = (ycom >= 0) ? "+" + yy : yy;
+		var KK = K.toExponential(3);
+		var text = tt + " ";
+		text += xx + " ";
+		text += yy + " ";
+		text += KK + "\n";
 		addText(text).to(taOut);
 	}
 	
@@ -393,8 +418,6 @@ function simulate() {
 		F = Vect3.add(F, FB);
 		F = Vect3.add(F, FD);
 		
-		
-		
 		for(var j = 0; j < N; j++) {
 			if(j != i) {
 				var FG = grav2.force(o[i], o[j]);
@@ -404,10 +427,10 @@ function simulate() {
 				var FS = sprn2.force(o[i], o[j]);
 				
 				F = Vect3.add(F, FG);
-				//F = Vect3.add(F, FE);
-				//F = Vect3.add(F, FB);
+				F = Vect3.add(F, FE);
+				F = Vect3.add(F, FB);
 				F = Vect3.add(F, FN);
-				//F = Vect3.add(F, FS);
+				F = Vect3.add(F, FS);
 			}
 		}
 		
@@ -500,7 +523,7 @@ function draw() {
 					cx.fill();
 				}
 				cx.lineWidth = "2";
-				cx.arc(X, Y, D, 0.5 * 0, 2 * Math.PI);
+				cx.arc(X, Y, 0.5 * D, 0, 2 * Math.PI);
 				cx.stroke();
 			} else if(o instanceof Path) {
 				var qi = o.qi * 2 * Math.PI;
