@@ -15,6 +15,7 @@
 	0851 Continue at home.
 	1025 Add magnetic force.
 	1611 Test G, E, B, D from enviroment and seems ok.
+	1829 Error in normal force.
 */
 
 // Define global variables
@@ -28,6 +29,7 @@ var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var o, N;
 var grav1, elec1, magn1, drag1;
 var grav2, elec2, magn2, norm2, sprn2;
+var iLeader;
 
 // Execute main function
 main();
@@ -62,6 +64,7 @@ function initParams() {
 	p += "DIAM 5\n";
 	p += "VELO 20\n";
 	p += "NUMP 36\n";
+	p += "LEAD -1\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0\n";
@@ -200,6 +203,15 @@ function readParams() {
 			if(i >= N) break;
 		}
 	}
+	
+	var leader = getValue("LEAD").from(taIn);
+	if(0 <= leader && leader < N) {
+		iLeader = leader
+	} else {
+		iLeader = Math.floor(Math.random() * N);
+	}
+	
+	o[iLeader].c = ["#008", "#aaf"];
 }
 
 
@@ -431,15 +443,14 @@ function simulate() {
 				F = Vect3.add(F, FG);
 				F = Vect3.add(F, FE);
 				F = Vect3.add(F, FB);
-				F = Vect3.add(F, FN);
+				//F = Vect3.add(F, FN);
 				F = Vect3.add(F, FS);
 			}
 		}
 		
 		// Set leader
-		if(i == N/2) {
+		if(i == iLeader) {
 			F = FB;
-			o[i].c = ["#008", "#aaf"];
 		}
 		
 		a.push(Vect3.div(F, m));		
