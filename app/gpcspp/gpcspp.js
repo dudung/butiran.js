@@ -9,6 +9,7 @@
 	
 	20190602
 	0308 Start this project with ssspp as template.
+	0410 Finish this stage of development.
 */
 
 // Define global variables
