@@ -10,6 +10,10 @@
 	20190531
 	1903 Start this project with cppcmf as template.	
 	1912 Update co-authors email and update info.
+	2003 Copy draw().on() from spfwfs app, test it, it works.
+	20190601
+	0851 Continue at home.
+	1025 Add magnetic force.
 */
 
 // Define global variables
@@ -20,7 +24,8 @@ var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
-var o, magnetic, corv;
+var o, N;
+var g, E, B, v;
 
 // Execute main function
 main();
@@ -37,28 +42,28 @@ function main() {
 function initParams() {
 	var p = "";
 	p += "# Environment\n";
-	p += "BFLD 0.0000 0.0000 -2.0000\n";
+	p += "GENV +1.00 +0.00 +0.00\n";
+	p += "EENV +0.00 +1.00 +0.00\n";
+	p += "BENV +0.00 +0.00 +1.00\n";
+	p += "VENV -0.71 -0.71 +0.00\n";
 	p += "\n";
-	p += "# Particle\n";
-	p += "MASS 0.1000\n";
-	p += "CHRG 3.1415\n";
-	p += "DIAM 0.001\n";
-	p += "POST 0.0159 0.0000 0.0000\n";
-	p += "VELO 0.0000 1.0000 0.0000\n";
+	p += "# Particles\n";
+	p += "MASS 1\n";
+	p += "CHRG 1\n";
+	p += "DIAM 2\n";
+	p += "NUMP 4\n";
 	p += "\n";
 	p += "# Iteration\n";
-	p += "TBEG 0.0000\n";
-	p += "TEND 0.1000\n";
-	p += "TSTP 0.0001\n";
-	p += "TDAT 0.0020\n";
-	p += "TPRC 1\n";
+	p += "TBEG 0.0\n";
+	p += "TEND 100.0\n";
+	p += "TSTP 0.1\n";
+	p += "TDAT 0.1\n";
+	p += "TPRC 10\n";
 	p += "\n";
 	p += "# Coordinates\n";
-	p += "RMIN -0.020 -0.020 -0.020\n";
-	p += "RMAX +0.020 +0.020 +0.020\n";
+	p += "RMIN -100 -100 -100\n";
+	p += "RMAX +100 +100 +100\n";
 	p += "\n";
-	p += "# Method\n";
-	p += "CORV 0\n";
 	
 	params = p;
 	
@@ -75,53 +80,79 @@ function loadParams() {
 
 // Read parameters
 function readParams() {
-var B = getValue("BFLD").from(taIn);
-var m = getValue("MASS").from(taIn);
-var q = getValue("CHRG").from(taIn);
-var D = getValue("DIAM").from(taIn);
-var r = getValue("POST").from(taIn);
-var v = getValue("VELO").from(taIn);
+	// Get parameters of enviroment
+	g = getValue("GENV").from(taIn);
+	E = getValue("EENV").from(taIn);
+	B = getValue("BENV").from(taIn);
+	v = getValue("VENV").from(taIn);
+	
+	// Get parameters of iteration
+	tbeg = getValue("TBEG").from(taIn);
+	tend = getValue("TEND").from(taIn);
+	dt = getValue("TSTP").from(taIn);
+	Tdata = getValue("TDAT").from(taIn);
+	Tproc = getValue("TPRC").from(taIn);
 
-tbeg = getValue("TBEG").from(taIn);
-tend = getValue("TEND").from(taIn);
-dt = getValue("TSTP").from(taIn);
-Tdata = getValue("TDAT").from(taIn);
-Tproc = getValue("TPRC").from(taIn);
+	iter = 0;
+	Niter = Math.floor(Tdata / dt);
+	
+	// Get parameters of coordinates
+	var rmin = getValue("RMIN").from(taIn);
+	var rmax = getValue("RMAX").from(taIn);
 
-var rmin = getValue("RMIN").from(taIn);
-var rmax = getValue("RMAX").from(taIn);
-
-corv = getValue("CORV").from(taIn);
-
-iter = 0;
-Niter = Math.floor(Tdata / dt);
-
-xmin = rmin.x;
-ymin = rmin.y;
-zmin = rmin.z;
-xmax = rmax.x;
-ymax = rmax.y;
-zmax = rmax.z;
-
-t = tbeg;
-
-o = new Grain();
-o.m = m;
-o.q = q;
-o.D = D;
-o.r = r;
-o.v = v;
-o.c = "#f00";
-
-magnetic = new Magnetic();
-magnetic.setField(B);
-
-XMIN = 0;
-XMAX = caOut.width;
-YMIN = caOut.height;
-YMAX = 0;
-ZMIN = -1;
-ZMAX = 1;
+	xmin = rmin.x;
+	ymin = rmin.y;
+	zmin = rmin.z;
+	xmax = rmax.x;
+	ymax = rmax.y;
+	zmax = rmax.z;
+	
+	xo = 0.5 * (xmin + xmax);
+	yo = 0.5 * (ymin + ymax);
+	
+	XMIN = 0;
+	XMAX = caOut.width;
+	YMIN = caOut.height;
+	YMAX = 0;
+	ZMIN = -1;
+	ZMAX = 1;
+	
+	// Get parameters of particles
+	var m = getValue("MASS").from(taIn);
+	var q = getValue("CHRG").from(taIn);
+	var D = getValue("DIAM").from(taIn);
+	N = getValue("NUMP").from(taIn);
+	
+	t = tbeg;
+	o = [];
+	var Lx = 10;
+	var Ly = 10;
+	var Ny = Math.ceil(Math.sqrt(N));
+	var Nx = N / Ny;
+	var i = 0;
+	for(var iy = 0; iy < Ny; iy++) {
+		for(var ix = 0; ix < Nx; ix++) {		
+			
+			var x = (ix - Nx/2) * Lx + xo;
+			var y = (iy - Ny/2) * Ly + yo;
+			
+			var vx = Math.random() * 2 - 1; 
+			var vy = Math.random() * 2 - 1; 
+			
+			var oi = new Grain();
+			oi.m = m;
+			oi.q = q;
+			oi.D = D;
+			oi.r = new Vect3(x, y, 0);
+			oi.v = new Vect3(vx, vy, 0);
+			oi.c = ["#800", "#faa"];
+			
+			o.push(oi);
+			
+			i++;
+			if(i >= N) break;
+		}
+	}
 }
 
 
@@ -238,6 +269,11 @@ function buttonClick() {
 	case "Read":
 		btStart.disabled = false;
 		readParams();
+		
+		clearCanvas(caOut);
+		for(var i = 0; i < N; i++) {
+			draw(o[i]).onCanvas(caOut);
+		}
 	break;
 	case "Start":
 		if(btStart.innerHTML == "Start") {
@@ -290,28 +326,59 @@ function simulate() {
 	
 	if(iter == 0) {
 		var tt = t.toFixed(digit);
-		var xx = o.r.x.toFixed(digit);
-		var yy = o.r.y.toFixed(digit);
-		var text = tt + " " + xx + " " + yy;
-		addText(text + "\n").to(taOut);
+		var text = tt + "\n";
+		addText(text).to(taOut);
 	}
-	
-	var FB = magnetic.force(o);
-	var F = FB;
-	var a = Vect3.div(F, o.m);
-	o.v = Vect3.add(o.v, Vect3.mul(a, dt));
-	if(corv != 0) {
-		var un = o.q * magnetic.B.len() * dt / o.m;
-		var alpha = 1 / Math.sqrt(1 + un * un);
-		o.v = Vect3.mul(o.v, alpha);
-	}
-	o.r = Vect3.add(o.r, Vect3.mul(o.v, dt));
-	
 	
 	clearCanvas(caOut);
-	draw(o).onCanvas(caOut);
+	for(var i = 0; i < N; i++) {
+		draw(o[i]).onCanvas(caOut);
+	}
 	
-	if(t >= tend) {
+	var a = [];
+	for(var i = 0; i < N; i++) {
+		
+		var v = o[i].v;
+		var r = o[i].r;
+		var q = o[i].q;
+		var m = o[i].m;
+		
+		var FB = Vect3.mul(q, Vect3.cross(v, B));
+
+		/*
+		var un = o.q * magnetic.B.len() * dt / o.m;
+		var alpha = 1 / Math.sqrt(1 + un * un);
+		*/
+
+		
+		var F = new Vect3;
+		F = Vect3.add(F, FB);
+		
+		a.push(Vect3.div(F, m));		
+	}
+	
+	for(var i = 0; i < N; i++) {
+		var r = o[i].r;
+		var v = o[i].v;
+		
+		v = Vect3.add(v, Vect3.mul(a[i], dt));
+		r = Vect3.add(r, Vect3.mul(v, dt));
+		
+		o[i].r = r;
+		o[i].v = v;
+	}
+	
+	var xIsOut = false;
+	var yIsOut = false;
+	for(var i = 0; i < N; i++) {
+		var x = o[i].r.x;
+		if(x < xmin || x > xmax) xIsOut = true;
+		var y = o[i].r.y;
+		if(y < ymin || y > xmax) yIsOut = true;
+		if(xIsOut || yIsOut) break;
+	}	
+	
+	if(t >= tend || xIsOut || yIsOut) {
 		btLoad.disabled = false;
 		btRead.disabled = false;
 		btStart.disabled = true;
@@ -342,21 +409,113 @@ function draw() {
 		onCanvas: function() {
 			var ca = arguments[0];
 			var cx = ca.getContext("2d");
-			
-			var x = o.r.x;
-			var dx = x + o.D;
-			var y = o.r.y;
-			
 			var lintrans = Transformation.linearTransform;
-			var X = lintrans(x, [xmin, xmax], [XMIN, XMAX]);
-			var DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
-			var D = DX - X;
-			var Y = lintrans(y, [ymin, ymax], [YMIN, YMAX]);
 			
-			cx.beginPath();
-			cx.strokeStyle = o.c;
-			cx.arc(X, Y, D, 0, 2 * Math.PI);
-			cx.stroke();
+			if(o instanceof Grain) {
+				var xg = o.r.x;
+				var dx = xg + o.D;
+				var yg = o.r.y;
+				
+				var X, DX;
+				if(ca.xmin == undefined) {
+					X = lintrans(xg, [xmin, xmax], [XMIN, XMAX]);
+					DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
+				} else {
+					X = lintrans(xg, [ca.xmin, ca.xmax], [XMIN, XMAX]);
+					DX = lintrans(dx, [ca.xmin, ca.xmax], [XMIN, XMAX]);
+				}
+				
+				var D = DX - X;
+				var Y = lintrans(yg, [ymin, ymax], [YMIN, YMAX]);
+				
+				cx.beginPath();
+				if(o.c instanceof Array) {
+					cx.strokeStyle = o.c[0];
+					if(o.c.length > 1) {
+						cx.fillStyle = o.c[1];
+					}
+				} else {
+					cx.strokeStyle = o.c;
+				}
+				
+				if(o.c instanceof Array && o.c.length > 1) {
+					cx.arc(X, Y, D, 0, 2 * Math.PI);
+					cx.fill();
+				}
+				cx.lineWidth = "2";
+				cx.arc(X, Y, D, 0, 2 * Math.PI);
+				cx.stroke();
+			} else if(o instanceof Path) {
+				var qi = o.qi * 2 * Math.PI;
+				var qf = o.qf * 2 * Math.PI;
+				var L = o.l;
+				var color = o.c;
+				
+				var N = Math.floor(L / ds);
+				var q = qi;
+				var dq = (qf - qi) / N;
+				
+				var xx = [];
+				var yy = [];
+				for(i = 0; i < N; i++) {
+					var dx = ds * Math.cos(q);		
+					x += dx;
+					xx.push(x);
+					sx.push(x);
+					
+					var dy = ds * Math.sin(q);		
+					y += dy;
+					yy.push(y);
+					sy.push(y);
+					
+					q += dq;
+				}
+				
+				cx.beginPath();
+				cx.strokeStyle = color;
+				cx.lineWidth = "1";
+				for(i = 0; i < N; i++) {
+					var X = lintrans(xx[i], [xmin, xmax], [XMIN, XMAX]);
+					var Y = lintrans(yy[i], [ymin, ymax], [YMIN, YMAX]);
+					if(i == 0) {
+						cx.moveTo(X, Y);
+					} else {
+						cx.lineTo(X, Y);
+					}
+				}
+				cx.stroke();
+				
+				cx.beginPath();
+				var X = lintrans(xx[0], [xmin, xmax], [XMIN, XMAX]);
+				var Y = lintrans(yy[0], [ymin, ymax], [YMIN, YMAX]);
+				cx.strokeStyle = "#000";
+				cx.arc(X, Y, 2, 0, 2 * Math.PI);
+				cx.stroke();
+				
+			} else if(o instanceof Points) {
+				var N = o.data[0].length;
+				cx.beginPath();
+				cx.lineWidth = "2";
+				cx.strokeStyle = "#00f";
+				for(var i = 0; i <= N; i++) {
+					var X;
+					if(ca.xmin == undefined) {
+						X = lintrans(o.data[0][i], [xmin, xmax],
+							[XMIN, XMAX]);
+					} else {
+						X = lintrans(o.data[0][i], [ca.xmin, ca.xmax],
+							[XMIN, XMAX]);
+					}
+					var Y = lintrans(o.data[1][i], [ymin, ymax],
+						[YMIN, YMAX]);
+					if(i == 0) {
+						cx.moveTo(X, Y);
+					} else {
+						cx.lineTo(X, Y);
+					}
+				}
+				cx.stroke();
+			}
 		}
 	};
 	return result;
