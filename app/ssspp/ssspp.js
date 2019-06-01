@@ -1,6 +1,6 @@
 /*
-	sspp.js
-	Simulation of self-propelled particles
+	ssspp.js
+	Simulation of single self-propelled particles
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
 	Ariq Dhia Irfanudin | 1157030004@student.uinsgd.ac.id
@@ -16,6 +16,8 @@
 	1025 Add magnetic force.
 	1611 Test G, E, B, D from enviroment and seems ok.
 	1829 Error in normal force.
+	1904 Fix normal force problem.
+	1928 Set 3 difference bc and rename to ssspp from sspp.
 */
 
 // Define global variables
@@ -30,6 +32,7 @@ var o, N;
 var grav1, elec1, magn1, drag1;
 var grav2, elec2, magn2, norm2, sprn2;
 var iLeader;
+var bc;
 
 // Execute main function
 main();
@@ -50,9 +53,10 @@ function initParams() {
 	p += "EENV +0.00 +0.00 +0.00\n";
 	p += "BENV +0.00 +0.00 -1.00\n";
 	p += "VENV -0.00 -0.00 +0.00\n";
+	p += "BCXX 0\n";
 	p += "\n";
 	p += "# Interactions\n";
-	p += "GINT 0\n";
+	p += "GINT 1\n";
 	p += "EINT 0\n";
 	p += "BINT 0\n";
 	p += "NINT 1E+3 1E-1\n";
@@ -98,6 +102,7 @@ function readParams() {
 	var E = getValue("EENV").from(taIn);
 	var B = getValue("BENV").from(taIn);
 	var v = getValue("VENV").from(taIn);
+	bc = getValue("BCXX").from(taIn);
 	
 	grav1 = new Gravitational;
 	grav1.setField(g)
@@ -212,6 +217,7 @@ function readParams() {
 	}
 	
 	o[iLeader].c = ["#008", "#aaf"];
+	o[iLeader].v = new Vect3(20, 10, 0);
 }
 
 
@@ -443,7 +449,7 @@ function simulate() {
 				F = Vect3.add(F, FG);
 				F = Vect3.add(F, FE);
 				F = Vect3.add(F, FB);
-				//F = Vect3.add(F, FN);
+				F = Vect3.add(F, FN);
 				F = Vect3.add(F, FS);
 			}
 		}
@@ -467,33 +473,41 @@ function simulate() {
 		o[i].v = v;
 	}
 	
-	// Set periodic boundary condition
-	for(var i = 0; i < N; i++) {
-		if(o[i].r.x < xmin) o[i].r.x += (xmax - xmin); 
-		if(o[i].r.x > xmax) o[i].r.x -= (xmax - xmin); 
-		if(o[i].r.y < ymin) o[i].r.y += (ymax - ymin); 
-		if(o[i].r.y > ymax) o[i].r.y -= (ymax - ymin); 
-	}
-
-	//
-	for(var i = 0; i < N; i++) {
-		if(o[i].r.x < xmin) o[i].r.x += (xmax - xmin); 
-		if(o[i].r.x > xmax) o[i].r.x -= (xmax - xmin); 
-		if(o[i].r.y < ymin) o[i].r.y += (ymax - ymin); 
-		if(o[i].r.y > ymax) o[i].r.y -= (ymax - ymin); 
-	}
-	
-	// 
+	// Apply boundary condition
 	var xIsOut = false;
 	var yIsOut = false;
-	for(var i = 0; i < N; i++) {
-		var x = o[i].r.x;
-		if(x < xmin || x > xmax) xIsOut = true;
-		var y = o[i].r.y;
-		if(y < ymin || y > xmax) yIsOut = true;
-		if(xIsOut || yIsOut) break;
+	if(bc == 0) {
+		// Stop simulation when particles out of area
+		for(var i = 0; i < N; i++) {
+			var x = o[i].r.x;
+			if(x < xmin || x > xmax) xIsOut = true;
+			var y = o[i].r.y;
+			if(y < ymin || y > xmax) yIsOut = true;
+			if(xIsOut || yIsOut) break;
+		}		
+	} else if(bc == 1) {
+		// Set reflective boundary condition
+		for(var i = 0; i < N; i++) {
+			var R = 0.5 * o[i].D;
+			if(o[i].r.x < xmin + R || o[i].r.x > xmax - R) {
+				 o[i].v.x = -o[i].v.x;
+				 o[i].r.x = o[i].r.x + o[i].v.x * dt;
+			}  
+			if(o[i].r.y < ymin + R || o[i].r.y > ymax - R) {
+				 o[i].v.y = -o[i].v.y;
+				 o[i].r.y = o[i].r.y + o[i].v.y * dt;
+			}  
+		}
+	} else if(bc == 2) {
+		// Set periodic boundary condition
+		for(var i = 0; i < N; i++) {
+			if(o[i].r.x < xmin) o[i].r.x += (xmax - xmin); 
+			if(o[i].r.x > xmax) o[i].r.x -= (xmax - xmin); 
+			if(o[i].r.y < ymin) o[i].r.y += (ymax - ymin); 
+			if(o[i].r.y > ymax) o[i].r.y -= (ymax - ymin); 
+		}		
 	}
-	
+		
 	if(t >= tend || xIsOut || yIsOut) {
 		btLoad.disabled = false;
 		btRead.disabled = false;

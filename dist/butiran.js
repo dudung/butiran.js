@@ -1067,6 +1067,7 @@ module.exports = function() {
 	for discussion.
 	20190601
 	1610 Change setConstant to setConstants.
+	1903 Fix gamma term with sign of ksi.
 */
 
 // Require classes
@@ -1110,7 +1111,7 @@ class Normal {
 			var gamma = this.gamma;
 			var R12 = 0.5 * (D1 + D2);
 			var ksi = Math.max(0, R12 - l12);
-			var ksidot = v12.len();
+			var ksidot = v12.len() * Math.sign(ksi);
 			
 			f = Vect3.mul(k * ksi - gamma * ksidot, u12);
 		}
