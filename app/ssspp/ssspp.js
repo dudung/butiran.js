@@ -69,6 +69,7 @@ function initParams() {
 	p += "VELO 20\n";
 	p += "NUMP 36\n";
 	p += "LEAD -1\n";
+	p += "VELD 30 40 0\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0\n";
@@ -216,8 +217,9 @@ function readParams() {
 		iLeader = Math.floor(Math.random() * N);
 	}
 	
+	var vLeader = getValue("VELD").from(taIn);
 	o[iLeader].c = ["#008", "#aaf"];
-	o[iLeader].v = new Vect3(20, 10, 0);
+	o[iLeader].v = vLeader;
 }
 
 
