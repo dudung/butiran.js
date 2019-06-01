@@ -31,7 +31,7 @@ var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var o, N;
 var grav1, elec1, magn1, drag1;
 var grav2, elec2, magn2, norm2, sprn2;
-var iLeader;
+var iLeader, propType;
 var bc;
 
 // Execute main function
@@ -70,6 +70,7 @@ function initParams() {
 	p += "NUMP 36\n";
 	p += "LEAD -1\n";
 	p += "VELD 30 40 0\n";
+	p += "PTYP 1\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0\n";
@@ -217,6 +218,7 @@ function readParams() {
 		iLeader = Math.floor(Math.random() * N);
 	}
 	
+	propType = getValue("PTYP").from(taIn);
 	var vLeader = getValue("VELD").from(taIn);
 	o[iLeader].c = ["#008", "#aaf"];
 	o[iLeader].v = vLeader;
@@ -456,9 +458,21 @@ function simulate() {
 			}
 		}
 		
-		// Set leader
+		// Modify leader
 		if(i == iLeader) {
-			F = FB;
+			if(propType == 0) {
+				F = new Vect3;
+			} else if(propType == 1) {
+				var dir = o[i].v.unit();
+				var theta0 = Math.atan(dir.y / dir.x);
+				var amag = 20;
+				var dtheta = (Math.random() * 2 - 1) * 0.25 * Math.PI;
+				var ax = amag * Math.cos(theta0 + dtheta);
+				var ay = amag * Math.sin(theta0 + dtheta);
+				var az = amag * 0;
+				var FP = new Vect3(ax, ay, az);
+				F = FP;
+			}
 		}
 		
 		a.push(Vect3.div(F, m));		
