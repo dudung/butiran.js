@@ -18,6 +18,7 @@
 	1829 Error in normal force.
 	1904 Fix normal force problem.
 	1928 Set 3 difference bc and rename to ssspp from sspp.
+	2058 Add another type of spp.
 */
 
 // Define global variables
@@ -51,7 +52,7 @@ function initParams() {
 	p += "# Environments\n";
 	p += "GENV +0.00 +0.00 +0.00\n";
 	p += "EENV +0.00 +0.00 +0.00\n";
-	p += "BENV +0.00 +0.00 -1.00\n";
+	p += "BENV +0.00 +0.00 -0.00\n";
 	p += "VENV -0.00 -0.00 +0.00\n";
 	p += "BCXX 1\n";
 	p += "\n";
@@ -70,7 +71,7 @@ function initParams() {
 	p += "NUMP 36\n";
 	p += "LEAD -1\n";
 	p += "VELD 30 40 0\n";
-	p += "PTYP 1\n";
+	p += "PTYP 2\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0\n";
@@ -465,12 +466,16 @@ function simulate() {
 			} else if(propType == 1) {
 				var dir = o[i].v.unit();
 				var theta0 = Math.atan(dir.y / dir.x);
-				var amag = 20;
 				var dtheta = (Math.random() * 2 - 1) * 0.25 * Math.PI;
+				var amag = 20;
 				var ax = amag * Math.cos(theta0 + dtheta);
 				var ay = amag * Math.sin(theta0 + dtheta);
 				var az = amag * 0;
 				var FP = new Vect3(ax, ay, az);
+				F = FP;
+			} else if(propType == 2) {
+				var vv = o[i].v;
+				var FP = Vect3.cross(vv, new Vect3(0, 0, 1));
 				F = FP;
 			}
 		}
