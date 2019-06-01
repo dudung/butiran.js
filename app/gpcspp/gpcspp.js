@@ -1,6 +1,6 @@
 /*
-	ssspp.js
-	Simulation of single self-propelled particle
+	gpcspp.js
+	Group of particle chasing a self-propelled particle
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
 	Yudha Satya Perkasa | yudha@uinsgd.ac.id
@@ -43,7 +43,7 @@ function initParams() {
 	p += "\n";
 	p += "# Interactions\n";
 	p += "NINT 2000 0.1\n";
-	p += "SINT 1 0.1\n";
+	p += "SINT 1 0.1 35\n";
 	p += "GINT 1000\n";
 	p += "\n";
 	p += "# Particles\n";
@@ -103,7 +103,8 @@ function readParams() {
 	grav2.setConstant(kG)
 
 	sprn2 = new Spring;
-	sprn2.setConstants(kS[0], kS[1]);
+	sprn2.setConstants(kS.x, kS.y);
+	sprn2.setUncompressedLength(kS.z);
 	
 	// Get parameters of iteration
 	tbeg = getValue("TBEG").from(taIn);
