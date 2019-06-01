@@ -219,6 +219,7 @@ function createVisualElements() {
 		overflowY = "scroll";
 		width = "214px";
 		height = "200px";
+		fontSize = "11px";
 	}
 	
 	// Create button for loading default parameters
@@ -385,9 +386,10 @@ function simulate() {
 	if(iter == 0) {
 		//var tt = t.toFixed(digit);
 		var tt = t.toFixed(1);
-		var xx = xcom.toFixed(2);
+		tt = (t < 100) ? ("00" + tt).slice(-5) : tt;
+		var xx = xcom.toExponential(1);
 		xx = (xcom >= 0) ? "+" + xx : xx;
-		var yy = ycom.toFixed(2);
+		var yy = ycom.toExponential(1);
 		yy = (ycom >= 0) ? "+" + yy : yy;
 		var KK = K.toExponential(3);
 		var text = tt + " ";
@@ -434,6 +436,12 @@ function simulate() {
 			}
 		}
 		
+		// Set leader
+		if(i == N/2) {
+			F = FB;
+			o[i].c = ["#008", "#aaf"];
+		}
+		
 		a.push(Vect3.div(F, m));		
 	}
 	
@@ -448,6 +456,23 @@ function simulate() {
 		o[i].v = v;
 	}
 	
+	// Set periodic boundary condition
+	for(var i = 0; i < N; i++) {
+		if(o[i].r.x < xmin) o[i].r.x += (xmax - xmin); 
+		if(o[i].r.x > xmax) o[i].r.x -= (xmax - xmin); 
+		if(o[i].r.y < ymin) o[i].r.y += (ymax - ymin); 
+		if(o[i].r.y > ymax) o[i].r.y -= (ymax - ymin); 
+	}
+
+	//
+	for(var i = 0; i < N; i++) {
+		if(o[i].r.x < xmin) o[i].r.x += (xmax - xmin); 
+		if(o[i].r.x > xmax) o[i].r.x -= (xmax - xmin); 
+		if(o[i].r.y < ymin) o[i].r.y += (ymax - ymin); 
+		if(o[i].r.y > ymax) o[i].r.y -= (ymax - ymin); 
+	}
+	
+	// 
 	var xIsOut = false;
 	var yIsOut = false;
 	for(var i = 0; i < N; i++) {
@@ -456,7 +481,7 @@ function simulate() {
 		var y = o[i].r.y;
 		if(y < ymin || y > xmax) yIsOut = true;
 		if(xIsOut || yIsOut) break;
-	}	
+	}
 	
 	if(t >= tend || xIsOut || yIsOut) {
 		btLoad.disabled = false;
