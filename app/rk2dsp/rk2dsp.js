@@ -13,190 +13,11 @@
 	20190602
 	1630 Change from s2drotkiln to rk2dsp, with old description
 	Simulation of 2-d rotary kiln for spherical particles.
+	1646 Remove internal Vect3 and adjust command, it works.
+	1647 Removing Grain and it works.
+	1657 Keep the other for history reason. A new version will
+	be developed in a new name.
 */
-
-
-
-/*
-	vect3.js
-	Library of Vect3 class in JavaScript
-	Sparisoma Viridi | dudung@gmail.com
-	
-	20170214
-	Create this library with following functions defined for
-	Vect3 class
-	add()	add two Vect3,
-	sub() subtract two Vect3,
-	dot()	dot product of two Vect3,
-	crs()	cross product of two Vect3,
-	mul()	multiplication of Vect3 with scalar,
-	div() division of Vect3 with scalar,
-	len() length of a Vect3,
-	uni()	unit vector of a Vect3,
-	neg()	negative of a Vect3.
-	All are tested and works.	
-
-// Class of Vect3
-function Vect3() {
-	// Define some constructor types
-	if(arguments.length == 3) {
-		this.x = arguments[0];
-		this.y = arguments[1];
-		this.z = arguments[2];
-	} else if(arguments.length == 1){
-		this.x = arguments[0].x;
-		this.y = arguments[0].y;
-		this.z = arguments[0].z;
-	} else {
-		this.x = 0;
-		this.y = 0;
-		this.z = 0;
-	}
-	this.strval = function() {
-		var str = "(";
-		str += this.x + ", ";
-		str += this.y + ", ";
-		str += this.z + ")";
-		return str;
-	}
-}
-
-// Define addition of Vect3
-Vect3.add = function(r1, r2) {
-	var r = new Vect3;
-	r.x = r1.x + r2.x;
-	r.y = r1.y + r2.y;
-	r.z = r1.z + r2.z;
-	return r;
-}
-
-// Define substraction of Vect3
-Vect3.sub = function(r1, r2) {
-	var r = new Vect3;
-	r.x = r1.x - r2.x;
-	r.y = r1.y - r2.y;
-	r.z = r1.z - r2.z;
-	return r;
-}
-
-// Define dot product of Vect3
-Vect3.dot = function(r1, r2) {
-	var l = r1.x * r2.x;
-	l += r1.y * r2.y;
-	l += r1.z * r2.z;
-	return l;
-}
-
-// Define cross product of Vect3
-Vect3.crs = function(r1, r2) {
-	var r = new Vect3;
-	r.x = r1.y * r2.z - r1.z * r2.y;
-	r.y = r1.z * r2.x - r1.x * r2.z;
-	r.z = r1.x * r2.y - r1.y * r2.x;
-	return r;
-}
-
-// Define multiplication with scalar
-Vect3.mul = function(a, b) {
-	var r = new Vect3;
-	if(a instanceof Vect3) {
-		r.x = a.x * b;
-		r.y = a.y * b;
-		r.z = a.z * b;
-	} else if(b instanceof Vect3) {
-		r.x = a * b.x;
-		r.y = a * b.y;
-		r.z = a * b.z;
-	}
-	return r;
-}
-
-// Define division with scalar
-Vect3.div = function(a, b) {
-	var r = new Vect3;
-	r.x = a.x / b;
-	r.y = a.y / b;
-	r.z = a.z / b;
-	return r;
-}
-
-// Define length of Vect3
-Vect3.len = function(r) {
-	var l2 = Vect3.dot(r, r);
-	var l = Math.sqrt(l2);
-	return l;
-}
-
-// Define unit vector
-Vect3.uni = function(a) {
-	var l = Vect3.len(a);
-	var r = Vect3.div(a, l);
-	return r;
-}
-
-// Define negative of a vector
-Vect3.neg = function(a) {
-	var r = Vect3;
-	r.x = -a.x;
-	r.y = -a.y;
-	r.z = -a.z;
-	return r;
-}
-
-*/
-
-
-/*
-	grain.js
-	Library of grain as granular particle
-	Sparisoma Viridi | dudung@gmail.com
-	
-	20170214
-	Create this library consists of only Grain class.
-	20170216
-	Add field for particle ID with type of integer.
-*/
-
-// Class of Grain
-function Grain() {
-	if(arguments.length == 6) {
-		this.i = arguments[0];
-		this.m = arguments[1];
-		this.D = arguments[2];
-		this.q = arguments[3];
-		this.c = arguments[4];
-		this.r = arguments[5];
-		this.v = arguments[6];
-	} else if(arguments.length == 1) {
-		this.i = arguments[0].i;
-		this.m = arguments[0].m;
-		this.D = arguments[0].D;
-		this.q = arguments[0].q;
-		this.c = arguments[0].c;
-		this.r = arguments[0].r;
-		this.v = arguments[0].v;
-	} else {
-		this.i = 0;
-		this.m = 1.0;
-		this.D = 1.0;
-		this.q = 1.0;
-		this.c = "#000";
-		this.r = new Vect3;
-		this.v = new Vect3;
-	}
-	this.strval = function() {
-		var str = "(" 
-		str += this.i + ", ";
-		str += this.m + ", ";
-		str += this.D + ", ";
-		str += this.q + ", ";
-		str += this.c + ", ";
-		str += this.r.strval() + ", ";
-		str += this.v.strval() + ")";
-		return str;
-	}
-}
-
 
 
 /*
@@ -288,7 +109,6 @@ Force.visc = function(p) {
 }
 
 
-
 /*
 	mdynamics.js
 	Library of simple molecular dynamics
@@ -337,7 +157,6 @@ Mdynamics.inct = function() {
 }
 
 
-
 /*
 	layout.js
 	Define layout for simulation.
@@ -354,7 +173,7 @@ function layout() {
 	ldiv.style.border = "0px black solid";
 	ldiv.style.height = "402px";
 	ldiv.style.float = "left";
-	ldiv.style.width = "252px";
+	ldiv.style.width = "163px";
 	
 	// Create right division
 	var rdiv = document.createElement("div");
@@ -369,13 +188,11 @@ function layout() {
 	ta.style.color = "black";
 	ta.style.background = "white";
 	ta.rows = "2";
-	ta.cols = "32";
-	//ta.style.overflowY = "scroll";
+	ta.cols = "20";
 	ta.style.display = "block";	
 	ta.id = "hout";
 	
 	var res = document.createElement("textarea");
-//	ldiv.appendChild(res);
 	res.style.color = "black";
 	res.style.background = "white";
 	res.rows = "35";
@@ -391,8 +208,8 @@ function layout() {
 	c.id = "canvas";
 	c.style.border = "1px solid #999";
 	c.style.background = "white";
-	c.width = "600";
-	c.height = "600";
+	c.width = "400";
+	c.height = "400";
 	//c.style.float = "left";
 	var ctx = c.getContext("2d");
 	
@@ -420,11 +237,11 @@ function layout() {
 	b2.innerHTML = "Save";
 	b2.onclick = function() {
 		var canvas = document.getElementById("canvas");
-		var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+		var image = canvas.toDataURL("image/png")
+			.replace("image/png", "image/octet-stream");
 		window.location.href = image;
 	}
 }
-
 
 
 /*
@@ -523,7 +340,7 @@ function plotParticle(p) {
 	ctx.arc(xx, yy, 0.5 * DD, 0, 2 * Math.PI);
 	ctx.stroke();
 	
-	ctx.font = "24px Times New Roman"
+	ctx.font = "20px Times New Roman"
 	ctx.fillStyle = "black";
 	ctx.textAlign = "center";
 	ctx.textBaseline="middle";
@@ -548,13 +365,12 @@ function plotLiner(p) {
 	ctx.arc(xx, yy, 0.5 * DD, 0, 2 * Math.PI);
 	ctx.stroke();
 	
-	ctx.font = "24px Times New Roman"
+	ctx.font = "20px Times New Roman"
 	ctx.fillStyle = "black";
 	ctx.textAlign = "center";
 	ctx.textBaseline="middle";
 	ctx.fillText(p.i, xx, yy);	
 }
-
 
 
 /*
@@ -567,7 +383,6 @@ Putri Mustika Widartiningsih | putrimw.itb@gmail.com
 Start this HTML (create liner)
 20170703
 Add grains
-
 */
 
 var timer1;
@@ -616,7 +431,6 @@ function initiate() {
 			grains[i].m = mL;
 			grains[i].c = cL;
 			grains[i].D = DL;
-			console.log(grains[i].D+"\n");
 		} else {						
 			grains[i].m = mG;
 			grains[i].c = cG;
@@ -624,7 +438,6 @@ function initiate() {
 		}
 		i++;
 	}
-	
 	
 	var ii = 0;
 	var Nx = Math.sqrt(NG);
@@ -666,7 +479,6 @@ function run() {
 		var f = Force.grav2(grains[iN]);
 		SF[iN] = Vect3.add(SF[iN], f);
 	}
-
 	
 	// Calculate normal force
 	for(var iN = NL; iN < N; iN++) {
@@ -678,8 +490,7 @@ function run() {
 			}
 		}
 	}
-				
-	
+		
 	var str = "t = " + t.toFixed(3) + " s";
 	var hout = document.getElementById("hout");
 	hout.innerHTML = str;
