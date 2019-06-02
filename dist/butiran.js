@@ -1143,6 +1143,9 @@ module.exports = function() {
 	20190601
 	1608 Change setConstant to setConstants.
 	1625 Fix comment normal to spring.
+	20190602
+	1508 Seek problem by relaxing spring.
+	1515 Fix it for two grains but not yet tested for one.
 */
 
 // Require classes
@@ -1202,7 +1205,9 @@ class Spring {
 				var ksi = l12 - l;
 				var ksidot = v12.len();
 				
-				f = Vect3.mul(-k * ksi - gamma * ksidot, u12);
+				var fr = Vect3.mul(-k * ksi, u12);
+				var fv = Vect3.mul(-gamma * ksidot, v12);
+				f = Vect3.add(fr, fv);
 			}
 		} else if(arguments.length == 2) {
 			if(arguments[0] instanceof Grain &&
@@ -1221,7 +1226,9 @@ class Spring {
 				var ksi = l12 - l;
 				var ksidot = v12.len();
 				
-				f = Vect3.mul(-k * ksi - gamma * ksidot, u12);
+				var fr = Vect3.mul(-k * ksi, u12);
+				var fv = Vect3.mul(-gamma * ksidot, v12);
+				f = Vect3.add(fr, fv);
 			}
 		}
 		
