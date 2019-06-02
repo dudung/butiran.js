@@ -9,6 +9,8 @@
 	20190602
 	0650 Start this project with gpcspp as template.
 	1341 Continue the progress.
+	1534 Fix termination condition.
+	1538 Add left and right elevation at both end points.
 	
 	References
 	1. Aufa Nu’man Fadhilah Rudiawan, Ismi Yasifa, Sparisoma
@@ -60,6 +62,7 @@ function initParams() {
 	p += "MASS 0.1\n";
 	p += "LENG 2\n";
 	p += "NUMP 20\n";
+	p += "ELEV 0 0.5\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0\n";
@@ -103,6 +106,7 @@ function readParams() {
 	var M = getValue("MASS").from(taIn);
 	var L = getValue("LENG").from(taIn);
 	N = getValue("NUMP").from(taIn);
+	var elev = getValue("ELEV").from(taIn);
 	
 	var dL = L / (N - 1);
 	var dM = M / N;
@@ -148,10 +152,11 @@ function readParams() {
 	
 	// Create initial position of all particles
 	o = [];
+	var dy = (elev[1] - elev[0]) / (N - 1);
 	var xo = 0.5 * (xmax + xmin) - 0.5 * L;
 	for(var i = 0; i < N; i++) {
 		var x = xo + i * dL;
-		var y = 0;
+		var y = elev[0] + i * dy;
 		var z = 0;
 		var r = new Vect3(x, y, z);
 		var v = new Vect3;
@@ -414,7 +419,17 @@ function simulate() {
 		o[i].r = r;
 		o[i].v = v;
 	}
-		
+	
+	if(t >= tend) {
+		btLoad.disabled = false;
+		btRead.disabled = false;
+		btStart.disabled = true;
+		btInfo.disabled = false;
+		btStart.innerHTML = "Start";
+		clearInterval(proc);
+		addText("\n").to(taOut);
+	}
+	
 	iter++;
 	t += dt;
 }
