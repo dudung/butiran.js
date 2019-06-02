@@ -11,6 +11,7 @@
 	1341 Continue the progress.
 	1534 Fix termination condition.
 	1538 Add left and right elevation at both end points.
+	1601 Revise co-authors in info.
 	
 	References
 	1. Aufa Nu’man Fadhilah Rudiawan, Ismi Yasifa, Sparisoma
@@ -324,9 +325,8 @@ function buttonClick() {
 		info += "sspp.js\n";
 		info += "Simulation of self-propelled particles";
 		info += "Sparisoma Viridi, ";
-		info += "Yudha Satya Perkasa\n";
-		info += "Ariq Dhia Irfanudin, ";
-		info += "Dinda Ravi Algifari, ";
+		info += "Aufa Nu'man Fadhilah Rudiawan, ";
+		info += "Ismi Yasifa\n";
 		info += "https://github.com/dudung/butiran.js\n"
 		info += "Load  load parameters\n";
 		info += "Read  read parameters\n";
