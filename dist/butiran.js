@@ -136,6 +136,9 @@
 	
 	20190530
 	1222 Add lib/data/points for spfwfs app.
+	
+	20190602
+	1718 Add lib/ui for sslssgm app.
 */
 
 // lib
@@ -175,6 +178,13 @@ var Path = __webpack_require__(22)();
 // lib/data
 var Points = __webpack_require__(23)();
 
+// lib/ui
+var TabText = __webpack_require__(24);
+var TabCanvas = __webpack_require__(25);
+var Parse = __webpack_require__(26);
+var Tabs = __webpack_require__(27)();
+var Bgroup = __webpack_require__(28)();
+
 // Store information 
 if(typeof window !== 'undefined') {
 	// Store to window object -- 20180519.2358
@@ -213,8 +223,15 @@ if(typeof window !== 'undefined') {
 	window["Integration"] = Integration;
 	window["Transformation"] = Transformation;
 	
-	// data/points
+	// lib/data/points
 	window["Points"] = Points;
+	
+	// lib/ui
+	window["TabText"] = TabText;
+	window["TabCanvas"] = TabCanvas;
+	window["Parse"] = Parse;
+	window["Tabs"] = Tabs;
+	window["Bgroup"] = Bgroup;
 }
 
 
@@ -2499,6 +2516,1435 @@ class Points {
 // Export module -- 20190530.1227 ok
 module.exports = function() {
 	return Points;
+};
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports) {
+
+/*
+	tabtext.js
+	Tabs of textarea for input and output in simulation using
+	butiran.js library.
+	
+	Sparisoma Viridi | dudung@gmail.com
+	
+	20180613
+	Start it from lib/grid/table.js in butiran.js libraries and
+	functions.
+	Constructing createAndSetLayoutElements, createStyle.
+	20180614
+	Continue creating this application, with functions
+	createIODiv, createAllStyles, changeStyleAttribute, openTA.
+	Rename createIODiv to createIOTabText.
+	Add pop and push.
+	Two or more instance will still sharing same elementId.
+	It is still a bug.
+*/
+
+// Reserver id of textareas
+var taIds = [];
+var taId;
+
+// Create IO division based on several divs and a textarea
+function createTabTextIO(menu, parent, dimension) {
+	// Set style of the tab
+	Style.createStyle(`
+	.tab {
+		overflow: hidden;
+		width: 200px;
+		height: 300px;
+		background: #f1f1f1;
+		border: 1px solid #ccc;
+		float: left;
+	}
+	`);
+
+	// Set style of the buttons inside the tab
+	Style.createStyle(`
+	.tab button {
+		background: #ddd;
+		float: left;
+		outline: none;
+		border: none;
+		padding: 6px 6px;
+		width: 60px;
+		height: 28px;
+		cursor: pointer;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	`);
+
+	// Set style of the buttons inside the tab on mouse hover
+	Style.createStyle(`
+	.tab button:hover {
+		background: #e7e7e7;
+		color: #000;
+	}
+	`);
+
+	// Set style of current active button
+	Style.createStyle(`
+	.tab button.active {
+		background: #f1f1f1;
+		color: #000;
+	}
+	`);
+	
+	// Set style of div content, parent of textarea
+	Style.createStyle(`
+	.divcontent {
+		clear: both;
+		padding: 4px 4px;
+		background: inherit;
+	}
+	`);
+	
+	// Set style of tab content, which is a textarea
+	Style.createStyle(`
+	.tabcontent {
+		width: 182px;
+		display: none;
+		padding: 4px 6px;
+		overflow-Y: scroll;
+		border: 1px solid #aaa;
+	}
+	`);
+	
+	// Get IODiv dimension
+	width = dimension.width;
+	height = dimension.height;
+	
+	// Get number of menu item
+	var N = menu.length;
+
+	// Adjust IODiv dimension
+	var div = document.createElement("div");
+	div.className = "tab";
+	Style.changeStyleAttribute(".tab", "width", width);
+	Style.changeStyleAttribute(".tab", "height", height);
+	parent.append(div);
+	
+	// Adjust button width	
+	var btnWidth = Math.floor(parseInt(dimension.width) / N) +
+		"px";
+	Style.changeStyleAttribute(".tab button", "width",
+		btnWidth);
+	
+	for(var i = 0; i < N; i++) {
+		var btnMenu = document.createElement("button");
+		btnMenu.id = "btn" + menu[i];
+		btnMenu.innerHTML = menu[i];
+		btnMenu.className = "tablinks";
+		btnMenu.addEventListener("click", openTabText);
+		div.append(btnMenu);
+	}
+	
+	var divMenu = document.createElement("div");
+	divMenu.className = "divcontent";
+	divMenu.id = "divMenu";
+	for(var i = 0; i < N; i++) {
+		var taMenu = document.createElement("textarea");
+		taMenu.id = "ta" + menu[i];
+		taIds.push(taMenu.id);
+		taMenu.innerHTML = menu[i];
+		taMenu.className = "tabcontent";
+		divMenu.append(taMenu);
+	}
+	div.append(divMenu);
+	
+	// Get dimension of elements and set its children's
+	var btnPadTop =
+		Style.getStyleAttribute(".tab button", "paddingTop");
+	var btnPadBtm =
+		Style.getStyleAttribute(".tab button", "paddingBottom");
+	var btnHeight =
+		Style.getStyleAttribute(".tab button", "height");
+	var divHeight = (parseInt(height) - parseInt(btnHeight)
+		- parseInt(btnPadTop) - parseInt(btnPadBtm)) + "px";
+	Style.changeStyleAttribute(".divcontent", "height",
+		divHeight);
+	
+	var divPadTop =
+		Style.getStyleAttribute(".divcontent", "paddingTop");
+	var divPadBtm =
+		Style.getStyleAttribute(".divcontent", "paddingBottom");
+	var tabCoB =
+		Style.getStyleAttribute(".tabcontent", "borderWidth");
+	var tabCoH = (parseInt(divHeight) - parseInt(divPadTop)
+		- parseInt(divPadBtm) + 2 * parseInt(tabCoB)) + "px";
+	Style.changeStyleAttribute(".tabcontent", "height",
+		tabCoH);
+	
+	var tabCoPL = 
+		Style.getStyleAttribute(".tabcontent", "paddingLeft");
+	var tabCoPR = 
+		Style.getStyleAttribute(".tabcontent", "paddingRight");
+	var scrollBarWidth = 10; // Not known
+	var tabCoW = (parseInt(width) - parseInt(tabCoPL)
+		- parseInt(tabCoPR) - scrollBarWidth) + "px";
+	Style.changeStyleAttribute(".tabcontent", "width", tabCoW);
+	
+	/*
+	20180614.1301 There are still some problems with dimension,
+	and child - parent size relations in width and height.
+	*/
+	
+	// Call initial active button and textarea
+	openTabText(0);
+	
+	return taIds;
+}
+
+// Open a textarea
+function openTabText(event) {
+	// Remove active from all button
+	var tablinks = document.getElementsByClassName("tablinks");
+	var N = tablinks.length;
+	for(var i = 0; i < N; i++) {
+		var className = tablinks[i].className;
+		var newClassName = className.replace("active", "");
+		tablinks[i].className = newClassName;
+	}
+	
+	// Hide all tabcontent
+	var tabcont = document.getElementsByClassName("tabcontent");
+	var N = tabcont.length;
+	for(var i = 0; i < N; i++) {
+		tabcont[i].style.display = "none";
+	}
+	
+	// Set active to current button and show related content
+	var target = event.target;
+	if(target != undefined) {
+		target.className += " active";
+		var id = "ta" + target.id.substring(3);
+		var ta = document.getElementById(id);
+		ta.style.display = "block";
+	} else {
+		var id = event;
+		tablinks[0].className += " active";
+		tabcont[0].style.display = "block";
+	}
+}
+
+// Set id
+function setId(id) {
+	taId = taIds[id];
+}
+
+// Pop last line from textarea
+function pop(id) {
+	var ta = document.getElementById(taId);
+	var val = ta.value;
+	var lines = val.split("\n");
+	var last = lines.pop();
+	val = lines.join("\n");
+	ta.value = val;
+	return last;
+}
+
+// Push to textarea
+function push(line) {
+	var ta = document.getElementById(taId);
+	var val = ta.value;
+	var lines = val.split("\n");
+	lines.push(line);
+	val = lines.join("\n");
+	ta.value = val;
+}
+
+// Export module
+module.exports = {
+	createTabTextIO: function(menu, parent, dimension) {
+		return createTabTextIO(menu, parent, dimension)
+	},
+	openTabText: function(event) {
+		return openTabText(event);
+	},
+	setId: function(id) {
+		return setId(id);
+	},
+	pop: function() {
+		return pop();
+	},
+	push: function(line) {
+		return push(line);
+	},
+};
+
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports) {
+
+/*
+	tabcanvas.js
+	Tabs of canvas for input and output in simulation using
+	butiran.js library.
+	
+	Sparisoma Viridi | dudung@gmail.com
+	
+	20180614
+	Start by modifying lib/ui/tabcanvas.js libraries and
+	functions.
+	Two or more instance will still sharing same elementId.
+	It is still a bug.
+*/
+
+// Reserver id of textareas
+var canIds = [];
+var canId;
+
+// Create IO division based on several divs and a textarea
+function createTabCanvasIO(menu, parent, dimension) {
+	// Set style of the tab
+	Style.createStyle(`
+	.tabcan {
+		overflow: hidden;
+		width: 200px;
+		height: 300px;
+		background: #f1f1f1;
+		border: 1px solid #ccc;
+		float: left;
+	}
+	`);
+
+	// Set style of the buttons inside the tab
+	Style.createStyle(`
+	.tabcan button {
+		background: #ddd;
+		float: left;
+		outline: none;
+		border: none;
+		padding: 6px 6px;
+		width: 60px;
+		height: 28px;
+		cursor: pointer;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	`);
+
+	// Set style of the buttons inside the tab on mouse hover
+	Style.createStyle(`
+	.tabcan button:hover {
+		background: #e7e7e7;
+		color: #000;
+	}
+	`);
+
+	// Set style of current active button
+	Style.createStyle(`
+	.tabcan button.active {
+		background: #f1f1f1;
+		color: #000;
+	}
+	`);
+	
+	// Set style of div content, parent of textarea
+	Style.createStyle(`
+	.divcontentcan {
+		clear: both;
+		padding: 4px 4px;
+		background: inherit;
+	}
+	`);
+	
+	// Set style of tab content, which is a textarea
+	Style.createStyle(`
+	.tabcontentcan {
+		width: 182px;
+		display: none;
+		padding: 4px 6px;
+		overflow-Y: scroll;
+		border: 1px solid #aaa;
+	}
+	`);
+	
+	// Get IODiv dimension
+	width = dimension.width;
+	height = dimension.height;
+	
+	// Get number of menu item
+	var N = menu.length;
+
+	// Adjust IODiv dimension
+	var div = document.createElement("div");
+	div.className = "tabcan";
+	Style.changeStyleAttribute(".tabcan", "width", width);
+	Style.changeStyleAttribute(".tabcan", "height", height);
+	parent.append(div);
+	
+	// Adjust button width	
+	var btnWidth = Math.floor(parseInt(dimension.width) / N) +
+		"px";
+	Style.changeStyleAttribute(".tabcan button", "width",
+		btnWidth);
+	
+	for(var i = 0; i < N; i++) {
+		var btnMenu = document.createElement("button");
+		btnMenu.id = "btc" + menu[i];
+		btnMenu.innerHTML = menu[i];
+		btnMenu.className = "tablinkscan";
+		btnMenu.addEventListener("click", openTabCanvas);
+		div.append(btnMenu);
+	}
+	
+	var divMenu = document.createElement("div");
+	divMenu.className = "divcontentcan";
+	divMenu.id = "divMenuCan";
+	for(var i = 0; i < N; i++) {
+		var taMenu = document.createElement("textarea");
+		taMenu.id = "can" + menu[i];
+		canIds.push(taMenu.id);
+		taMenu.innerHTML = menu[i];
+		taMenu.className = "tabcontentcan";
+		divMenu.append(taMenu);
+	}
+	div.append(divMenu);
+	
+	// Get dimension of elements and set its children's
+	var btnPadTop =
+		Style.getStyleAttribute(".tabcan button", "paddingTop");
+	var btnPadBtm =
+		Style.getStyleAttribute(".tabcan button", "paddingBottom");
+	var btnHeight =
+		Style.getStyleAttribute(".tabcan button", "height");
+	var divHeight = (parseInt(height) - parseInt(btnHeight)
+		- parseInt(btnPadTop) - parseInt(btnPadBtm)) + "px";
+	Style.changeStyleAttribute(".divcontent", "height",
+		divHeight);
+	
+	var divPadTop =
+		Style.getStyleAttribute(".divcontentcan", "paddingTop");
+	var divPadBtm =
+		Style.getStyleAttribute(".divcontentcan", "paddingBottom");
+	var tabCoB =
+		Style.getStyleAttribute(".tabcontentcan", "borderWidth");
+	var tabCoH = (parseInt(divHeight) - parseInt(divPadTop)
+		- parseInt(divPadBtm) + 2 * parseInt(tabCoB)) + "px";
+	Style.changeStyleAttribute(".tabcontentcan", "height",
+		tabCoH);
+	
+	var tabCoPL = 
+		Style.getStyleAttribute(".tabcontentcan", "paddingLeft");
+	var tabCoPR = 
+		Style.getStyleAttribute(".tabcontentcan", "paddingRight");
+	var scrollBarWidth = 10; // Not known
+	var tabCoW = (parseInt(width) - parseInt(tabCoPL)
+		- parseInt(tabCoPR) - scrollBarWidth) + "px";
+	Style.changeStyleAttribute(".tabcontentcan", "width", tabCoW);
+	
+	/*
+	20180614.1301 There are still some problems with dimension,
+	and child - parent size relations in width and height.
+	*/
+	
+	// Call initial active button and textarea
+	openTabCanvas(0);
+	
+	return canIds;
+}
+
+// Open a canvas
+function openTabCanvas(event) {
+	// Remove active from all button
+	var tablinks = document.getElementsByClassName("tablinkscan");
+	var N = tablinks.length;
+	for(var i = 0; i < N; i++) {
+		var className = tablinks[i].className;
+		var newClassName = className.replace("active", "");
+		tablinks[i].className = newClassName;
+	}
+	
+	// Hide all tabcontent
+	var tabcont = document.getElementsByClassName("tabcontentcan");
+	var N = tabcont.length;
+	for(var i = 0; i < N; i++) {
+		tabcont[i].style.display = "none";
+	}
+	
+	// Set active to current button and show related content
+	var target = event.target;
+	if(target != undefined) {
+		target.className += " active";
+		var id = "can" + target.id.substring(3);
+		var ta = document.getElementById(id);
+		ta.style.display = "block";
+	} else {
+		var id = event;
+		tablinks[0].className += " active";
+		tabcont[0].style.display = "block";
+	}
+}
+
+// Set id
+function setId(id) {
+	canId = canIds[id];
+}
+
+// Pop last line from textarea
+function pop(id) {
+	var ta = document.getElementById(taId);
+	var val = ta.value;
+	var lines = val.split("\n");
+	var last = lines.pop();
+	val = lines.join("\n");
+	ta.value = val;
+	return last;
+}
+
+// Push to textarea
+function push(line) {
+	var ta = document.getElementById(taId);
+	var val = ta.value;
+	var lines = val.split("\n");
+	lines.push(line);
+	val = lines.join("\n");
+	ta.value = val;
+}
+
+// Export module
+module.exports = {
+	createTabCanvasIO: function(menu, parent, dimension) {
+		return createTabCanvasIO(menu, parent, dimension)
+	},
+	openTabCanvas: function(event) {
+		return openTabCanvas(event);
+	},
+	setId: function(id) {
+		return setId(id);
+	},
+	pop: function() {
+		return pop();
+	},
+	push: function(line) {
+		return push(line);
+	},
+};
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+	parse.js
+	Parse key and value pair
+	
+	Sparisoma Viridi | dudung@gmail.com
+	
+	20180618
+	Create this library of functions.
+	20180619
+	Get column from multiline text.
+	20180627
+	Add new function for handling 4 parameters in a line.
+*/
+
+// Require classes
+var Vect3 = __webpack_require__(2)();
+
+// Get value of related key from multi line text with '\n'
+function getFrom(text) {
+	var par = {
+		valueOf: function(key) {
+			var lines = text.split('\n');
+			var N = lines.length;
+			var val;
+			for(var i = 0; i < N; i++) {
+				var j = lines[i].indexOf(key);
+				if(j != -1) {
+					var cols = lines[i].split(' ');
+					var M = cols.length;
+					if(M == 2) {
+						val = parseFloat(cols[1]);
+					} else if(M == 4) {
+						var x = parseFloat(cols[1]);
+						var y = parseFloat(cols[2]);
+						var z = parseFloat(cols[3]);
+						val = new Vect3(x, y, z)
+					} else if(M == 5) {
+						val = [
+							parseFloat(cols[1]),
+							parseFloat(cols[2]),
+							parseFloat(cols[3]),
+							parseFloat(cols[4])
+						];
+					}
+				}
+			}
+			return val;
+		},
+		column: function(jcol) {
+			var lines = text.split('\n');
+			var N = lines.length;
+			var val = [];
+			for(var i = 0; i < N; i++) {
+				var cols = lines[i].split(" ");
+				val.push(parseFloat(cols[jcol]));
+			}
+			return val;
+		},
+	};
+	return par;
+}
+
+// Export module
+module.exports = {
+	getFrom: function(text) {
+		return getFrom(text)
+	},
+};
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports) {
+
+/*
+	tabs.js
+	A GUI based on div element for containing visual elements,
+	e.g. textarea and canvas, which can be hidden and shown
+	using appropriate button
+	
+	Sparisoma Viridi | dudung@gmail.com
+	
+	20180615
+	Create this class in order to overcome problem of not
+	unique ID of elements as TabText and TabCanvas functions
+	are used.
+	20180616
+	Continue creating this class. Class style tablinks must
+	also be labeled with id.
+	20180617
+	Fix referencing to this in event handler.
+	Fix size of canvas.
+	Canvas and textarea can be accessed through text(label)
+	graphic(label).
+	20180618
+	Add element(label) for alternative to textarea(label) and
+	canvas(label).
+	20180714
+	Remove a line in arch outputting to console.
+*/
+
+// Define class of Tabs
+class Tabs {
+	// Create constructor
+	constructor() {
+		// Set rules for number of arguments
+		if(arguments.length == 0) {
+			var msg = "Tabs requires id (and parentId) as "
+				+ "arguments";
+			throw new Error(msg);
+		} else if(arguments.length == 1){
+			this.id = arguments[0];
+			this.parentId = "document.body";
+			var msg = "Tabs " + this.id + " assumes that parent is"
+				+ " document.body";
+			console.warn(msg);
+		} else {
+			this.id = arguments[0];
+			this.parentId = arguments[1]
+		}
+		
+		// Check whether id already exists
+		var el = document.getElementById(this.id);
+		var idExist = (el != undefined)
+		if(idExist) {
+			var msg = this.id + " exists";
+			throw new Error(msg)
+		}
+		
+		// Create style
+		this.createAllStyle(this.id);
+		this.tabcs = "tab" + this.id;
+		this.tabbtncs = "tab" + this.id + " button";
+		this.tablinkscs =  "tablinks" + this.id;
+		this.divcontcs =  "divcontent" + this.id;
+		this.tabcontcs =  "tabcontent" + this.id;
+		
+		// Try not so good workaround
+		localStorage.setItem(this.tablinkscs, this.tablinkscs);
+		localStorage.setItem(this.tabcontcs, this.tabcontcs);
+		
+		// Define visual container
+		var tab  = document.createElement("div");
+		tab.id = this.id;
+		tab.className = this.tabcs;
+		this.tab = tab;
+		
+		// Set parent of Tabs instance
+		if(this.parentId == "document.body") {
+			document.body.append(this.tab);
+		} else {
+			var el = document.getElementById(this.parentId);
+			el.append(this.tab);
+		}
+		
+		// Define array for storing tab button information
+		this.tabs = [];
+		this.tabsType = [];
+	}
+	
+	// Set background color
+	setBackground(color) {
+		Style.changeStyleAttribute('.' + this.tabcs,
+			"background", color);
+	}
+	
+	// Set width
+	setWidth(width) {
+		Style.changeStyleAttribute('.' + this.tabcs,
+			"width", width);		
+	}
+	
+	// Set hight
+	setHeight(height) {
+		Style.changeStyleAttribute('.' + this.tabcs,
+			"height", height);		
+	}
+	
+	// Ada label for tab button
+	addTab(label, type) {
+		// Erase div
+		var divid = this.id + "div";
+		var div = document.getElementById(divid);
+		if(div != undefined) {
+			div.remove();
+		}
+		
+		// Avoid same tab label
+		var ilabel = this.tabs.indexOf(label);
+		if(ilabel < 0) {
+			this.tabs.push(label);
+			this.tabsType.push(type);
+		} else {
+			var msg = "Duplicate label " + label + " is igonered";
+			console.warn(msg);
+		}
+		
+		// Create tab buttons
+		var N = this.tabs.length;
+		for(var i = 0; i < N; i++) {
+			var id = this.id + this.tabs[i];
+			var btn = document.getElementById(id);
+			if(btn == undefined) {
+				var btn = document.createElement("button");
+				btn.id = id;
+				btn.className = this.tablinkscs;
+				btn.innerHTML = this.tabs[i];
+				btn.addEventListener("click", this.toggleContent)
+				this.tab.append(btn);
+			}
+		}
+		
+		// Recreate div -- without following line act differently
+		// when number of tab buttons is odd or even
+		div = document.getElementById(divid);
+		if(div == undefined) {
+			var div = document.createElement("div");
+			div.id = divid;
+			div.className = this.divcontcs;
+			this.tab.append(div);
+		}
+		
+		// Adjust textarea or canvas width
+		var width = parseInt(Style.getStyleAttribute('.' +
+			this.tabcs, "width"));
+		var pl = parseInt(Style.getStyleAttribute('.' +
+			this.divcontcs, "paddingLeft"));
+		var pr = parseInt(Style.getStyleAttribute('.' +
+			this.divcontcs, "paddingRight"));
+		var dh = 14;
+		var tcwidth = (width - pl - pr - dh) + "px";
+		Style.changeStyleAttribute('.' + this.tabcontcs,
+			"width", tcwidth);
+		
+		var height = parseInt(Style.getStyleAttribute('.' +
+			this.tabcs, "height"));
+		var pt = parseInt(Style.getStyleAttribute('.' +
+			this.divcontcs, "paddingTop"));
+		var pb = parseInt(Style.getStyleAttribute('.' +
+			this.divcontcs, "paddingBottom"));
+		var dv = 38;
+		var tcheight = (height - pt - pb - dv) + "px";
+		Style.changeStyleAttribute('.' + this.tabcontcs,
+			"height", tcheight);
+
+		// Create content of div
+		for(var i = 0; i < N; i++) {
+			var id = this.id + this.tabs[i] + "content";
+			var el = document.getElementById(id);
+			if(el == undefined) {
+				var el;
+				if(this.tabsType[i] == 0) {
+					el = document.createElement("textarea");
+					el.className = this.tabcontcs;
+					el.innerHTML = this.tabs[i];
+				} else if(this.tabsType[i] == 1) {
+					el = document.createElement("canvas");
+					el.className = this.tabcontcs;
+					el.width = parseInt(tcwidth);
+					el.height = parseInt(tcheight);
+					el.getContext("2d").font = "12px Courier";
+					el.getContext("2d").fillText(this.tabs[i], 2, 10);
+					el.getContext("2d").beginPath();
+					el.getContext("2d")
+						.arc(45, 45, 20, 0, 2 * Math.PI);
+					el.getContext("2d").stroke();
+					el.getContext("2d").beginPath();
+					el.getContext("2d")
+						.arc(55, 25, 10, 0, 2 * Math.PI);
+					el.getContext("2d").stroke();
+				}
+				el.id = id;
+				div.append(el);
+			}
+		}
+		
+		// Adjust width according to number of tab buttons
+		this.updateTabButtonsWidth();
+		
+		// Initiate visible tab -- 20180617.0918
+		this.toggleContent(0);
+	}
+	
+	// Remove label for tab button
+	removeTab(label) {
+		// 20180616.0445
+		// Tom Wadley, Beau Smith
+		// https://stackoverflow.com/a/5767357/9475509
+		var i = this.tabs.indexOf(label);
+		var remE = this.tabs.splice(i, 1);
+		this.tabsType.splice(i, 1);
+		
+		// Warn only for unexisting label for removing
+		if(i < 0) {
+			var msg = "Unexisting label " + label + " for removing "
+				+ "is igonered";
+			console.warn(msg);
+		}
+		
+		// 20180616.1612
+		// Catalin Rosu
+		// https://catalin.red/removing-an-element-with
+		// -plain-javascript-remove-method/
+		
+		// Remove tab button
+		var id = this.id + remE;
+		var btn = document.getElementById(id);
+		btn.remove();
+		this.updateTabButtonsWidth();
+		
+		// Remove element related to tab button
+		var id2 = this.id + remE + "content";
+		var el = document.getElementById(id2);
+		el.remove();
+		
+		// Initiate visible tab after remove a tab button
+		// -- 20180617.1031
+		this.toggleContent(0);
+	}
+	
+	// Check and update tab buttons
+	updateTabButtonsWidth() {
+		var N = this.tabs.length;
+		var M = document.getElementsByClassName(this.tablinkscs)
+			.length;
+		// Make sure that label and tabbutton have the same size
+		if(M == N) {
+			var width =
+				Style.getStyleAttribute('.' + this.tabcs, "width");
+			var btnWidth = parseInt(width) / N + "px";
+			Style.changeStyleAttribute('.' + this.tabbtncs,
+				"width", btnWidth);
+		}
+	}
+	
+	// Get class name -- problem by event also not work
+	getStyleClassName() {
+		var scn = [];
+		scn.push(this.tabcs);
+		scn.push(this.tabbtncs);
+		scn.push(this.tablinkscs);
+		scn.push(this.tabcontcs);
+		return scn;
+	}
+		
+	// Toggle tab content when button clicked
+	toggleContent() {
+		// The idea using styles is from
+		// https://www.w3schools.com/howto/howto_js_tabs.asp
+		
+		if(event != undefined) {
+			// Get style name with workaround using localStorage
+			var parent = event.target.parentElement;
+			var tlcs = localStorage
+				.getItem("tablinks" + parent.id);
+			var tccs = localStorage
+				.getItem("tabcontent" + parent.id);
+
+			// Remove active from all button
+			var tablinks = document.getElementsByClassName(tlcs);
+			var N = tablinks.length;
+			for(var i = 0; i < N; i++) {
+				var className = tablinks[i].className;
+				var newClassName = className.replace("active", "");
+				tablinks[i].className = newClassName;
+			}
+			
+			// Hide all tabcontent
+			var tabcont = document.getElementsByClassName(tccs);
+			var N = tabcont.length;
+			for(var i = 0; i < N; i++) {
+				tabcont[i].style.display = "none";
+			}
+			
+			// Set active to current button and show related content
+			var target = event.target;
+			target.className += " active";
+			var id = target.id + "content";
+			var el = document.getElementById(id);
+			el.style.display = "block";
+		} else {
+			var i = arguments[0];
+			var id = this.id;
+			var tlcs = localStorage.getItem("tablinks" + id);
+			var tccs = localStorage.getItem("tabcontent" + id);
+			var tablinks = document.getElementsByClassName(tlcs);
+			var tabcont = document.getElementsByClassName(tccs);
+			
+			// Fixed -- 20180617.0918 for undefined
+			// -- 1020 for multiple active
+			if(tablinks.length > 0 && tabcont.length > 0) {
+				var className = tablinks[i].className;
+				var newClassName = className.replace("active", "");
+				tablinks[i].className = newClassName;
+				tablinks[i].className += " active";
+				tabcont[i].style.display = "block";
+			}
+		}
+	}
+	
+	// Create default style for this class
+	createAllStyle(id) {
+		// Set style of the tab
+		Style.createStyle(
+		'.tab' + id + ` {
+			overflow: hidden;
+			width: 240px;
+			height: 200px;
+			background: #f1f1f1;
+			border: 1px solid #ccc;
+			float: left;
+		}
+		`);
+
+		// Set style of the buttons inside the tab
+		Style.createStyle(
+		'.tab' + id +  ` button {
+			background: #ddd;
+			float: left;
+			outline: none;
+			border: none;
+			padding: 6px 6px;
+			width: 60px;
+			height: 28px;
+			cursor: pointer;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		`);
+
+		// Set style of the buttons inside the tab on mouse hover
+		Style.createStyle(
+		'.tab' + id + ` button:hover {
+			background: #e7e7e7;
+			color: #000;
+		}
+		`);
+
+		// Set style of current active button
+		Style.createStyle(
+		'.tab' + id + ` button.active {
+			background: #f1f1f1;
+			color: #000;
+		}
+		`);
+		
+		// Set style of div content, parent of textarea
+		Style.createStyle(
+		'.divcontent' + id + ` {
+			clear: both;
+			padding: 4px 4px;
+			background: inherit;
+		}
+		`);
+		
+		// Set style of tab content, which is a textarea
+		Style.createStyle(
+		'.tabcontent' + id + ` {
+			width: 182px;
+			display: none;
+			padding: 4px 6px;
+			overflow-Y: scroll;
+			border: 1px solid #aaa;
+			background: #fff;
+			margin: 0px;
+		}
+		`);
+	}
+	
+	// Get access to textarea of tab with name
+	textarea(label) {
+		var i = this.tabs.indexOf(label);
+		var id = this.id + this.tabs[i] + "content";
+		var el = document.getElementById(id);
+		var nottextarea = !(el instanceof HTMLTextAreaElement);
+		if(nottextarea) {
+			var msg = "Tabs " + this.id + " " + label +
+				" is not as a textarea";
+			throw new Error(msg);
+		} else {
+			return el;
+		}
+	}
+	
+	// Get access to canvas of tab with name
+	canvas(label) {
+		var i = this.tabs.indexOf(label);
+		var id = this.id + this.tabs[i] + "content";
+		var el = document.getElementById(id);
+		var notcanvas = !(el instanceof HTMLCanvasElement);
+		if(notcanvas) {
+			var msg = "Tabs " + this.id + " " + label +
+				" is not as a canvas";
+			throw new Error(msg);
+		} else {
+			return el;
+		}
+	}
+	
+	// Get element
+	element(label) {
+		var i = this.tabs.indexOf(label);
+		var id = this.id + this.tabs[i] + "content";
+		var el = document.getElementById(id);
+		return el;
+	}
+	
+	// Manipulate directly tab content of type text
+	text(label) {
+		var i = this.tabs.indexOf(label);
+		var id = this.id + this.tabs[i] + "content";
+		var el = document.getElementById(id);
+		var textarea = (el instanceof HTMLTextAreaElement);
+		
+		// Handle content as textarea
+		if(textarea) {
+			var lines = el.value.split("\n");
+			var tav = {
+				push: function(line) {
+					// Avoid first empty line after clear textarea
+					if(lines.length == 1 && lines[0].length == 0) {
+						lines[0] = line;
+					} else {
+						lines.push(line);
+					}
+					var val = lines.join("\n");
+					el.value = val;
+				},
+				pop: function() {
+					var pl = lines.pop();
+					var val = lines.join("\n");
+					el.value = val;
+					return pl;
+				},
+				popAll: function() {
+					el.value;
+					return lines;
+				},
+				clear: function() {
+					el.value = "";
+				},
+			}
+			return tav;
+		} else {
+			var msg = this.id + " " + this.tabs[i] +
+				" is not a textarea";
+			throw new Error(msg);
+		}
+	}
+
+	// Manipulate directly tab content of type graphic
+	graphic(label) {
+		var i = this.tabs.indexOf(label);
+		var id = this.id + this.tabs[i] + "content";
+		var el = document.getElementById(id);
+		var canvas = (el instanceof HTMLCanvasElement);
+		var ctx = el.getContext("2d");
+		
+		// Handle content as canvas
+		if(canvas) {
+			// Define COORD
+			el.RANGE = [0, el.height, el.width, 0];
+			
+			// Define object for handling drawing process
+			var can = {
+				setCoord: function(range) {
+					el.range = range;
+				},
+				getCoord: function() {
+					return el.range;
+				},
+				getCOORD: function() {
+					return el.RANGE;
+				},
+				setLineColor: function(color) {
+					ctx.strokeStyle = color;
+				},
+				setFillColor: function(color) {
+					ctx.fillStyle = color;
+				},
+				trect: function(x, y, width, height) {
+					var xx = Transformation.linearTransform(
+						x,
+						[el.range[0], el.range[2]], 
+						[el.RANGE[0], el.RANGE[2]]
+					);
+					var yy = Transformation.linearTransform(
+						y,
+						[el.range[1], el.range[3]], 
+						[el.RANGE[1], el.RANGE[3]]
+					);
+					var xxdx = Transformation.linearTransform(
+						x + width,
+						[el.range[0], el.range[2]], 
+						[el.RANGE[0], el.RANGE[2]]
+					);
+					var yydy = Transformation.linearTransform(
+						y + height,
+						[el.range[1], el.range[3]], 
+						[el.RANGE[1], el.RANGE[3]]
+					);
+					var ww = xxdx - xx;
+					var hh = yydy - yy;
+					return [xx, yy, ww, hh];
+				},
+				rect: function(x, y, width, height) {
+					var tc = this.trect(x, y, width, height);
+					ctx.rect(tc[0], tc[1], tc[2], tc[3]);
+				},
+				strokeRect: function(x, y, width, height) {
+					var tc = this.trect(x, y, width, height);
+					ctx.strokeRect(tc[0], tc[1], tc[2], tc[3]);
+				},
+				fillRect: function(x, y, width, height) {
+					var tc = this.trect(x, y, width, height);
+					ctx.fillRect(tc[0], tc[1], tc[2], tc[3]);
+				},
+				arc: function(x, y, r, sAngle, eAngle) {
+					var tc = this.trect(x, y, r, r);
+					ctx.beginPath();
+					ctx.arc(tc[0], tc[1], tc[2], sAngle, eAngle);
+					ctx.stroke();
+				},
+				strokeCircle: function(x, y, r) {
+					this.arc(x, y, r, 0, 2 * Math.PI);
+				},
+				fillCircle: function(x, y, r) {
+					this.arc(x, y, r, 0, 2 * Math.PI);
+					ctx.fill();
+				},
+				setPointType: function(pointType) {
+					el.pointType = pointType;
+				},
+				setPointSize: function(pointSize) {
+					el.pointSize = pointSize;
+				},
+				point: function(x, y) {
+					var r = el.pointSize;
+					var t = el.pointType;
+					if(t == "circle") {
+						var tc = this.trect(x, y, r, r);
+						ctx.beginPath();
+						ctx.arc(tc[0], tc[1], 0.5 * r, 0, 2 * Math.PI);
+						ctx.stroke();
+					} else if(t == "box") {
+						var tc = this.trect(x, y, r, r);
+						var dr = 0.5 * r;
+						ctx.strokeRect(tc[0] - dr, tc[1] - dr, r, r);
+					}
+				},
+				points: function(x, y) {
+					var Nx = x.length;
+					var Ny = y.length;
+					var N = Math.min(Nx, Ny);
+					for(var i = 0; i < N; i++) {
+						this.point(x[i], y[i]);
+					}
+				},
+				lines: function(x, y) {
+					var Nx = x.length;
+					var Ny = y.length;
+					var N = Math.min(Nx, Ny);
+					ctx.beginPath();
+					for(var i = 0; i < N; i++) {
+						var xi = x[i];
+						var yi = y[i];
+						var tc = this.trect(xi, yi, 0, 0);
+						if(i == 0) {
+							ctx.moveTo(tc[0], tc[1]);
+						} else {
+							ctx.lineTo(tc[0], tc[1]);
+						}
+					}
+					ctx.stroke();
+				},
+				clear: function() {
+					ctx.clearRect(0, 0, el.width, el.height);
+				},
+			}
+			return can;
+		} else {
+			var msg = this.id + " " + this.tabs[i] +
+				" is not a canvas";
+			throw new Error(msg);
+		}
+	}
+}
+
+// Export module
+module.exports = function() {
+	return Tabs;
+};
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports) {
+
+/*
+	bgroup.js
+	A GUI based on div element for containing buttons
+	
+	Sparisoma Viridi | dudung@gmail.com
+	
+	20180619
+	Create this based on Tabs.
+	Add enable, disable, setCaption.
+*/
+
+// Define class of Bgroup
+class Bgroup {
+	// Create constructor
+	constructor() {
+		// Set rules for number of arguments
+		if(arguments.length == 0) {
+			var msg = "Bgroup requires id (and parentId) as "
+				+ "arguments";
+			throw new Error(msg);
+		} else if(arguments.length == 1){
+			this.id = arguments[0];
+			this.parentId = "document.body";
+			var msg = "Bgroup " + this.id + " assumes that " + 
+				"parent is document.body";
+			console.warn(msg);
+		} else {
+			this.id = arguments[0];
+			this.parentId = arguments[1]
+		}
+		
+		// Check whether id already exists
+		var el = document.getElementById(this.id);
+		var idExist = (el != undefined)
+		if(idExist) {
+			var msg = this.id + " exists";
+			throw new Error(msg)
+		}
+		
+		// Create style
+		this.createAllStyle(this.id);
+		this.bgroupcs = "bgroup" + this.id;
+		this.buttoncs = "button" + this.id;
+		
+		// Define visual container
+		var bgroup  = document.createElement("div");
+		bgroup.id = this.id;
+		bgroup.className = this.bgroupcs;
+		this.bgroup = bgroup;
+		
+		// Set parent of Tabs instance
+		if(this.parentId == "document.body") {
+			document.body.append(this.bgroup);
+		} else {
+			var el = document.getElementById(this.parentId);
+			el.append(this.bgroup);
+		}
+		
+		// Define array for storing tab button information
+		this.buttons = [];
+		this.funcs = [];
+	}
+	
+	// Set background color
+	setBackground(color) {
+		Style.changeStyleAttribute('.' + this.bgroupcs,
+			"background", color);
+	}
+	
+	// Set width
+	setWidth(width) {
+		Style.changeStyleAttribute('.' + this.bgroupcs,
+			"width", width);		
+	}
+	
+	// Set hight
+	setHeight(height) {
+		Style.changeStyleAttribute('.' + this.bgroupcs,
+			"height", height);		
+	}
+	
+	// Ada button
+	addButton(label, func) {
+		// Avoid same button
+		var ibutton = this.buttons.indexOf(label);
+		if(ibutton < 0) {
+			this.buttons.push(label);
+		} else {
+			var msg = "Duplicate label " + label + " is igonered";
+			console.warn(msg);
+		}
+		
+		// Create tab buttons
+		var N = this.buttons.length;
+		for(var i = 0; i < N; i++) {
+			var id = this.id + this.buttons[i];
+			var btn = document.getElementById(id);
+			if(btn == undefined) {
+				var btn = document.createElement("button");
+				btn.id = id;
+				btn.className = this.buttoncs;
+				btn.innerHTML = this.buttons[i];
+				btn.addEventListener("click", buttonClick)
+				this.bgroup.append(btn);
+			}
+		}
+	}
+	
+	// Remove label for tab button
+	removeButton(label) {
+		// 20180616.0445
+		// Tom Wadley, Beau Smith
+		// https://stackoverflow.com/a/5767357/9475509
+		var i = this.buttons.indexOf(label);
+		var remE = this.buttons.splice(i, 1);
+		
+		// Warn only for unexisting label for removing
+		if(i < 0) {
+			var msg = "Unexisting label " + label + " for removing "
+				+ "is igonered";
+			console.warn(msg);
+		}
+		
+		// Remove tab button
+		var id = this.id + remE;
+		var btn = document.getElementById(id);
+		btn.remove();
+		this.updateTabButtonsWidth();
+		
+		// Initiate visible tab after remove a tab button
+		// -- 20180617.1031
+		//this.toggleContent(0);
+	}
+	
+	// Enable button with certain label
+	disable(label) {
+		var i = this.buttons.indexOf(label);
+		if(i < 0) {
+			var msg = "Disable button " + label
+				+ " of unexisting is igonered";
+			console.warn(msg);
+		} else {
+			var id = this.id + this.buttons[i];
+			var btn = document.getElementById(id);
+			btn.disabled = true;
+		}
+	}
+	
+	// Disable button with certain label
+	enable(label) {
+		var i = this.buttons.indexOf(label);
+		if(i < 0) {
+			var msg = "Enable button " + label
+				+ " of unexisting is igonered";
+			console.warn(msg);
+		} else {
+			var id = this.id + this.buttons[i];
+			var btn = document.getElementById(id);
+			btn.disabled = false;
+		}
+	}
+
+	// Set button caption
+	setCaption(label) {
+		var i = this.buttons.indexOf(label);
+		var id = this.id + this.buttons[i];
+		if(i < 0) {
+			var msg = "Set button caption " + label
+				+ " of unexisting is igonered";
+			console.warn(msg);
+		} else {
+			var bt = {
+				to: function(caption) {
+					var btn = document.getElementById(id);
+					btn.innerHTML = caption;
+				}
+			}
+			return bt;
+		}
+	}
+	
+	// Create default style for this class
+	createAllStyle(id) {
+		// Set style of the tab
+		Style.createStyle(
+		'.bgroup' + id + ` {
+			overflow: hidden;
+			width: 150px;
+			height: 100px;
+			background: #f1f1f1;
+			border: 1px solid #ccc;
+			padding: 4px 4px;
+			float: left;
+		}
+		`);
+
+		// Set style of the buttons inside the tab
+		Style.createStyle(
+		'.button' + id +  ` {
+			background: #ddd;
+			float: left;
+			width: 60px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		`);
+	}
+}
+
+// Export module
+module.exports = function() {
+	return Bgroup;
 };
 
 

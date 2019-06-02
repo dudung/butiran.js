@@ -61,6 +61,9 @@
 	
 	20190530
 	1222 Add lib/data/points for spfwfs app.
+	
+	20190602
+	1718 Add lib/ui for sslssgm app.
 */
 
 // lib
@@ -100,6 +103,13 @@ var Path = require('./lib/math/path')();
 // lib/data
 var Points = require('./lib/data/points')();
 
+// lib/ui
+var TabText = require('./lib/ui/tabtext.js');
+var TabCanvas = require('./lib/ui/tabcanvas.js');
+var Parse = require('./lib/ui/parse.js');
+var Tabs = require('./lib/ui/tabs.js')();
+var Bgroup = require('./lib/ui/bgroup.js')();
+
 // Store information 
 if(typeof window !== 'undefined') {
 	// Store to window object -- 20180519.2358
@@ -138,6 +148,13 @@ if(typeof window !== 'undefined') {
 	window["Integration"] = Integration;
 	window["Transformation"] = Transformation;
 	
-	// data/points
+	// lib/data/points
 	window["Points"] = Points;
+	
+	// lib/ui
+	window["TabText"] = TabText;
+	window["TabCanvas"] = TabCanvas;
+	window["Parse"] = Parse;
+	window["Tabs"] = Tabs;
+	window["Bgroup"] = Bgroup;
 }
