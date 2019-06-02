@@ -204,7 +204,7 @@ function setLayout() {
 	p.innerHTML = "Simulation of snake-like swimming system "
 		+ "based on granular model";
 	p.style.fontWeight = "bold";
-	document.body.append(p);
+	//document.body.append(p);
 
 	// Define first Tabs
 	tabs1 = new Tabs("tabs1");
@@ -304,6 +304,8 @@ function readParameters() {
 	
 	var seq = Parse.getFrom(text).valueBetween(
 		"GRAINBEG", "GRAINEND");
+	//console.log(seq);	
+	
 	N = seq.length / 3;
 	r = [];
 	v = [];
@@ -317,6 +319,7 @@ function readParameters() {
 		var vv = new Vect3;
 		v.push(vv);
 	}
+	//console.log(r);
 	
 	boneb = [];
 	for(var i = 0; i < N - 1; i++) {

@@ -3091,6 +3091,19 @@ function getFrom(text) {
 			}
 			return val;
 		},
+		valueBetween: function(beg, end) {
+			var lines = text.split('\n');
+			var N = lines.length;
+			var val = [];
+			for(var i = 0; i < N; i++) {
+				
+			}
+			// For testing only
+			val.push(0); val.push(0); val.push(0);
+			val.push(1); val.push(0); val.push(0);
+			val.push(2); val.push(0); val.push(0);
+			return val;
+		},
 	};
 	return par;
 }
