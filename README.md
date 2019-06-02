@@ -30,6 +30,13 @@ Library of butiran.js can be downloaded from
    `refs` <br>
    `code` https://github.com/dudung/butiran.js/blob/master/app/gpcspp/gpcspp.js<br>
    `demo` https://raw.githack.com/dudung/butiran.js/master/app/gpcspp/gpcspp.html
+7. **gcm2d.js** | Granular catenary model in two-dimension | 20190602<br>
+   `refs` [https://doi.org/10.21009/03.SNF2018.02.PA.12](http://journal.unj.ac.id/unj/index.php/prosidingsnf/article/view/9181)<br>
+   `code` https://github.com/dudung/butiran.js/blob/master/app/gcm2d/gcm2d.js<br>
+   `demo` https://raw.githack.com/dudung/butiran.js/master/app/gcm2d/gcm2d.html
+
+
+	
 
 
 
