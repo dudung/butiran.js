@@ -38,9 +38,10 @@ Library of butiran.js can be downloaded from
    `refs` https://doi.org/10.1088/1742-6596/1090/1/012009<br>
    `code` https://github.com/dudung/butiran.js/blob/master/app/rk2dsp/rk2dsp.js<br>
    `demo` https://raw.githack.com/dudung/butiran.js/master/app/rk2dsp/rk2dsp.html
-
-
-	
+8. **sslssgm.js** | Simulation of snake-like swimming system based on granular model | 20190602<br>
+   `refs` https://doi.org/10.5281/zenodo.2673046<br>
+   `code` https://github.com/dudung/butiran.js/blob/master/app/sslssgm/sslssgm.js<br>
+   `demo` https://raw.githack.com/dudung/butiran.js/master/app/sslssgm/sslssgm.html
 
 
 
