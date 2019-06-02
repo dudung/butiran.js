@@ -3045,6 +3045,9 @@ module.exports = {
 	Get column from multiline text.
 	20180627
 	Add new function for handling 4 parameters in a line.
+	20190602
+	1736 Try to recover missing getFrom().valueBetween().
+	2005 Finally done.
 */
 
 // Require classes
@@ -3095,13 +3098,31 @@ function getFrom(text) {
 			var lines = text.split('\n');
 			var N = lines.length;
 			var val = [];
+			var iBeg, iEnd;
 			for(var i = 0; i < N; i++) {
-				
+				if(lines[i].indexOf(beg) == 0) {
+					iBeg = i;
+				}
+				if(lines[i].indexOf(end) == 0) {
+					iEnd = i;
+				}
 			}
+			
+			for(var i = iBeg + 1; i < iEnd-1; i++) {
+				var cols = lines[i].split(" ");
+				for(var j = 0; j < cols.length; j++) {
+					var rrr = parseFloat(cols[j]);
+					val.push(rrr);
+				}
+			}
+			
+			/*
 			// For testing only
 			val.push(0); val.push(0); val.push(0);
 			val.push(1); val.push(0); val.push(0);
 			val.push(2); val.push(0); val.push(0);
+			*/
+			
 			return val;
 		},
 	};

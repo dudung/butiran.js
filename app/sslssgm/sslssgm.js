@@ -303,8 +303,8 @@ function readParameters() {
 	Tb = Parse.getFrom(text).valueOf("PERIODB");
 	
 	var seq = Parse.getFrom(text).valueBetween(
-		"GRAINBEG", "GRAINEND");
-	//console.log(seq);	
+		"GRAINBEG", "GRAINEND"
+	);
 	
 	N = seq.length / 3;
 	r = [];
