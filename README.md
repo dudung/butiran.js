@@ -34,6 +34,10 @@ Library of butiran.js can be downloaded from
    `refs` [https://doi.org/10.21009/03.SNF2018.02.PA.12](http://journal.unj.ac.id/unj/index.php/prosidingsnf/article/view/9181)<br>
    `code` https://github.com/dudung/butiran.js/blob/master/app/gcm2d/gcm2d.js<br>
    `demo` https://raw.githack.com/dudung/butiran.js/master/app/gcm2d/gcm2d.html
+8. **rk2dsp.js** | Rotary kil in 2-d for spherical particles | 20190602<br>
+   `refs` https://doi.org/10.1088/1742-6596/1090/1/012009<br>
+   `code` https://github.com/dudung/butiran.js/blob/master/app/rk2dsp/rk2dsp.js<br>
+   `demo` https://raw.githack.com/dudung/butiran.js/master/app/rk2dsp/rk2dsp.html
 
 
 	
