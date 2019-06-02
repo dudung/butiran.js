@@ -10,6 +10,7 @@
 	20190602
 	0308 Start this project with ssspp as template.
 	0410 Finish this stage of development.
+	1605 Change default params.
 */
 
 // Define global variables
@@ -43,7 +44,7 @@ function initParams() {
 	p += "BCXX 1\n";
 	p += "\n";
 	p += "# Interactions\n";
-	p += "NINT 2000 0.1\n";
+	p += "NINT 1000 0.1\n";
 	p += "SINT 1 0.1 35\n";
 	p += "GINT 1000\n";
 	p += "\n";
