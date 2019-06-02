@@ -6,6 +6,8 @@
 	Aufa Nu’man Fadhilah Rudiawan | aufa.rudiawan@gmail.com
 	Ismi Yasifa | yasifa.ismi@gmail.com
 	
+	20181121
+	Change to JS.
 	20190602
 	0650 Start this project with gpcspp as template.
 	1341 Continue the progress.
