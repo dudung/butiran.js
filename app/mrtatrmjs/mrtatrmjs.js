@@ -1,5 +1,5 @@
 /*
-	script.js
+	mrtatrmjs.js
 	Draw and calculate position and direction of relected ray
 	of a right angle prism in a common ATR setup
 	Sparisoma Viridi and Hendro
