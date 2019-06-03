@@ -6,6 +6,7 @@
 	Aufa Nu’man Fadhilah Rudiawan | aufa.rudiawan@gmail.com
 	Ismi Yasifa | yasifa.ismi@gmail.com
 	
+	20181030 From SNF proceeding publication [1].
 	20181121
 	Change to JS.
 	20190602
