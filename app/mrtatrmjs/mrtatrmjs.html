@@ -1,0 +1,96 @@
+<!--
+	atr.html
+	JavaScript simulation in HTML5 for learning ray tracing
+	in ATR using right angle prism
+	Sparisoma Viridi and Hendro
+	dudung@fi.itb.ac.id, hendro@fi.itb.ac.id
+	Physics Department, Institut Teknologi Bandung
+	Jalan Ganesha 10, Bandung 40132, Indonesia
+	20131010.1116
+	
+	20190603
+	1217 Change name from at to mrtatrmjs and also with css
+	script.
+-->
+<html>
+	<head>
+		<script src="mrtatrmjs.js"></script>
+		<link rel="stylesheet" type="text/css" href="mrtatrmjs.css" />
+	</head>
+	<body onLoad="initialize()">
+		<h1>Model of Ray Tracing in ATR Method using JavaScript</h1>
+		
+		<div class="author">
+		Sparisoma Viridi<sup>1</sup> and Hendro<sup>2</sup> <br />
+		Physics Department, Institut Teknologi Bandung, Bandung 40132, Indonesia <br />
+		<sup>1</sup>dudung@fi.itb.ac.id, <sup>2</sup>hendro@fi.itb.ac.id
+		</div>
+		
+		<div class="visualization">
+			<div class="parameter">
+				<h3>Parameters</h3>
+
+				<i>R<sub>S</sub></i>
+				&nbsp;=<input id="R_S" type="text" value="25" class="label" /> cm
+				&nbsp;
+				<input type="button" value="<" onClick="dec('R_S')" />
+				<input type="button" value=">" onClick="inc('R_S')" />
+				<br />
+				<i>R<sub>D</sub></i>
+				&nbsp;=<input id="R_D" type="text" value="20" class="label" /> cm
+				&nbsp;
+				<input type="button" value="<" onClick="dec('R_D')" />
+				<input type="button" value=">" onClick="inc('R_D')" />
+				<br />
+				<i>&theta;<sub>S</sub></i>
+				&nbsp;=<input id="theta_S" type="text" value="72" class="label" /> &deg;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" value="<" onClick="dec('theta_S')" />
+				<input type="button" value=">" onClick="inc('theta_S')" />
+				<br />
+				<i>&theta;<sub>D</sub></i>
+				&nbsp;=<input id="theta_D" type="text" value="-40" class="label" /> &deg;
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" value="<" onClick="dec('theta_D')" />
+				<input type="button" value=">" onClick="inc('theta_D')" />
+				<br />
+				<i>t</i>
+				&nbsp;=<input id="t" type="text" value="15" class="label" /> cm
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<input type="button" value="<" onClick="dec('t')" />
+				<input type="button" value=">" onClick="inc('t')" />
+				<i>n</i>
+				&nbsp;=<input id="n" type="text" value="1.5" class="label" />
+				<br />
+				<br />
+				
+				<h3>Intersection points</h3>
+				
+				(<i>x</i><sub>0</sub>, <i>x</i><sub>0</sub>)
+				&nbsp;= <input id="x0y0" type="text" value="" class="label2" readonly />
+				<br />
+				(<i>x</i><sub>1</sub>, <i>x</i><sub>1</sub>)
+				&nbsp;= <input id="x1y1" type="text" value="" class="label2" readonly />
+				<br />
+				(<i>x</i><sub>2</sub>, <i>x</i><sub>2</sub>)
+				&nbsp;= <input id="x2y2" type="text" value="" class="label2" readonly />
+				
+				<h3>Refracted angle</h3>
+				
+				<i>&theta;'<sub>D</sub></i>
+				&nbsp;= <input id="theta_D_" type="text" value="" class="label" readonly />
+				&deg;
+			</div>
+			<div class="graphic">
+				<canvas id="canvas0" width="400" height="400">
+				</canvas>
+			</div>
+		</div>
+		
+		<br /><br />
+		
+		<div class="test">
+		Last updated 20131010.1111+07.
+		</div>
+	</body>
+</html>

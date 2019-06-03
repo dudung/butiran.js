@@ -1,0 +1,58 @@
+/*
+	style.css
+	Style for ATR simulation
+	Sparisoma Viridi
+	dudung@fi.itb.ac.id
+	Physics Department, Institut Teknologi Bandung
+	Jalan Ganesha 10, Bandung 40132, Indonesia
+	20131010.1111
+*/
+h1 {
+	color: #5555cc;
+	font-size: 16pt;
+}
+
+body {
+	font-size: 10pt;
+	font-family: Sans-Serif;
+}
+
+.author {
+	font-size: 11pt;
+	padding-bottom: 1em;
+}
+
+.test {
+	border: 0px dashed #aaaaaa;
+}
+
+.label {
+	width: 30px;
+	text-align: right;
+	border: none;
+}
+
+.label2 {
+	width: 80px;
+	text-align: left;
+	border: none;
+}
+
+.parameter {
+	float: right;
+	width: 160px;
+	border: 0px dashed #aaaaaa;
+	padding-left: 20px;
+	padding-right: 10px;
+}
+
+.graphic {
+	border: 1px solid #aaaaaa;
+	background: #ffffff;
+	width: 400px;
+}
+
+.visualization {
+	border: 0px dashed #aaaaaa;
+	width: 600px;
+}
