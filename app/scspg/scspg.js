@@ -4,8 +4,9 @@
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
 	
+	20120305 From arXiv article.
 	20190528
-	2037 Start this app.
+	2037 Start recreating this app.
 	20190529
 	0824 Continue at campus.
 	0926 Test Path class and it works.
