@@ -10,7 +10,7 @@
 	20181121
 	Change to JS.
 	20190602
-	0650 Start this project with gpcspp as template.
+	0650 Start recreating this project with gpcspp as template.
 	1341 Continue the progress.
 	1534 Fix termination condition.
 	1538 Add left and right elevation at both end points.
