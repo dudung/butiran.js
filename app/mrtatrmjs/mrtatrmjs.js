@@ -5,6 +5,10 @@
 	Sparisoma Viridi and Hendro
 	dudung@fi.itb.ac.id, hendro@fi.itb.ac.id
 	20131010.1111
+	
+	20190603
+	1226 Change script to mrtatrmjs to fit in butiran.js name
+	convention.
 */
 
 // Initialize canvas and its events
