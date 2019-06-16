@@ -1,12 +1,16 @@
 /*
-	gfhtgr.js
-	Granular flow in a HTGR
+	gpcspp.js
+	Group of particle chasing a self-propelled particle
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
-	Dwi Irwanto | dirwanto@fi.ac.id
+	Yudha Satya Perkasa | yudha@uinsgd.ac.id
+	Ariq Dhia Irfanudin | 1157030004@student.uinsgd.ac.id
+	Dinda Ravi Algifari | dinda.ravi.algivari@gmail.com
 	
-	20190616
-	0835 Start this project.
+	20190602
+	0308 Start this project with ssspp as template.
+	0410 Finish this stage of development.
+	1605 Change default params.
 */
 
 // Define global variables
