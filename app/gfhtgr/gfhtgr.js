@@ -20,7 +20,7 @@ main();
 
 // Define main function
 function main() {
-	var box = new Box;
+	box = new Box;
 }
 
 

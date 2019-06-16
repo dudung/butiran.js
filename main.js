@@ -67,7 +67,7 @@
 	
 	20190616
 	2019 Add lib/box for gfhtgr app.
-	2032 Empty class is ok.
+	2032 Empty class is ok, fix at 2041.
 */
 
 // lib
@@ -123,7 +123,7 @@ if(typeof window !== 'undefined') {
 	window["Grain"] = Grain;
 	window["Style"] = Style;
 	window["Vect3"] = Vect3;
-	window["Box"] = Vect3;
+	window["Box"] = Box;
 	
 	// lib/color
 	window["RGB"] = RGB;
