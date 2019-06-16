@@ -1,6 +1,6 @@
 /*
-	gpcspp.js
-	Group of particle chasing a self-propelled particle
+	gfhtgr.js
+	Granular flow in a HTGR
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
 	Dwi Irwanto | dirwanto@fi.ac.id
