@@ -139,51 +139,55 @@
 	
 	20190602
 	1718 Add lib/ui for sslssgm app.
+	
+	20190616
+	2019 Add lib/box for gfhtgr app.
 */
 
 // lib
 var Grain = __webpack_require__(1)();
 var Style = __webpack_require__(3);
 var Vect3 = __webpack_require__(2)();
+var Box = __webpack_require__(4)();
 
 // lib/color
-var RGB = __webpack_require__(4);
+var RGB = __webpack_require__(5);
 
 // lib/force
-var Buoyant = __webpack_require__(5)();
-var Drag = __webpack_require__(6)();
-var Electrostatic = __webpack_require__(7)();
-var Gravitational = __webpack_require__(8)();
-var Magnetic = __webpack_require__(9)();
-var Normal = __webpack_require__(10)();
-var Spring = __webpack_require__(11)();
+var Buoyant = __webpack_require__(6)();
+var Drag = __webpack_require__(7)();
+var Electrostatic = __webpack_require__(8)();
+var Gravitational = __webpack_require__(9)();
+var Magnetic = __webpack_require__(10)();
+var Normal = __webpack_require__(11)();
+var Spring = __webpack_require__(12)();
 
 // lib/generator
-var Generator = __webpack_require__(12)();
-var Random = __webpack_require__(14);
-var Sequence = __webpack_require__(13)();
-var Timer = __webpack_require__(15)();
-var Sample = __webpack_require__(16)();
+var Generator = __webpack_require__(13)();
+var Random = __webpack_require__(15);
+var Sequence = __webpack_require__(14)();
+var Timer = __webpack_require__(16)();
+var Sample = __webpack_require__(17)();
 
 // lib/grid
-var Tablet = __webpack_require__(17);
-var Pile = __webpack_require__(18)();
+var Tablet = __webpack_require__(18);
+var Pile = __webpack_require__(19)();
 
 // lib/math
-var Integration = __webpack_require__(19);
-var Polynomial = __webpack_require__(20)();
-var Transformation = __webpack_require__(21);
-var Path = __webpack_require__(22)();
+var Integration = __webpack_require__(20);
+var Polynomial = __webpack_require__(21)();
+var Transformation = __webpack_require__(22);
+var Path = __webpack_require__(23)();
 
 // lib/data
-var Points = __webpack_require__(23)();
+var Points = __webpack_require__(24)();
 
 // lib/ui
-var TabText = __webpack_require__(24);
-var TabCanvas = __webpack_require__(25);
-var Parse = __webpack_require__(26);
-var Tabs = __webpack_require__(27)();
-var Bgroup = __webpack_require__(28)();
+var TabText = __webpack_require__(25);
+var TabCanvas = __webpack_require__(26);
+var Parse = __webpack_require__(27);
+var Tabs = __webpack_require__(28)();
+var Bgroup = __webpack_require__(29)();
 
 // Store information 
 if(typeof window !== 'undefined') {
@@ -193,6 +197,7 @@ if(typeof window !== 'undefined') {
 	window["Grain"] = Grain;
 	window["Style"] = Style;
 	window["Vect3"] = Vect3;
+	window["Box"] = Vect3;
 	
 	// lib/color
 	window["RGB"] = RGB;
@@ -588,6 +593,43 @@ module.exports = {
 
 /***/ }),
 /* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+	box.js
+	Library of box for colliding with granular particle
+	Sparisoma Viridi | https://github.com/dudung/butiran.js
+	Dwi Irwanto | dirwanto@fi.ac.id
+	
+	20190616
+	2011 Start for sustaining gfhtgr in app.
+*/
+
+// Require classes
+var Vect3 = __webpack_require__(2)();
+
+// Define class of Box
+function Box() {
+	if(arguments.length == 0) {
+	} else if(arguments.length == 1) {
+	} else if(arguments.length == 4) {
+	}
+	this.strval = function() {
+		var str = "(";
+		str += "" + ",";
+		str += ")";
+		return str;
+	}
+}
+
+// Export module -- 20190616.2021 ok (empty)
+module.exports = function() {
+	return Box;
+};
+
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports) {
 
 /*
@@ -635,7 +677,7 @@ module.exports = {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -758,7 +800,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -827,7 +869,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -905,7 +947,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -985,7 +1027,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1068,7 +1110,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1145,7 +1187,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1261,7 +1303,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -1284,7 +1326,7 @@ module.exports = function() {
 */
 
 // List dependencies
-var Sequence = __webpack_require__(13)();
+var Sequence = __webpack_require__(14)();
 
 // Define class of Generator
 class Generator {
@@ -1377,7 +1419,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports) {
 
 /*
@@ -1437,7 +1479,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports) {
 
 /*
@@ -1480,7 +1522,7 @@ module.exports = {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports) {
 
 /*
@@ -1539,7 +1581,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports) {
 
 /*
@@ -1581,7 +1623,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports) {
 
 /*
@@ -1927,7 +1969,7 @@ module.exports = {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 /*
@@ -2057,7 +2099,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 /*
@@ -2317,7 +2359,7 @@ module.exports = {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 /*
@@ -2388,7 +2430,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 /*
@@ -2427,7 +2469,7 @@ module.exports = {
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports) {
 
 /*
@@ -2487,7 +2529,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports) {
 
 /*
@@ -2520,7 +2562,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports) {
 
 /*
@@ -2778,7 +2820,7 @@ module.exports = {
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports) {
 
 /*
@@ -3030,7 +3072,7 @@ module.exports = {
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -3138,7 +3180,7 @@ module.exports = {
 
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports) {
 
 /*
@@ -3763,7 +3805,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports) {
 
 /*

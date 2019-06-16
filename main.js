@@ -64,12 +64,17 @@
 	
 	20190602
 	1718 Add lib/ui for sslssgm app.
+	
+	20190616
+	2019 Add lib/box for gfhtgr app.
+	2032 Empty class is ok.
 */
 
 // lib
 var Grain = require('./lib/grain')();
 var Style = require('./lib/style');
 var Vect3 = require('./lib/vect3')();
+var Box = require('./lib/box')();
 
 // lib/color
 var RGB = require('./lib/color/rgb');
@@ -118,6 +123,7 @@ if(typeof window !== 'undefined') {
 	window["Grain"] = Grain;
 	window["Style"] = Style;
 	window["Vect3"] = Vect3;
+	window["Box"] = Vect3;
 	
 	// lib/color
 	window["RGB"] = RGB;

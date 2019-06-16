@@ -12,6 +12,20 @@
 */
 
 // Define global variables
+var box;
+
+// Execute main function
+main();
+
+
+// Define main function
+function main() {
+	var box = new Box;
+}
+
+
+/*
+// Define global variables
 var params;
 var taIn, taOut, caOut;
 var btLoad, btRead, btStart, btInfo;
@@ -681,3 +695,4 @@ function getValue() {
 	};
 	return result;	
 }
+*/
