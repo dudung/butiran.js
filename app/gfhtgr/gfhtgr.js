@@ -3,9 +3,7 @@
 	Group of particle chasing a self-propelled particle
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
-	Yudha Satya Perkasa | yudha@uinsgd.ac.id
-	Ariq Dhia Irfanudin | 1157030004@student.uinsgd.ac.id
-	Dinda Ravi Algifari | dinda.ravi.algivari@gmail.com
+	Dwi Irwanto | dirwanto@fi.ac.id
 	
 	20190602
 	0308 Start this project with ssspp as template.
