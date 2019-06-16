@@ -604,7 +604,8 @@ module.exports = {
 	
 	20190616
 	2011 Start for sustaining gfhtgr in app.
-	2059 Finish defining 8 points.
+	2059 Finish defining 8 points, simplify with _ for .neg().
+	2119 Modify strval function.
 */
 
 // Require classes
@@ -659,6 +660,16 @@ function Box() {
 		str += this.s[0].strval() + ", ";
 		str += this.s[1].strval() + ", ";
 		str += this.s[2].strval() + "";
+		str += "], ";
+		str += "[";
+		str += this.p[0].strval() + ", ";
+		str += this.p[1].strval() + ", ";
+		str += this.p[2].strval() + ", ";
+		str += this.p[3].strval() + ", ";
+		str += this.p[4].strval() + ", ";
+		str += this.p[5].strval() + ", ";
+		str += this.p[6].strval() + ", ";
+		str += this.p[7].strval() + "";
 		str += "]";
 		str += ")";
 		return str;
