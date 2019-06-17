@@ -1195,6 +1195,8 @@ module.exports = function() {
 	20190601
 	1610 Change setConstant to setConstants.
 	1903 Fix gamma term with sign of ksi.
+	20190617
+	1011 Change unit vector for ksidot term.
 */
 
 // Require classes

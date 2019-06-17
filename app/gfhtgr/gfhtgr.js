@@ -43,7 +43,7 @@ function initParams() {
 	p += "TEMF 288\n";
 	p += "\n";
 	p += "# Interactions\n";
-	p += "NINT 1000 0.1\n";
+	p += "NINT 1000 1\n";
 	p += "GINT 0 -9.80665 0\n";
 	p += "\n";
 	p += "# Particles\n";
