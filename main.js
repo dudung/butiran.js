@@ -68,6 +68,17 @@
 	20190616
 	2019 Add lib/box for gfhtgr app.
 	2032 Empty class is ok, fix at 2041.
+	
+	20160617
+	0733 Finally install webpack in campus with command
+	npm config set proxy http://user:pwd@proxy:port
+	npm install -g webpack
+	npm install -g webpack-cli
+	0805 Done and webpack works as usual.
+	
+	References
+	1. url https://www.competa.com/blog/how-to-run-npm
+	   -without-sudo/ [20190617].
 */
 
 // lib
