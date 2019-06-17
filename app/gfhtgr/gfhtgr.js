@@ -14,6 +14,7 @@
 	1017 Collision between grains is corrected and works.
 	1203 There is still problem by collision between two grains.
 	1644 Try to get information related to box.
+	1758 Finish drawing box projection in 2d canvas.
 */
 
 // Define global variables
@@ -56,19 +57,23 @@ function initParams() {
 	p += "DIAG 0.05\n";
 	p += "\n";
 	p += "# Walls\n";
-	p += "NUMW 3\n";
-	p += "BX1R -0.75 +0.00 +0.00\n";
+	p += "NUMW 4\n";
+	p += "BX1R -0.40 +0.20 +0.00\n";
 	p += "BX1A +0.10 +0.00 +0.00\n";
 	p += "BX1B +0.00 +1.00 +0.00\n";
 	p += "BX1C +0.00 +0.00 +0.10\n";
-	p += "BX2R +0.75 +0.00 +0.00\n";
+	p += "BX2R +0.40 +0.20 +0.00\n";
 	p += "BX2A +0.10 +0.00 +0.00\n";
 	p += "BX2B +0.00 +1.00 +0.00\n";
 	p += "BX2C +0.00 +0.00 +0.10\n";
-	p += "BX3R +0.00 +0.00 +0.00\n";
-	p += "BX3A +1.50 +0.00 +0.00\n";
-	p += "BX3B +0.00 +1.00 +0.00\n";
+	p += "BX3R -0.26 -0.40 +0.00\n";
+	p += "BX3A +0.30 -0.30 +0.00\n";
+	p += "BX3B +0.07 +0.07 +0.00\n";
 	p += "BX3C +0.00 +0.00 +0.10\n";
+	p += "BX4R +0.26 -0.40 +0.00\n";
+	p += "BX4A +0.30 +0.30 +0.00\n";
+	p += "BX4B +0.07 -0.07 +0.00\n";
+	p += "BX4C +0.00 +0.00 +0.10\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0\n";
@@ -332,6 +337,9 @@ function buttonClick() {
 		for(var i = 0; i < No; i++) {
 			draw(o[i]).onCanvas(caOut);
 		}
+		for(var i = 0; i < Nb; i++) {
+			draw(b[i]).onCanvas(caOut);
+		}
 	break;
 	case "Start":
 		if(btStart.innerHTML == "Start") {
@@ -584,6 +592,24 @@ function draw() {
 						cx.lineTo(X, Y);
 					}
 				}
+				cx.stroke();
+			} else if(o instanceof Box) {
+				cx.beginPath();
+				cx.lineWidth = "2";
+				cx.strokeStyle = "#000";
+				var N = o.p.length;
+				for(var i = 0; i < N/2; i++) {
+					var x = o.p[i].x;
+					var y = o.p[i].y;
+					var X = lintrans(x, [xmin, xmax], [XMIN, XMAX]);
+					var Y = lintrans(y, [ymin, ymax], [YMIN, YMAX]);
+					if(i == 0) {
+						cx.moveTo(X, Y);
+					} else {
+						cx.lineTo(X, Y);
+					}
+				}
+				cx.closePath();
 				cx.stroke();
 			}
 		}
