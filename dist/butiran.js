@@ -1197,6 +1197,7 @@ module.exports = function() {
 	1903 Fix gamma term with sign of ksi.
 	20190617
 	1011 Change unit vector for ksidot term.
+	1206 There is still a problem but unknown.
 */
 
 // Require classes
@@ -1237,8 +1238,10 @@ class Normal {
 			var v2 = arguments[1].v;
 			var v12 = Vect3.sub(v1, v2);
 			var uv12 = v12.unit();
+			
 			var k = this.k;
 			var gamma = this.gamma;
+			
 			var R12 = 0.5 * (D1 + D2);
 			var ksi = Math.max(0, R12 - l12);
 			var ksidot = v12.len() * Math.sign(ksi);

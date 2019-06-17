@@ -12,6 +12,7 @@
 	0954 Correct info menu.
 	1000 Work for no container wall, begin working on box.
 	1017 Collision between grains is corrected and works.
+	1203 There is still problem by collision between two grains.
 */
 
 // Define global variables
@@ -46,12 +47,12 @@ function initParams() {
 	p += "GACC 0 -9.80665 0\n";
 	p += "\n";
 	p += "# Interactions\n";
-	p += "NINT 1000 1\n";
+	p += "NINT 10000 1\n";
 	p += "\n";
 	p += "# Particles\n";
-	p += "NUMG 36\n";
+	p += "NUMG 100\n";
 	p += "RHOG 2000\n";
-	p += "DIAG 0.2\n";
+	p += "DIAG 0.05\n";
 	p += "\n";
 	p += "# Walls\n";
 	p += "NUMW 3\n";
@@ -168,6 +169,12 @@ function readParams() {
 			
 			var x = ((ix + 0.5) - 0.5 * Nx) * Lx + xo;
 			var y = ((iy + 0.5) - 0.5 * Ny) * Ly + yo;
+						
+			var rndx = 0.0001 * (Math.random() - 0.5) * D;
+			var rndy = 0.0001 * (Math.random() - 0.5) * D;
+			
+			x += rndx;
+			y += rndy;
 			
 			var oi = new Grain();
 			oi.m = m;
@@ -389,7 +396,6 @@ function simulate() {
 	for(var i = 0; i < N; i++) {
 		
 		var F = new Vect3;
-		var m = o[i].m;
 		
 		var FD = drag1.force(o[i]);
 		F = Vect3.add(F, FD);
@@ -407,13 +413,11 @@ function simulate() {
 		var FG = grav1.force(o[i]);
 		F = Vect3.add(F, FG);
 		
-		if(i > 5)
-			a.push(Vect3.div(F, m));
-		else
-			a.push(Vect3.div(new Vect3, m));			
+		var m = o[i].m;
+		a.push(Vect3.div(F, m));
 	}
 	
-	for(var i = 0; i < N; i++) {
+	for(var i = 10; i < N; i++) {
 		var r = o[i].r;
 		var v = o[i].v;
 		
