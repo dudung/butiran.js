@@ -7,22 +7,9 @@
 	
 	20190616
 	0835 Start this project.
+	0839 Continue in konsinyering at Staf Lama.
 */
 
-// Define global variables
-var box;
-
-// Execute main function
-main();
-
-
-// Define main function
-function main() {
-	box = new Box;
-}
-
-
-/*
 // Define global variables
 var params;
 var taIn, taOut, caOut;
@@ -32,8 +19,8 @@ var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var o, N;
-var iLeader, propType;
-var bc;
+var box;
+
 
 // Execute main function
 main();
@@ -357,6 +344,7 @@ function buttonClick() {
 	}
 }
 
+/*
 
 // Perform simulation
 function simulate() {
@@ -510,15 +498,6 @@ function simulate() {
 }
 
 
-// Clear canvas
-function clearCanvas(caOut) {
-	var width = caOut.width;
-	var height = caOut.height;
-	var cx = caOut.getContext("2d");
-	cx.clearRect(0, 0, width, height);
-}
-
-
 // Draw grain on canvas
 function draw() {
 	var o = arguments[0];
@@ -636,61 +615,5 @@ function draw() {
 		}
 	};
 	return result;
-}
-
-
-// Clear a Textarea
-function clearText() {
-	var ta = arguments[0];
-	ta.value = "";
-}
-
-
-// Add text to a textarea
-function addText() {
-	var text = arguments[0];
-	var result = {
-		to: function() {
-			var ta = arguments[0];
-			ta.value += text;
-			ta.scrollTop = ta.scrollHeight;
-		}
-	};
-	return result;
-}
-
-
-// Get parameter value from a Textarea
-function getValue() {
-	var key = arguments[0];
-	var result = {
-		from: function() {
-			var ta = arguments[0];
-			var lines = ta.value.split("\n");
-			var Nl = lines.length;
-			for(var l = 0; l < Nl; l++) {
-				var words = lines[l].split(" ");
-				var Nw = words.length;
-				var value;
-				if(words[0].indexOf(key) == 0) {
-					if(Nw == 2) {
-						value = parseFloat(words[1]);
-					} else if(Nw == 4) {
-						value = new Vect3(
-							parseFloat(words[1]),
-							parseFloat(words[2]),
-							parseFloat(words[3])
-						);
-					} else if(Nw == 3) {
-						value = [];
-						value.push(parseFloat(words[1]));
-						value.push(parseFloat(words[2]));
-					}
-					return value;
-				}
-			}
-		}
-	};
-	return result;	
 }
 */
