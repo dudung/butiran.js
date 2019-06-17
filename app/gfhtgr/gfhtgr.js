@@ -16,6 +16,8 @@
 	1644 Try to get information related to box.
 	1758 Finish drawing box projection in 2d canvas.
 	2005 Finish drawing 2d silo with same color for stroke and fill.
+	20190618
+	0327 Start again by adding test mode.
 */
 
 // Define global variables
@@ -27,7 +29,7 @@ var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var o, No, b, Nb, drag1, buoy1, grav1, norm2;
-
+var TEST_MODE;
 
 // Execute main function
 main();
@@ -35,6 +37,7 @@ main();
 
 // Define main function
 function main() {
+	TEST_MODE = true;
 	initParams();
 	createVisualElements();
 }
@@ -53,36 +56,49 @@ function initParams() {
 	p += "NINT 20000 1\n";
 	p += "\n";
 	p += "# Particles\n";
+	if(TEST_MODE) {
+		p += "NUMG 4\n";
+	} else {
+		p += "NUMG 144\n";
+	}
 	p += "NUMG 144\n";
 	p += "RHOG 2000\n";
 	p += "DIAG 0.05\n";
 	p += "\n";
 	p += "# Walls\n";
-	p += "NUMW 6\n";
-	p += "BX1R -0.40 +0.20 +0.00\n";
-	p += "BX1A +0.10 +0.00 +0.00\n";
-	p += "BX1B +0.00 +1.00 +0.00\n";
-	p += "BX1C +0.00 +0.00 +0.10\n";
-	p += "BX2R +0.40 +0.20 +0.00\n";
-	p += "BX2A +0.10 +0.00 +0.00\n";
-	p += "BX2B +0.00 +1.00 +0.00\n";
-	p += "BX2C +0.00 +0.00 +0.10\n";
-	p += "BX3R -0.26 -0.42 +0.00\n";
-	p += "BX3A +0.30 -0.30 +0.00\n";
-	p += "BX3B +0.07 +0.07 +0.00\n";
-	p += "BX3C +0.00 +0.00 +0.10\n";
-	p += "BX4R +0.26 -0.42 +0.00\n";
-	p += "BX4A +0.30 +0.30 +0.00\n";
-	p += "BX4B +0.07 -0.07 +0.00\n";
-	p += "BX4C +0.00 +0.00 +0.10\n";
-	p += "BX5R -0.12 -0.69 +0.00\n";
-	p += "BX5A +0.10 +0.00 +0.00\n";
-	p += "BX5B +0.00 +0.30 +0.00\n";
-	p += "BX5C +0.00 +0.00 +0.10\n";
-	p += "BX6R +0.12 -0.69 +0.00\n";
-	p += "BX6A +0.10 +0.00 +0.00\n";
-	p += "BX6B +0.00 +0.30 +0.00\n";
-	p += "BX6C +0.00 +0.00 +0.10\n";
+	if(TEST_MODE) {
+		p += "NUMW 1\n";
+		p += "BX1R +0.00 -0.10 +0.00\n";
+		p += "BX1A +0.40 +0.00 +0.00\n";
+		p += "BX1B +0.00 +0.10 +0.00\n";
+		p += "BX1C +0.00 +0.00 +0.10\n";
+	} else {
+		p += "NUMW 6\n";
+		p += "BX1R -0.40 +0.20 +0.00\n";
+		p += "BX1A +0.10 +0.00 +0.00\n";
+		p += "BX1B +0.00 +1.00 +0.00\n";
+		p += "BX1C +0.00 +0.00 +0.10\n";
+		p += "BX2R +0.40 +0.20 +0.00\n";
+		p += "BX2A +0.10 +0.00 +0.00\n";
+		p += "BX2B +0.00 +1.00 +0.00\n";
+		p += "BX2C +0.00 +0.00 +0.10\n";
+		p += "BX3R -0.26 -0.42 +0.00\n";
+		p += "BX3A +0.30 -0.30 +0.00\n";
+		p += "BX3B +0.07 +0.07 +0.00\n";
+		p += "BX3C +0.00 +0.00 +0.10\n";
+		p += "BX4R +0.26 -0.42 +0.00\n";
+		p += "BX4A +0.30 +0.30 +0.00\n";
+		p += "BX4B +0.07 -0.07 +0.00\n";
+		p += "BX4C +0.00 +0.00 +0.10\n";
+		p += "BX5R -0.12 -0.69 +0.00\n";
+		p += "BX5A +0.10 +0.00 +0.00\n";
+		p += "BX5B +0.00 +0.30 +0.00\n";
+		p += "BX5C +0.00 +0.00 +0.10\n";
+		p += "BX6R +0.12 -0.69 +0.00\n";
+		p += "BX6A +0.10 +0.00 +0.00\n";
+		p += "BX6B +0.00 +0.30 +0.00\n";
+		p += "BX6C +0.00 +0.00 +0.10\n";
+	}
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0\n";
