@@ -1229,18 +1229,21 @@ class Normal {
 			var r1 = arguments[0].r;
 			var r2 = arguments[1].r;
 			var r12 = Vect3.sub(r1, r2);
-			var u12 = r12.unit();
+			var ur12 = r12.unit();
 			var l12 = r12.len();
 			var v1 = arguments[0].v;
 			var v2 = arguments[1].v;
 			var v12 = Vect3.sub(v1, v2);
+			var uv12 = v12.unit();
 			var k = this.k;
 			var gamma = this.gamma;
 			var R12 = 0.5 * (D1 + D2);
 			var ksi = Math.max(0, R12 - l12);
 			var ksidot = v12.len() * Math.sign(ksi);
 			
-			f = Vect3.mul(k * ksi - gamma * ksidot, u12);
+			var fr = Vect3.mul(k * ksi, ur12);
+			var fv = Vect3.mul(-gamma * ksidot, uv12);
+			f = Vect3.add(fr, fv);
 		}
 		
 		// Note that (0, 0, 0) value could be due to error

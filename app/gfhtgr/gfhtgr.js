@@ -1,6 +1,6 @@
 /*
 	gfhtgr.js
-	Granular flow in a HTGR
+	Granular flow in a HTGR (high temperature gas-cooled reactor)
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
 	Dwi Irwanto | dirwanto@fi.ac.id
@@ -9,6 +9,8 @@
 	0835 Start this project.
 	0839 Continue in konsinyering at Staf Lama.
 	0914 Finish veio in lib/ui.
+	0954 Correct info menu.
+	1000 Work for no container wall, begin working on box.
 */
 
 // Define global variables
@@ -19,8 +21,7 @@ var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
-var o, N;
-var box;
+var o, No, b, Nb, norm2, grav1;
 
 
 // Execute main function
@@ -38,34 +39,28 @@ function main() {
 function initParams() {
 	var p = "";
 	p += "# Environments\n";
-	p += "ETAF 0 1 1\n";
-	p += "BCXX 1\n";
+	p += "ETAF 0 1.81E-5 0\n";
+	p += "TEMF 288\n";
 	p += "\n";
 	p += "# Interactions\n";
 	p += "NINT 1000 0.1\n";
-	p += "SINT 1 0.1 35\n";
-	p += "GINT 1000\n";
+	p += "GINT 0 -9.80665 0\n";
 	p += "\n";
 	p += "# Particles\n";
-	p += "MASS 1\n";
-	p += "CHRG 1\n";
-	p += "DIAM 5\n";
-	p += "VELO 20\n";
-	p += "NUMP 36\n";
-	p += "LEAD -1\n";
-	p += "VELD 30 40 0\n";
-	p += "PTYP 2\n";
+	p += "RHOG 2000\n";
+	p += "DIAG 0.2\n";
+	p += "NUMG 36\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0\n";
 	p += "TEND 100.0\n";
-	p += "TSTP 0.01\n";
+	p += "TSTP 0.001\n";
 	p += "TDAT 0.1\n";
 	p += "TPRC 10\n";
 	p += "\n";
 	p += "# Coordinates\n";
-	p += "RMIN -100 -100 -100\n";
-	p += "RMAX +100 +100 +100\n";
+	p += "RMIN -1 -1 -1\n";
+	p += "RMAX +1 +1 +1\n";
 	p += "\n";
 	
 	params = p;
@@ -85,7 +80,7 @@ function loadParams() {
 function readParams() {
 	// Get parameters of enviroment
 	var eta = Veio.getValue("ETAF").from(taIn);
-	bc = Veio.getValue("BCXX").from(taIn);
+	var tem = Veio.getValue("TEMF").from(taIn);
 	
 	drag1 = new Drag;
 	drag1.setField(new Vect3);
@@ -93,18 +88,13 @@ function readParams() {
 	
 	// Get parameters of interaction
 	var kN = Veio.getValue("NINT").from(taIn);
-	var kS = Veio.getValue("SINT").from(taIn);
 	var kG = Veio.getValue("GINT").from(taIn);
 	
 	norm2 = new Normal;
 	norm2.setConstants(kN[0], kN[1]);
 	
-	grav2 = new Gravitational;
-	grav2.setConstant(kG)
-
-	sprn2 = new Spring;
-	sprn2.setConstants(kS.x, kS.y);
-	sprn2.setUncompressedLength(kS.z);
+	grav1 = new Gravitational;
+	grav1.setField(kG);
 	
 	// Get parameters of iteration
 	tbeg = Veio.getValue("TBEG").from(taIn);
@@ -138,16 +128,15 @@ function readParams() {
 	ZMAX = 1;
 	
 	// Get parameters of particles
-	var m = Veio.getValue("MASS").from(taIn);
-	var q = Veio.getValue("CHRG").from(taIn);
-	var D = Veio.getValue("DIAM").from(taIn);
-	var v = Veio.getValue("VELO").from(taIn);
-	N = Veio.getValue("NUMP").from(taIn);
+	var rho = Veio.getValue("RHOG").from(taIn);
+	var D = Veio.getValue("DIAG").from(taIn);
+	var m = (Math.PI / 6) * D * D * D;
+	N = Veio.getValue("NUMG").from(taIn);
 	
 	t = tbeg;
 	o = [];
-	var Lx = 20;
-	var Ly = 20;
+	var Lx = 1.1 * D;
+	var Ly = 1.1 * D;
 	var Ny = Math.ceil(Math.sqrt(N));
 	var Nx = N / Ny;
 	var i = 0;
@@ -157,16 +146,11 @@ function readParams() {
 			var x = ((ix + 0.5) - 0.5 * Nx) * Lx + xo;
 			var y = ((iy + 0.5) - 0.5 * Ny) * Ly + yo;
 			
-			var theta = Math.random() * 2 * Math.PI;
-			var vx = v * Math.cos(theta); 
-			var vy = v * Math.sin(theta); 
-			
 			var oi = new Grain();
 			oi.m = m;
-			oi.q = q;
 			oi.D = D;
 			oi.r = new Vect3(x, y, 0);
-			oi.v = new Vect3(vx, vy, 0);
+			oi.v = new Vect3;
 			oi.c = ["#800", "#faa"];
 			
 			o.push(oi);
@@ -174,19 +158,7 @@ function readParams() {
 			i++;
 			if(i >= N) break;
 		}
-	}
-	
-	var leader = Veio.getValue("LEAD").from(taIn);
-	if(0 <= leader && leader < N) {
-		iLeader = leader
-	} else {
-		iLeader = Math.floor(Math.random() * N);
-	}
-	
-	propType = Veio.getValue("PTYP").from(taIn);
-	var vLeader = Veio.getValue("VELD").from(taIn);
-	o[iLeader].c = ["#008", "#aaf"];
-	o[iLeader].v = vLeader;
+	}	
 }
 
 
@@ -327,19 +299,18 @@ function buttonClick() {
 	break;
 	case "Info":
 		var info = "";
-		info += "sspp.js\n";
-		info += "Simulation of self-propelled particles";
+		info += "gfhtgr.js\n";
+		info += "Granular flow in a HTGR (high temperature gas-";
+		info += "cooled reactor)\n";
 		info += "Sparisoma Viridi, ";
-		info += "Yudha Satya Perkasa\n";
-		info += "Ariq Dhia Irfanudin, ";
-		info += "Dinda Ravi Algifari, ";
+		info += "Dwi Irwanto\n";
 		info += "https://github.com/dudung/butiran.js\n"
 		info += "Load  load parameters\n";
 		info += "Read  read parameters\n";
 		info += "Start start simulation\n";
 		info += "Info  show this messages\n";
 		info += "\n";
-		addText(info).to(taOut);
+		Veio.addText(info).to(taOut);
 	break;
 	default:
 	}
@@ -398,43 +369,22 @@ function simulate() {
 		var m = o[i].m;
 		
 		var FD = drag1.force(o[i]);
-	
 		F = Vect3.add(F, FD);
 		
 		for(var j = 0; j < N; j++) {
 			if(j != i) {
 				var FN = norm2.force(o[i], o[j]);
-				var FS = sprn2.force(o[i], o[j]);
-				var FG = grav2.force(o[i], o[j]);
-				
 				F = Vect3.add(F, FN);
-				F = Vect3.add(F, FG);
-				F = Vect3.add(F, FS);
 			}
 		}
 		
-		// Modify leader
-		if(i == iLeader) {
-			if(propType == 0) {
-				F = new Vect3;
-			} else if(propType == 1) {
-				var dir = o[i].v.unit();
-				var theta0 = Math.atan(dir.y / dir.x);
-				var dtheta = (Math.random() * 2 - 1) * 0.25 * Math.PI;
-				var amag = 20;
-				var ax = amag * Math.cos(theta0 + dtheta);
-				var ay = amag * Math.sin(theta0 + dtheta);
-				var az = amag * 0;
-				var FP = new Vect3(ax, ay, az);
-				F = FP;
-			} else if(propType == 2) {
-				var vv = o[i].v;
-				var FP = Vect3.cross(vv, new Vect3(0, 0, 1));
-				F = FP;
-			}
-		}
+		var FG = grav1.force(o[i]);
+		F = Vect3.add(F, FG);
 		
-		a.push(Vect3.div(F, m));		
+		if(i > 5)
+			a.push(Vect3.div(F, m));
+		else
+			a.push(Vect3.div(new Vect3, m));			
 	}
 	
 	for(var i = 0; i < N; i++) {
@@ -448,42 +398,7 @@ function simulate() {
 		o[i].v = v;
 	}
 	
-	// Apply boundary condition
-	var xIsOut = false;
-	var yIsOut = false;
-	if(bc == 0) {
-		// Stop simulation when particles out of area
-		for(var i = 0; i < N; i++) {
-			var x = o[i].r.x;
-			if(x < xmin || x > xmax) xIsOut = true;
-			var y = o[i].r.y;
-			if(y < ymin || y > xmax) yIsOut = true;
-			if(xIsOut || yIsOut) break;
-		}		
-	} else if(bc == 1) {
-		// Set reflective boundary condition
-		for(var i = 0; i < N; i++) {
-			var R = 0.5 * o[i].D;
-			if(o[i].r.x < xmin + R || o[i].r.x > xmax - R) {
-				 o[i].v.x = -o[i].v.x;
-				 o[i].r.x = o[i].r.x + o[i].v.x * dt;
-			}  
-			if(o[i].r.y < ymin + R || o[i].r.y > ymax - R) {
-				 o[i].v.y = -o[i].v.y;
-				 o[i].r.y = o[i].r.y + o[i].v.y * dt;
-			}  
-		}
-	} else if(bc == 2) {
-		// Set periodic boundary condition
-		for(var i = 0; i < N; i++) {
-			if(o[i].r.x < xmin) o[i].r.x += (xmax - xmin); 
-			if(o[i].r.x > xmax) o[i].r.x -= (xmax - xmin); 
-			if(o[i].r.y < ymin) o[i].r.y += (ymax - ymin); 
-			if(o[i].r.y > ymax) o[i].r.y -= (ymax - ymin); 
-		}		
-	}
-		
-	if(t >= tend || xIsOut || yIsOut) {
+	if(t >= tend) {
 		btLoad.disabled = false;
 		btRead.disabled = false;
 		btStart.disabled = true;
