@@ -18,6 +18,7 @@
 	2005 Finish drawing 2d silo with same color for stroke and fill.
 	20190618
 	0327 Start again by adding test mode.
+	0426 Bug found in determining n but not solution came up yet.
 */
 
 // Define global variables
@@ -57,21 +58,29 @@ function initParams() {
 	p += "\n";
 	p += "# Particles\n";
 	if(TEST_MODE) {
-		p += "NUMG 4\n";
+		p += "NUMG 1\n";
+		p += "DIAG 0.20\n";
 	} else {
 		p += "NUMG 144\n";
+		p += "DIAG 0.05\n";
 	}
-	p += "NUMG 144\n";
 	p += "RHOG 2000\n";
-	p += "DIAG 0.05\n";
 	p += "\n";
 	p += "# Walls\n";
 	if(TEST_MODE) {
 		p += "NUMW 1\n";
-		p += "BX1R +0.00 -0.10 +0.00\n";
-		p += "BX1A +0.40 +0.00 +0.00\n";
+		p += "BX1R +0.00 -0.30 +0.00\n";
+		p += "BX1A +0.80 +0.00 +0.00\n";
 		p += "BX1B +0.00 +0.10 +0.00\n";
 		p += "BX1C +0.00 +0.00 +0.10\n";
+		p += "BX2R -0.40 +0.05 +0.00\n";
+		p += "BX2A +0.10 +0.00 +0.00\n";
+		p += "BX2B +0.00 +0.80 +0.00\n";
+		p += "BX2C +0.00 +0.00 +0.10\n";
+		p += "BX3R +0.40 +0.05 +0.00\n";
+		p += "BX3A +0.10 +0.00 +0.00\n";
+		p += "BX3B +0.00 +0.80 +0.00\n";
+		p += "BX3C +0.00 +0.00 +0.10\n";
 	} else {
 		p += "NUMW 6\n";
 		p += "BX1R -0.40 +0.20 +0.00\n";
@@ -172,6 +181,9 @@ function readParams() {
 	zmax = rmax.z;
 	
 	xo = 0.5 * (xmin + xmax);
+	if(TEST_MODE) {
+		xo += 0.2;
+	}
 	yo = 0.5 * (ymin + ymax) + 0.1;
 	
 	XMIN = 0;
@@ -626,7 +638,6 @@ function draw() {
 			} else if(o instanceof Box) {
 				cx.beginPath();
 				cx.lineWidth = "2";
-				cx.strokeStyle = "#aaa";
 				var N = o.p.length;
 				for(var i = 0; i < N/2; i++) {
 					var x = o.p[i].x;
@@ -640,8 +651,9 @@ function draw() {
 					}
 				}
 				cx.closePath();
+				cx.strokeStyle = "#000";
 				cx.stroke();
-				cx.fillStyle = "#aaa";
+				cx.fillStyle = "#fff";
 				cx.fill();
 			}
 		}

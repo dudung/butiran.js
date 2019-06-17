@@ -1279,7 +1279,7 @@ class Normal {
 			for(var i = 0; i < n.length; i++) {
 				if(i == 0) {
 					dotmax = Vect3.dot(n[i], ur12);
-					j = i;
+					//j = i;
 				} else {
 					if(Vect3.dot(n[i], ur12) > dotmax) {
 						dotmax = Vect3.dot(n[i], ur12);
@@ -1287,20 +1287,22 @@ class Normal {
 					}
 				}
 			}
-			var un = n[j];
-			
-			var stot = Vect3.add(b.s[0], b.s[1], b.s[2]);
-			var h12 = Vect3.dot(r12, un) - 0.5 * Vect3.dot(stot, un);
-			var ksi = Math.max(0, 0.5 * D1 - h12);
-			
-			var k = this.k;
-			var gamma = this.gamma;
-						
-			var ksidot = v12.len() * Math.sign(ksi);
-			
-			var fr = Vect3.mul(k * ksi, ur12);
-			var fv = Vect3.mul(-gamma * ksidot, uv12);
-			f = Vect3.add(fr, fv);
+			if(j > -1) {
+				var un = n[j];
+				
+				var stot = Vect3.add(b.s[0], b.s[1], b.s[2]);
+				var h12 = Vect3.dot(r12, un) - 0.5 * Vect3.dot(stot, un);
+				var ksi = Math.max(0, 0.5 * D1 - h12);
+				
+				var k = this.k;
+				var gamma = this.gamma;
+							
+				var ksidot = v12.len() * Math.sign(ksi);
+				
+				var fr = Vect3.mul(k * ksi, ur12);
+				var fv = Vect3.mul(-gamma * ksidot, uv12);
+				f = Vect3.add(fr, fv);
+			}
 		}
 		// Note that (0, 0, 0) value could be due to error
 		return f;
