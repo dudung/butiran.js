@@ -1281,7 +1281,7 @@ class Normal {
 					dotmax = Vect3.dot(n[i], ur12);
 					j = i;
 				} else {
-					if(Vect3.dot(n[i], ur12) >= dotmax) {
+					if(Vect3.dot(n[i], ur12) > dotmax) {
 						dotmax = Vect3.dot(n[i], ur12);
 						j = i;
 					}
@@ -1290,7 +1290,7 @@ class Normal {
 			var un = n[j];
 			
 			var stot = Vect3.add(b.s[0], b.s[1], b.s[2]);
-			var h12 = Vect3.dot(r12, un) - Vect3.dot(stot, un);
+			var h12 = Vect3.dot(r12, un) - 0.5 * Vect3.dot(stot, un);
 			var ksi = Math.max(0, 0.5 * D1 - h12);
 			
 			var k = this.k;
