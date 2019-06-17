@@ -5,10 +5,8 @@
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
 	Dwi Irwanto | dirwanto@fi.ac.id
 	
-	20190602
-	0308 Start this project with ssspp as template.
-	0410 Finish this stage of development.
-	1605 Change default params.
+	20190616
+	0835 Start this project.
 */
 
 // Define global variables
