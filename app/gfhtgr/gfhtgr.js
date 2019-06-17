@@ -11,6 +11,7 @@
 	0914 Finish veio in lib/ui.
 	0954 Correct info menu.
 	1000 Work for no container wall, begin working on box.
+	1017 Collision between grains is corrected and works.
 */
 
 // Define global variables
@@ -21,7 +22,7 @@ var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
-var o, No, b, Nb, norm2, grav1;
+var o, No, b, Nb, drag1, buoy1, grav1, norm2;
 
 
 // Execute main function
@@ -39,17 +40,33 @@ function main() {
 function initParams() {
 	var p = "";
 	p += "# Environments\n";
-	p += "ETAF 0 1.81E-5 0\n";
 	p += "TEMF 288\n";
+	p += "ETAF 0 1.81E-5 0\n";
+	p += "RHOF 1000\n";
+	p += "GACC 0 -9.80665 0\n";
 	p += "\n";
 	p += "# Interactions\n";
 	p += "NINT 1000 1\n";
-	p += "GINT 0 -9.80665 0\n";
 	p += "\n";
 	p += "# Particles\n";
+	p += "NUMG 36\n";
 	p += "RHOG 2000\n";
 	p += "DIAG 0.2\n";
-	p += "NUMG 36\n";
+	p += "\n";
+	p += "# Walls\n";
+	p += "NUMW 3\n";
+	p += "BX1R -0.75  0.00  0.00\n";
+	p += "BX1A  0.10  0.00  0.00\n";
+	p += "BX1B  0.00  1.00  0.00\n";
+	p += "BX1C  0.00  0.00  0.10\n";
+	p += "BX2R  0.75  0.00  0.00\n";
+	p += "BX2A  0.10  0.00  0.00\n";
+	p += "BX2B  0.00  1.00  0.00\n";
+	p += "BX2C  0.00  0.00  0.10\n";
+	p += "BX3R  0.00  0.00  0.00\n";
+	p += "BX3A  1.50  0.00  0.00\n";
+	p += "BX3B  0.00  1.00  0.00\n";
+	p += "BX3C  0.00  0.00  0.10\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0\n";
@@ -79,22 +96,27 @@ function loadParams() {
 // Read parameters
 function readParams() {
 	// Get parameters of enviroment
-	var eta = Veio.getValue("ETAF").from(taIn);
-	var tem = Veio.getValue("TEMF").from(taIn);
+	var temf = Veio.getValue("TEMF").from(taIn);
+	var etaf = Veio.getValue("ETAF").from(taIn);
+	var rhof = Veio.getValue("RHOF").from(taIn);
+	var gacc = Veio.getValue("GACC").from(taIn);
 	
 	drag1 = new Drag;
 	drag1.setField(new Vect3);
-	drag1.setConstants(eta.x, eta.y, eta.z);
+	drag1.setConstants(etaf.x, etaf.y, etaf.z);
+	
+	buoy1 = new Buoyant;
+	buoy1.setFluidDensity(rhof);
+	buoy1.setGravity(gacc);
+	
+	grav1 = new Gravitational;
+	grav1.setField(gacc);
 	
 	// Get parameters of interaction
 	var kN = Veio.getValue("NINT").from(taIn);
-	var kG = Veio.getValue("GINT").from(taIn);
 	
 	norm2 = new Normal;
 	norm2.setConstants(kN[0], kN[1]);
-	
-	grav1 = new Gravitational;
-	grav1.setField(kG);
 	
 	// Get parameters of iteration
 	tbeg = Veio.getValue("TBEG").from(taIn);
@@ -130,7 +152,8 @@ function readParams() {
 	// Get parameters of particles
 	var rho = Veio.getValue("RHOG").from(taIn);
 	var D = Veio.getValue("DIAG").from(taIn);
-	var m = (Math.PI / 6) * D * D * D;
+	var V = (Math.PI / 6) * D * D * D;
+	var m = rho * V;
 	N = Veio.getValue("NUMG").from(taIn);
 	
 	t = tbeg;
@@ -377,6 +400,9 @@ function simulate() {
 				F = Vect3.add(F, FN);
 			}
 		}
+		
+		var FB = buoy1.force(o[i]);
+		F = Vect3.add(F, FB);
 		
 		var FG = grav1.force(o[i]);
 		F = Vect3.add(F, FG);
