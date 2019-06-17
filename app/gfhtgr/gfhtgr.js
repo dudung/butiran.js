@@ -15,6 +15,7 @@
 	1203 There is still problem by collision between two grains.
 	1644 Try to get information related to box.
 	1758 Finish drawing box projection in 2d canvas.
+	2005 Finish drawing 2d silo with same color for stroke and fill.
 */
 
 // Define global variables
@@ -45,7 +46,7 @@ function initParams() {
 	p += "# Environments\n";
 	p += "TEMF 288\n";
 	p += "ETAF 0 1.81E-5 0\n";
-	p += "RHOF 1000\n";
+	p += "RHOF 1\n";
 	p += "GACC 0 -9.80665 0\n";
 	p += "\n";
 	p += "# Interactions\n";
@@ -452,6 +453,11 @@ function simulate() {
 			}
 		}
 		
+		for(var j = 0; j < Nb; j++) {
+			var FN = norm2.force(o[i], b[j]);
+			F = Vect3.add(F, FN);
+		}
+		
 		var FB = buoy1.force(o[i]);
 		F = Vect3.add(F, FB);
 		
@@ -462,7 +468,7 @@ function simulate() {
 		a.push(Vect3.div(F, m));
 	}
 	
-	for(var i = 10; i < No; i++) {
+	for(var i = 0; i < No; i++) {
 		var r = o[i].r;
 		var v = o[i].v;
 		
