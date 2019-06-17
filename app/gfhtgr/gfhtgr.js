@@ -604,7 +604,7 @@ function draw() {
 			} else if(o instanceof Box) {
 				cx.beginPath();
 				cx.lineWidth = "2";
-				cx.strokeStyle = "#000";
+				cx.strokeStyle = "#aaa";
 				var N = o.p.length;
 				for(var i = 0; i < N/2; i++) {
 					var x = o.p[i].x;
@@ -619,6 +619,8 @@ function draw() {
 				}
 				cx.closePath();
 				cx.stroke();
+				cx.fillStyle = "#aaa";
+				cx.fill();
 			}
 		}
 	};
