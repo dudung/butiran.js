@@ -1199,6 +1199,7 @@ module.exports = function() {
 	1011 Change unit vector for ksidot term.
 	1206 There is still a problem but unknown.
 	2006 Add require of Box class.
+	2049 Still error.
 */
 
 // Require classes
@@ -1266,7 +1267,6 @@ class Normal {
 			var n4 = n1.neg(); n.push(n4);
 			var n5 = n2.neg(); n.push(n5);
 			var n6 = n3.neg(); n.push(n6);
-
 			var r12 = Vect3.sub(r1, r2);
 			var ur12 = r12.unit();
 			
@@ -1279,8 +1279,9 @@ class Normal {
 			for(var i = 0; i < n.length; i++) {
 				if(i == 0) {
 					dotmax = Vect3.dot(n[i], ur12);
+					j = i;
 				} else {
-					if(Vect3.dot(n[i], ur12) > dotmax) {
+					if(Vect3.dot(n[i], ur12) >= dotmax) {
 						dotmax = Vect3.dot(n[i], ur12);
 						j = i;
 					}
@@ -1289,9 +1290,7 @@ class Normal {
 			var un = n[j];
 			
 			var stot = Vect3.add(b.s[0], b.s[1], b.s[2]);
-			var h12 = Vect3.sub(
-				Vect3.dot(r12, un), Vect3.dot(stot, un)
-			);
+			var h12 = Vect3.dot(r12, un) - Vect3.dot(stot, un);
 			var ksi = Math.max(0, 0.5 * D1 - h12);
 			
 			var k = this.k;
