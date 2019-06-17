@@ -13,6 +13,7 @@
 	1000 Work for no container wall, begin working on box.
 	1017 Collision between grains is corrected and works.
 	1203 There is still problem by collision between two grains.
+	1644 Try to get information related to box.
 */
 
 // Define global variables
@@ -47,7 +48,7 @@ function initParams() {
 	p += "GACC 0 -9.80665 0\n";
 	p += "\n";
 	p += "# Interactions\n";
-	p += "NINT 10000 1\n";
+	p += "NINT 20000 1\n";
 	p += "\n";
 	p += "# Particles\n";
 	p += "NUMG 100\n";
@@ -56,18 +57,18 @@ function initParams() {
 	p += "\n";
 	p += "# Walls\n";
 	p += "NUMW 3\n";
-	p += "BX1R -0.75  0.00  0.00\n";
-	p += "BX1A  0.10  0.00  0.00\n";
-	p += "BX1B  0.00  1.00  0.00\n";
-	p += "BX1C  0.00  0.00  0.10\n";
-	p += "BX2R  0.75  0.00  0.00\n";
-	p += "BX2A  0.10  0.00  0.00\n";
-	p += "BX2B  0.00  1.00  0.00\n";
-	p += "BX2C  0.00  0.00  0.10\n";
-	p += "BX3R  0.00  0.00  0.00\n";
-	p += "BX3A  1.50  0.00  0.00\n";
-	p += "BX3B  0.00  1.00  0.00\n";
-	p += "BX3C  0.00  0.00  0.10\n";
+	p += "BX1R -0.75 +0.00 +0.00\n";
+	p += "BX1A +0.10 +0.00 +0.00\n";
+	p += "BX1B +0.00 +1.00 +0.00\n";
+	p += "BX1C +0.00 +0.00 +0.10\n";
+	p += "BX2R +0.75 +0.00 +0.00\n";
+	p += "BX2A +0.10 +0.00 +0.00\n";
+	p += "BX2B +0.00 +1.00 +0.00\n";
+	p += "BX2C +0.00 +0.00 +0.10\n";
+	p += "BX3R +0.00 +0.00 +0.00\n";
+	p += "BX3A +1.50 +0.00 +0.00\n";
+	p += "BX3B +0.00 +1.00 +0.00\n";
+	p += "BX3C +0.00 +0.00 +0.10\n";
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0.0\n";
@@ -155,17 +156,18 @@ function readParams() {
 	var D = Veio.getValue("DIAG").from(taIn);
 	var V = (Math.PI / 6) * D * D * D;
 	var m = rho * V;
-	N = Veio.getValue("NUMG").from(taIn);
+	No = Veio.getValue("NUMG").from(taIn);
 	
 	t = tbeg;
+	
 	o = [];
 	var Lx = 1.1 * D;
 	var Ly = 1.1 * D;
-	var Ny = Math.ceil(Math.sqrt(N));
-	var Nx = N / Ny;
+	var Ny = Math.ceil(Math.sqrt(No));
+	var Nx = No / Ny;
 	var i = 0;
 	for(var iy = 0; iy < Ny; iy++) {
-		for(var ix = 0; ix < Nx; ix++) {		
+		for(var ix = 0; ix < Nx; ix++) {
 			
 			var x = ((ix + 0.5) - 0.5 * Nx) * Lx + xo;
 			var y = ((iy + 0.5) - 0.5 * Ny) * Ly + yo;
@@ -186,9 +188,28 @@ function readParams() {
 			o.push(oi);
 			
 			i++;
-			if(i >= N) break;
+			if(i >= No) break;
 		}
-	}	
+	}
+	
+	
+	b = [];
+	Nb = Veio.getValue("NUMW").from(taIn);
+	for(var i = 0; i < Nb; i++) {
+		var pre = "BX" + (i + 1);
+		var rpattern = pre + "R";
+		var apattern = pre + "A";
+		var bpattern = pre + "B";
+		var cpattern = pre + "C";
+		
+		var r = Veio.getValue(rpattern).from(taIn);
+		var sa = Veio.getValue(apattern).from(taIn);
+		var sb = Veio.getValue(bpattern).from(taIn);
+		var sc = Veio.getValue(cpattern).from(taIn);
+		
+		var bi = new Box(r, sa, sb, sc);
+		b.push(bi);
+	}
 }
 
 
@@ -308,7 +329,7 @@ function buttonClick() {
 		readParams();
 		
 		Veio.clearCanvas(caOut);
-		for(var i = 0; i < N; i++) {
+		for(var i = 0; i < No; i++) {
 			draw(o[i]).onCanvas(caOut);
 		}
 	break;
@@ -361,15 +382,15 @@ function simulate() {
 	var K = 0;
 	var xcom = 0;
 	var ycom = 0;
-	for(var i = 0; i < N; i++) {
+	for(var i = 0; i < No; i++) {
 		xcom += o[i].r.x;
 		ycom += o[i].r.y;
 		var m = o[i].m;
 		var v = o[i].v.len();
 		K += 0.5 * m * v * v;
 	}
-	xcom /= N;
-	ycom /= N;
+	xcom /= No;
+	ycom /= No;
 	
 	if(iter == 0) {
 		//var tt = t.toFixed(digit);
@@ -387,20 +408,28 @@ function simulate() {
 		Veio.addText(text).to(taOut);
 	}
 	
+	// Clear canvas
 	Veio.clearCanvas(caOut);
-	for(var i = 0; i < N; i++) {
+	
+    // Draw grains on canvas
+    for(var i = 0; i < No; i++) {
 		draw(o[i]).onCanvas(caOut);
 	}
 	
+    // Draw boxes on canvas
+    for(var i = 0; i < Nb; i++) {
+		draw(b[i]).onCanvas(caOut);
+	}
+	
 	var a = [];
-	for(var i = 0; i < N; i++) {
+	for(var i = 0; i < No; i++) {
 		
 		var F = new Vect3;
 		
 		var FD = drag1.force(o[i]);
 		F = Vect3.add(F, FD);
 		
-		for(var j = 0; j < N; j++) {
+		for(var j = 0; j < No; j++) {
 			if(j != i) {
 				var FN = norm2.force(o[i], o[j]);
 				F = Vect3.add(F, FN);
@@ -417,7 +446,7 @@ function simulate() {
 		a.push(Vect3.div(F, m));
 	}
 	
-	for(var i = 10; i < N; i++) {
+	for(var i = 10; i < No; i++) {
 		var r = o[i].r;
 		var v = o[i].v;
 		
