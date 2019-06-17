@@ -75,6 +75,7 @@
 	npm install -g webpack
 	npm install -g webpack-cli
 	0805 Done and webpack works as usual.
+	0903 Add veio in lib/ui.
 	
 	References
 	1. url https://www.competa.com/blog/how-to-run-npm
@@ -125,6 +126,7 @@ var TabCanvas = require('./lib/ui/tabcanvas.js');
 var Parse = require('./lib/ui/parse.js');
 var Tabs = require('./lib/ui/tabs.js')();
 var Bgroup = require('./lib/ui/bgroup.js')();
+var Veio = require('./lib/ui/veio.js');
 
 // Store information 
 if(typeof window !== 'undefined') {
@@ -174,4 +176,5 @@ if(typeof window !== 'undefined') {
 	window["Parse"] = Parse;
 	window["Tabs"] = Tabs;
 	window["Bgroup"] = Bgroup;
+	window["Veio"] = Veio;
 }

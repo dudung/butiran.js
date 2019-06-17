@@ -8,6 +8,7 @@
 	20190616
 	0835 Start this project.
 	0839 Continue in konsinyering at Staf Lama.
+	0914 Finish veio in lib/ui.
 */
 
 // Define global variables
@@ -75,25 +76,25 @@ function initParams() {
 
 // Load parameters
 function loadParams() {
-	clearText(taIn);
-	addText(params).to(taIn);
+	Veio.clearText(taIn);
+	Veio.addText(params).to(taIn);
 }
 
 
 // Read parameters
 function readParams() {
 	// Get parameters of enviroment
-	var eta = getValue("ETAF").from(taIn);
-	bc = getValue("BCXX").from(taIn);
+	var eta = Veio.getValue("ETAF").from(taIn);
+	bc = Veio.getValue("BCXX").from(taIn);
 	
 	drag1 = new Drag;
 	drag1.setField(new Vect3);
 	drag1.setConstants(eta.x, eta.y, eta.z);
 	
 	// Get parameters of interaction
-	var kN = getValue("NINT").from(taIn);
-	var kS = getValue("SINT").from(taIn);
-	var kG = getValue("GINT").from(taIn);
+	var kN = Veio.getValue("NINT").from(taIn);
+	var kS = Veio.getValue("SINT").from(taIn);
+	var kG = Veio.getValue("GINT").from(taIn);
 	
 	norm2 = new Normal;
 	norm2.setConstants(kN[0], kN[1]);
@@ -106,18 +107,18 @@ function readParams() {
 	sprn2.setUncompressedLength(kS.z);
 	
 	// Get parameters of iteration
-	tbeg = getValue("TBEG").from(taIn);
-	tend = getValue("TEND").from(taIn);
-	dt = getValue("TSTP").from(taIn);
-	Tdata = getValue("TDAT").from(taIn);
-	Tproc = getValue("TPRC").from(taIn);
+	tbeg = Veio.getValue("TBEG").from(taIn);
+	tend = Veio.getValue("TEND").from(taIn);
+	dt = Veio.getValue("TSTP").from(taIn);
+	Tdata = Veio.getValue("TDAT").from(taIn);
+	Tproc = Veio.getValue("TPRC").from(taIn);
 
 	iter = 0;
 	Niter = Math.floor(Tdata / dt);
 	
 	// Get parameters of coordinates
-	var rmin = getValue("RMIN").from(taIn);
-	var rmax = getValue("RMAX").from(taIn);
+	var rmin = Veio.getValue("RMIN").from(taIn);
+	var rmax = Veio.getValue("RMAX").from(taIn);
 
 	xmin = rmin.x;
 	ymin = rmin.y;
@@ -137,11 +138,11 @@ function readParams() {
 	ZMAX = 1;
 	
 	// Get parameters of particles
-	var m = getValue("MASS").from(taIn);
-	var q = getValue("CHRG").from(taIn);
-	var D = getValue("DIAM").from(taIn);
-	var v = getValue("VELO").from(taIn);
-	N = getValue("NUMP").from(taIn);
+	var m = Veio.getValue("MASS").from(taIn);
+	var q = Veio.getValue("CHRG").from(taIn);
+	var D = Veio.getValue("DIAM").from(taIn);
+	var v = Veio.getValue("VELO").from(taIn);
+	N = Veio.getValue("NUMP").from(taIn);
 	
 	t = tbeg;
 	o = [];
@@ -175,15 +176,15 @@ function readParams() {
 		}
 	}
 	
-	var leader = getValue("LEAD").from(taIn);
+	var leader = Veio.getValue("LEAD").from(taIn);
 	if(0 <= leader && leader < N) {
 		iLeader = leader
 	} else {
 		iLeader = Math.floor(Math.random() * N);
 	}
 	
-	propType = getValue("PTYP").from(taIn);
-	var vLeader = getValue("VELD").from(taIn);
+	propType = Veio.getValue("PTYP").from(taIn);
+	var vLeader = Veio.getValue("VELD").from(taIn);
 	o[iLeader].c = ["#008", "#aaf"];
 	o[iLeader].v = vLeader;
 }
@@ -304,7 +305,7 @@ function buttonClick() {
 		btStart.disabled = false;
 		readParams();
 		
-		clearCanvas(caOut);
+		Veio.clearCanvas(caOut);
 		for(var i = 0; i < N; i++) {
 			draw(o[i]).onCanvas(caOut);
 		}
@@ -344,7 +345,6 @@ function buttonClick() {
 	}
 }
 
-/*
 
 // Perform simulation
 function simulate() {
@@ -354,7 +354,7 @@ function simulate() {
 	
 	if(t == tbeg) {
 		//       0.0740 -0.0009 -0.0162
-		addText("#t      xcom    ycom    K\n").to(taOut);
+		Veio.addText("#t      xcom    ycom    K\n").to(taOut);
 	}
 	
 	var K = 0;
@@ -383,10 +383,10 @@ function simulate() {
 		text += xx + " ";
 		text += yy + " ";
 		text += KK + "\n";
-		addText(text).to(taOut);
+		Veio.addText(text).to(taOut);
 	}
 	
-	clearCanvas(caOut);
+	Veio.clearCanvas(caOut);
 	for(var i = 0; i < N; i++) {
 		draw(o[i]).onCanvas(caOut);
 	}
@@ -616,4 +616,3 @@ function draw() {
 	};
 	return result;
 }
-*/

@@ -36,32 +36,17 @@
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -164,6 +149,8 @@
 	npm config set proxy http://user:pwd@proxy:port
 	npm install -g webpack
 	npm install -g webpack-cli
+	0805 Done and webpack works as usual.
+	0903 Add veio in lib/ui.
 	
 	References
 	1. url https://www.competa.com/blog/how-to-run-npm
@@ -214,6 +201,7 @@ var TabCanvas = __webpack_require__(26);
 var Parse = __webpack_require__(27);
 var Tabs = __webpack_require__(28)();
 var Bgroup = __webpack_require__(29)();
+var Veio = __webpack_require__(30);
 
 // Store information 
 if(typeof window !== 'undefined') {
@@ -263,6 +251,7 @@ if(typeof window !== 'undefined') {
 	window["Parse"] = Parse;
 	window["Tabs"] = Tabs;
 	window["Bgroup"] = Bgroup;
+	window["Veio"] = Veio;
 }
 
 
@@ -4100,6 +4089,107 @@ class Bgroup {
 // Export module
 module.exports = function() {
 	return Bgroup;
+};
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+	veio.js
+	Visual elements for input and output 
+	
+	Sparisoma Viridi | dudung@gmail.com
+	
+	20190617
+	Create this library of functions as supporting gfhtgr app.
+*/
+
+// Require classes
+var Vect3 = __webpack_require__(2)();
+
+
+// Clear a Textarea
+function clearText() {
+	var ta = arguments[0];
+	ta.value = "";
+}
+
+
+// Clear canvas
+function clearCanvas() {
+	var ca = arguments[0];
+	var width = ca.width;
+	var height = ca.height;
+	var cx = ca.getContext("2d");
+	cx.clearRect(0, 0, width, height);
+}
+
+
+// Add text to a textarea
+function addText() {
+	var text = arguments[0];
+	var result = {
+		to: function() {
+			var ta = arguments[0];
+			ta.value += text;
+			ta.scrollTop = ta.scrollHeight;
+		}
+	};
+	return result;
+}
+
+
+// Get parameter value from a Textarea
+function getValue() {
+	var key = arguments[0];
+	var result = {
+		from: function() {
+			var ta = arguments[0];
+			var lines = ta.value.split("\n");
+			var Nl = lines.length;
+			for(var l = 0; l < Nl; l++) {
+				var words = lines[l].split(" ");
+				var Nw = words.length;
+				var value;
+				if(words[0].indexOf(key) == 0) {
+					if(Nw == 2) {
+						value = parseFloat(words[1]);
+					} else if(Nw == 4) {
+						value = new Vect3(
+							parseFloat(words[1]),
+							parseFloat(words[2]),
+							parseFloat(words[3])
+						);
+					} else if(Nw == 3) {
+						value = [];
+						value.push(parseFloat(words[1]));
+						value.push(parseFloat(words[2]));
+					}
+					return value;
+				}
+			}
+		}
+	};
+	return result;	
+}
+
+
+// Export module -- 20190617.0902 test
+module.exports = {
+	clearText: function() {
+		return clearText(arguments[0])
+	},
+	clearCanvas: function() {
+		return clearCanvas(arguments[0])
+	},
+	addText: function() {
+		return addText(arguments[0])
+	},
+	getValue: function() {
+		return getValue(arguments[0])
+	},
 };
 
 
