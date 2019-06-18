@@ -182,7 +182,7 @@ function readParams() {
 	
 	xo = 0.5 * (xmin + xmax);
 	if(TEST_MODE) {
-		xo += 0.2;
+		xo += 0.0;
 	}
 	yo = 0.5 * (ymin + ymax) + 0.1;
 	

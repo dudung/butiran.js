@@ -36,17 +36,32 @@
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, {
-/******/ 				configurable: false,
-/******/ 				enumerable: true,
-/******/ 				get: getter
-/******/ 			});
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
 /******/ 		}
 /******/ 	};
 /******/
 /******/ 	// define __esModule on exports
 /******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
 /******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
 /******/ 	};
 /******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
@@ -1200,6 +1215,9 @@ module.exports = function() {
 	1206 There is still a problem but unknown.
 	2006 Add require of Box class.
 	2049 Still error.
+	0426 Bug found in determining n but not solution came up yet.
+	0717 Can not found solution, still.
+	0732 Can determine interaction side, but not yet overlap.
 */
 
 // Require classes
@@ -1274,34 +1292,54 @@ class Normal {
 			var v12 = Vect3.sub(v1, v2);
 			var uv12 = v12.unit();
 			
-			var dotmax;
-			var j = -1;
+			var h = [];
 			for(var i = 0; i < n.length; i++) {
-				if(i == 0) {
-					dotmax = Vect3.dot(n[i], ur12);
-					//j = i;
-				} else {
-					if(Vect3.dot(n[i], ur12) > dotmax) {
-						dotmax = Vect3.dot(n[i], ur12);
-						j = i;
-					}
+				var stot = Vect3.add(b.s[0], b.s[1], b.s[2]);
+				var rn = Vect3.dot(r12, n[i]);
+				var hn = Math.abs(0.5 * Vect3.dot(stot, n[i]));
+				h.push(rn - hn);
+			}
+			
+			var hmin = h[0];
+			var j = -1;
+			for(var i = 1; i < h.length; i++) {
+				if(h[i] < hmin) {
+					hmin = h[i];
+					j = i;
 				}
 			}
+			
+			var hs = [];
+			for(var i = 0; i < h.length; i++) {
+				hs.push(parseFloat(h[i].toFixed(3)));
+			}
+			console.log(hs);
+			
+			var ds = ["I", "R", "U", "F", "L", "D", "B"];
+			var k = 0;
+			for(var i = 0; i < h.length; i++) {
+				if(h[i] > 0) {
+					k = i + 1;
+				}
+			}
+			console.log("side: " + ds[k]);
+			
 			if(j > -1) {
 				var un = n[j];
 				
 				var stot = Vect3.add(b.s[0], b.s[1], b.s[2]);
-				var h12 = Vect3.dot(r12, un) - 0.5 * Vect3.dot(stot, un);
-				var ksi = Math.max(0, 0.5 * D1 - h12);
+				var shalf = Vect3.dot(stot, un);
+				//var h12 = Math.abs(Vect3.dot(Vect3.sub(r12, shalf), un));
+				//var ksi = Math.max(0, 0.5 * D1 - h12) * 0;
 				
-				var k = this.k;
-				var gamma = this.gamma;
+				//var k = this.k;
+				//var gamma = this.gamma;
 							
-				var ksidot = v12.len() * Math.sign(ksi);
+				//var ksidot = v12.len() * Math.sign(ksi) * 0;
 				
-				var fr = Vect3.mul(k * ksi, ur12);
-				var fv = Vect3.mul(-gamma * ksidot, uv12);
-				f = Vect3.add(fr, fv);
+				//var fr = Vect3.mul(k * ksi, ur12);
+				//var fv = Vect3.mul(-gamma * ksidot, uv12);
+				//f = Vect3.add(fr, fv);
 			}
 		}
 		// Note that (0, 0, 0) value could be due to error
