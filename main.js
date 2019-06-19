@@ -61,12 +61,32 @@
 	
 	20190530
 	1222 Add lib/data/points for spfwfs app.
+	
+	20190602
+	1718 Add lib/ui for sslssgm app.
+	
+	20190616
+	2019 Add lib/box for gfhtgr app.
+	2032 Empty class is ok, fix at 2041.
+	
+	20160617
+	0733 Finally install webpack in campus with command
+	npm config set proxy http://user:pwd@proxy:port
+	npm install -g webpack
+	npm install -g webpack-cli
+	0805 Done and webpack works as usual.
+	0903 Add veio in lib/ui.
+	
+	References
+	1. url https://www.competa.com/blog/how-to-run-npm
+	   -without-sudo/ [20190617].
 */
 
 // lib
 var Grain = require('./lib/grain')();
 var Style = require('./lib/style');
 var Vect3 = require('./lib/vect3')();
+var Box = require('./lib/box')();
 
 // lib/color
 var RGB = require('./lib/color/rgb');
@@ -100,6 +120,14 @@ var Path = require('./lib/math/path')();
 // lib/data
 var Points = require('./lib/data/points')();
 
+// lib/ui
+var TabText = require('./lib/ui/tabtext.js');
+var TabCanvas = require('./lib/ui/tabcanvas.js');
+var Parse = require('./lib/ui/parse.js');
+var Tabs = require('./lib/ui/tabs.js')();
+var Bgroup = require('./lib/ui/bgroup.js')();
+var Veio = require('./lib/ui/veio.js');
+
 // Store information 
 if(typeof window !== 'undefined') {
 	// Store to window object -- 20180519.2358
@@ -108,6 +136,7 @@ if(typeof window !== 'undefined') {
 	window["Grain"] = Grain;
 	window["Style"] = Style;
 	window["Vect3"] = Vect3;
+	window["Box"] = Box;
 	
 	// lib/color
 	window["RGB"] = RGB;
@@ -138,6 +167,14 @@ if(typeof window !== 'undefined') {
 	window["Integration"] = Integration;
 	window["Transformation"] = Transformation;
 	
-	// data/points
+	// lib/data/points
 	window["Points"] = Points;
+	
+	// lib/ui
+	window["TabText"] = TabText;
+	window["TabCanvas"] = TabCanvas;
+	window["Parse"] = Parse;
+	window["Tabs"] = Tabs;
+	window["Bgroup"] = Bgroup;
+	window["Veio"] = Veio;
 }

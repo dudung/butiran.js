@@ -1,37 +1,44 @@
 /*
-	scspg.js
-	Semi-circle segmented path generator
+	gcm2d.js
+	Granular catenary model in two-dimension
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
+	Aufa Nu’man Fadhilah Rudiawan | aufa.rudiawan@gmail.com
+	Ismi Yasifa | yasifa.ismi@gmail.com
 	
-	20120305 From arXiv article.
-	20190528
-	2037 Start recreating this app.
-	20190529
-	0824 Continue at campus.
-	0926 Test Path class and it works.
-	0944 Get good result for this stage.
-	1046 Finish making an example of 26 segmented paths.
-	1101 Finalize this app and update Github.
+	20181030 From SNF proceeding publication [1].
+	20181121
+	Change to JS.
+	20190602
+	0650 Start recreating this project with gpcspp as template.
+	1341 Continue the progress.
+	1534 Fix termination condition.
+	1538 Add left and right elevation at both end points.
+	1601 Revise co-authors in info.
 	
 	References
-	1. Sparisoma Viridi, Siti Nurul Khotimah, "SCSPG (Semi-
-		 Circle Segmented Path Generator): How to Use and
-		 an Example in Calculating Work of Friction along Curved
-		 Path", arXiv:1203.0796v1 [physics.comp-ph] 5 Mar 2012,
-		 url https://arxiv.org/abs/1203.0796v1
+	1. Aufa Nu’man Fadhilah Rudiawan, Ismi Yasifa, Sparisoma
+		 Viridi, "Perumusan Gaya antar Butiran pada Kasus Rantai
+		 Butiran Magnetik Terentang Horizontal", Prosiding
+		 Seminar Nasional Fisika (SNF 2018), vol. 7, pp. SNF2018-PA-92, 30 Oktober 2018, url
+		 https://doi.org/10.21009/03.SNF2018.02.PA.12
+		 http://journal.unj.ac.id/unj/index.php/prosidingsnf
+		 /article/view/9181
+	2. "Viscosity of air, dynamic and kinematic", url
+		 https://www.engineersedge.com/physics/viscosity
+		 _of_air_dynamic_and_kinematic_14483.htm [20190602].
 */
 
 // Define global variables
 var params;
 var taIn, taOut, caOut;
 var btLoad, btRead, btStart, btInfo;
-var ds, paths;
+var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
-var proc, Tproc, iter, Niter;
-var x, y, sx, sy;
+var o, N;
+var grav1, sprn2;
 
 // Execute main function
 main();
@@ -47,44 +54,31 @@ function main() {
 // Initialize parameters
 function initParams() {
 	var p = "";
-	p += "# Step\n";
-	p += "SSTP 0.0100\n";
+	p += "# Environments\n";
+	p += "GENV 0 -9.807 0\n";
+	p += "TENV 298\n";
+	p += "ETAF 0 1.86E-5 0\n";
+	p += "\n";
+	p += "# Interactions\n";
+	p += "SINT 1000 1\n";
+	p += "\n";
+	p += "# Catenary\n";
+	p += "MASS 0.1\n";
+	p += "LENG 2\n";
+	p += "NUMP 20\n";
+	p += "ELEV 0 0.5\n";
 	p += "\n";
 	p += "# Iteration\n";
-	p += "TPRC 100\n";
+	p += "TBEG 0.0\n";
+	p += "TEND 100.0\n";
+	p += "TSTP 0.002\n";
+	p += "TDAT 0.1\n";
+	p += "TPRC 10\n";
 	p += "\n";
 	p += "# Coordinates\n";
-	p += "RORG 2 1 1\n";
-	p += "RMIN -1 -1 -1\n";
-	p += "RMAX 21 21 21\n";
+	p += "RMIN -1.5 -1.5 -1.5\n";
+	p += "RMAX +1.5 +1.5 +1.5\n";
 	p += "\n";
-	p += "# Segments\n";
-	p += "0.0000 0.0000 15.000 #f00\n";
-	p += "0.0000 0.2500 3.1416 #00f\n"; // R = 2
-	p += "0.2500 0.2500 9.0000 #f00\n";
-	p += "0.2500 0.3750 3.1416 #00f\n"; // R = 4
-	p += "0.3750 0.3750 4.0000 #f00\n";
-	p += "0.3750 0.5000 4.7124 #00f\n"; // R = 6
-	p += "0.5000 0.5000 2.0000 #f00\n";
-	p += "0.5000 0.7500 3.1416 #00f\n"; // R = 2
-	p += "0.7500 0.7500 7.0000 #f00\n";
-	p += "0.7500 1.0000 1.5708 #00f\n"; // R = 1
-	p += "0.0000 0.0000 4.0000 #f00\n";
-	p += "0.0000 -0.250 3.1416 #00f\n"; // R = 2
-	p += "-0.250 -0.250 4.0000 #f00\n";
-	p += "-0.250 -0.500 1.5708 #00f\n"; // R = 1
-	p += "-0.500 -0.500 8.0000 #f00\n";
-	p += "0.5000 0.0000 6.2832 #00f\n"; // R = 4
-	p += "0.0000 0.2500 1.5708 #f00\n"; // R = 1
-	p += "0.2500 0.2500 9.5000 #00f\n";
-	p += "0.2500 0.7500 7.5398 #f00\n"; // R = 2.4
-	p += "0.7500 0.7500 3.0000 #00f\n";
-	p += "0.7500 1.0000 1.5708 #f00\n"; // R = 1
-	p += "0.0000 -0.500 3.1416 #00f\n"; // R = 1
-	p += "0.5000 0.7500 1.5708 #f00\n"; // R = 1
-	p += "0.7500 0.7500 3.0000 #00f\n";
-	p += "0.7500 0.7500 4.9000 #f00\n";
-	p += "0.7500 1.0000 1.5708 #00f\n"; // R = 1
 	
 	params = p;
 	
@@ -101,13 +95,47 @@ function loadParams() {
 
 // Read parameters
 function readParams() {
-	ds = getValue("SSTP").from(taIn);
+	// Get parameters of enviroment
+	var eta = getValue("ETAF").from(taIn);
+	var g = getValue("GENV").from(taIn);
+	
+	drag1 = new Drag;
+	drag1.setField(new Vect3);
+	drag1.setConstants(eta.x, eta.y, eta.z);
+	
+	grav1 = new Gravitational;
+	grav1.setField(g);
+	
+	// Get parameters of catenary
+	var M = getValue("MASS").from(taIn);
+	var L = getValue("LENG").from(taIn);
+	N = getValue("NUMP").from(taIn);
+	var elev = getValue("ELEV").from(taIn);
+	
+	var dL = L / (N - 1);
+	var dM = M / N;
 
+	// Get parameters of interaction
+	var kS = getValue("SINT").from(taIn);
+	
+	sprn2 = new Spring;
+	sprn2.setConstants(kS[0], kS[1]);
+	sprn2.setUncompressedLength(dL);
+	
+	// Get parameters of iteration
+	tbeg = getValue("TBEG").from(taIn);
+	tend = getValue("TEND").from(taIn);
+	dt = getValue("TSTP").from(taIn);
+	Tdata = getValue("TDAT").from(taIn);
 	Tproc = getValue("TPRC").from(taIn);
 
+	iter = 0;
+	Niter = Math.floor(Tdata / dt);
+	t = tbeg;
+	
+	// Get parameters of coordinates
 	var rmin = getValue("RMIN").from(taIn);
 	var rmax = getValue("RMAX").from(taIn);
-	var rorg = getValue("RORG").from(taIn);
 
 	xmin = rmin.x;
 	ymin = rmin.y;
@@ -115,62 +143,48 @@ function readParams() {
 	xmax = rmax.x;
 	ymax = rmax.y;
 	zmax = rmax.z;
-
+	
+	xo = 0.5 * (xmin + xmax);
+	yo = 0.5 * (ymin + ymax);
+	
 	XMIN = 0;
 	XMAX = caOut.width;
 	YMIN = caOut.height;
 	YMAX = 0;
 	ZMIN = -1;
 	ZMAX = 1;
-
-	paths = getBlockValue("# Segments").from(taIn);
-	iter = 0;
-	Niter = paths.length;
-
-	x = rorg.x;
-	y = rorg.y;
-
-	sx = [];
-	sy = [];
-}
-
-
-// Get block of value form a textarea
-function getBlockValue() {
-	var pattern = arguments[0];
-	var results = {
-		from: function() {
-			var ta = arguments[0];
-			var lines = ta.value.split("\n");
-			var Nl = lines.length;
-			
-			var lbeg = -1;
-			var lend = -1;
-			for(var l = 0; l < Nl; l++) {
-				if(lines[l].indexOf(pattern) == 0) {
-					lbeg = l + 1;
-				}
-				if(lines[l].length == 0 && l > lbeg) {
-					lend = l - 1;
-				}
-			}
-			
-			var block = [];
-			for(var l = lbeg; l <= lend; l++) {
-				var words = lines[l].split(" ");
-				var p = new Path(
-					parseFloat(words[0]),
-					parseFloat(words[1]),
-					parseFloat(words[2]),
-					words[3]
-				);
-				block.push(p);
-			}
-			
-			return block;
+	
+	// Create initial position of all particles
+	o = [];
+	var dy = (elev[1] - elev[0]) / (N - 1);
+	var xo = 0.5 * (xmax + xmin) - 0.5 * L;
+	for(var i = 0; i < N; i++) {
+		var x = xo + i * dL;
+		var y = elev[0] + i * dy;
+		var z = 0;
+		var r = new Vect3(x, y, z);
+		var v = new Vect3;
+		
+		oi = new Grain();
+		oi.m = dM;
+		oi.q = 0;
+		oi.D = 0.5 * dL;
+		if(i == 0 || i == N - 1) {
+			oi.c = ["#0a0", "#8f8"];
+		} else {
+			oi.c = ["#00a", "#88f"];			
 		}
-	};
-	return results;
+		oi.r = r;
+		oi.v = v;
+		
+		o.push(oi);
+	}
+	
+	// Draw all particles
+	clearCanvas(caOut);
+	for(var i = 0; i < N; i++) {
+		draw(o[i]).onCanvas(caOut);
+	}
 }
 
 
@@ -190,6 +204,7 @@ function createVisualElements() {
 		overflowY = "scroll";
 		width = "214px";
 		height = "200px";
+		fontSize = "11px";
 	}
 	
 	// Create button for loading default parameters
@@ -287,6 +302,11 @@ function buttonClick() {
 	case "Read":
 		btStart.disabled = false;
 		readParams();
+		
+		clearCanvas(caOut);
+		for(var i = 0; i < N; i++) {
+			draw(o[i]).onCanvas(caOut);
+		}
 	break;
 	case "Start":
 		if(btStart.innerHTML == "Start") {
@@ -305,13 +325,15 @@ function buttonClick() {
 	break;
 	case "Info":
 		var info = "";
-		info += "scspg.js\n";
-		info += "Semi-circle segmented path generator\n";
-		info += "Sparisoma Viridi\n";
+		info += "sspp.js\n";
+		info += "Simulation of self-propelled particles";
+		info += "Sparisoma Viridi, ";
+		info += "Aufa Nu'man Fadhilah Rudiawan, ";
+		info += "Ismi Yasifa\n";
 		info += "https://github.com/dudung/butiran.js\n"
 		info += "Load  load parameters\n";
 		info += "Read  read parameters\n";
-		info += "Start start generation\n";
+		info += "Start start simulation\n";
 		info += "Info  show this messages\n";
 		info += "\n";
 		addText(info).to(taOut);
@@ -323,45 +345,96 @@ function buttonClick() {
 
 // Perform simulation
 function simulate() {
+	if(iter >= Niter) {
+		iter = 0;
+	}
+	
+	if(t == tbeg) {
+		//       0.0740 -0.0009 -0.0162
+		addText("#t      xcom    ycom    K\n").to(taOut);
+	}
+	
+	var K = 0;
+	var xcom = 0;
+	var ycom = 0;
+	for(var i = 0; i < N; i++) {
+		xcom += o[i].r.x;
+		ycom += o[i].r.y;
+		var m = o[i].m;
+		var v = o[i].v.len();
+		K += 0.5 * m * v * v;
+	}
+	xcom /= N;
+	ycom /= N;
 	
 	if(iter == 0) {
-	  clearCanvas(caOut);
-		addText("#s" + "\n").to(taOut);
+		//var tt = t.toFixed(digit);
+		var tt = t.toFixed(1);
+		tt = (t < 100) ? ("00" + tt).slice(-5) : tt;
+		var xx = xcom.toExponential(1);
+		xx = (xcom >= 0) ? "+" + xx : xx;
+		var yy = ycom.toExponential(1);
+		yy = (ycom >= 0) ? "+" + yy : yy;
+		var KK = K.toExponential(3);
+		var text = tt + " ";
+		text += xx + " ";
+		text += yy + " ";
+		text += KK + "\n";
+		addText(text).to(taOut);
 	}
-	addText(iter + " ").to(taOut);
 	
-	draw(paths[iter]).onCanvas(caOut);
+	clearCanvas(caOut);
+	for(var i = 0; i < N; i++) {
+		draw(o[i]).onCanvas(caOut);
+	}
 	
-	if(iter >= Niter - 1) {
+	// Calculate total force and acceleration
+	var a = [];
+	a.push(Vect3);
+	for(var i = 1; i < N-1; i++) {
+		
+		var F = new Vect3;
+		var m = o[i].m;
+		
+		var FD = drag1.force(o[i]);
+		F = Vect3.add(F, FD);
+		
+		var FG = grav1.force(o[i]);
+		F = Vect3.add(F, FG);
+
+		var FSL = sprn2.force(o[i], o[i-1]);
+		var FSR = sprn2.force(o[i], o[i+1]);
+		var FS = Vect3.add(FSL, FSR);
+		F = Vect3.add(F, FS);
+		
+		a.push(Vect3.div(F, m));
+	}
+	a.push(Vect3);
+	
+	// Integrate acceleration and velocity
+	for(var i = 1; i < N-1; i++) {
+		var r = o[i].r;
+		var v = o[i].v;
+		
+		v = Vect3.add(v, Vect3.mul(a[i], dt));
+		r = Vect3.add(r, Vect3.mul(v, dt));
+		
+		o[i].r = r;
+		o[i].v = v;
+	}
+	
+	if(t >= tend) {
 		btLoad.disabled = false;
 		btRead.disabled = false;
 		btStart.disabled = true;
 		btInfo.disabled = false;
 		btStart.innerHTML = "Start";
 		clearInterval(proc);
-		addText("\n\n").to(taOut);
-		
-		var N = sx.length;
-		addText("#x      y\n").to(taOut);
-		for(var i = 0; i < 2; i++) {
-			var strxy = "";
-			strxy += sx[i].toFixed(digit) + " ";
-			strxy += sy[i].toFixed(digit) + "\n";
-			addText(strxy).to(taOut);
-		}
-		addText("..\n").to(taOut);
-		for(var i = N - 2; i < N; i++) {
-			var strxy = "";
-			strxy += sx[i].toFixed(digit) + " ";
-			strxy += sy[i].toFixed(digit) + "\n";
-			addText(strxy).to(taOut);
-		}
-		addText("Lines = " + N + "\n").to(taOut);
-		
 		addText("\n").to(taOut);
 	}
 	
 	iter++;
+	t += dt;
 }
 
 
@@ -388,14 +461,34 @@ function draw() {
 				var dx = xg + o.D;
 				var yg = o.r.y;
 				
-				var X = lintrans(xg, [xmin, xmax], [XMIN, XMAX]);
-				var DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
+				var X, DX;
+				if(ca.xmin == undefined) {
+					X = lintrans(xg, [xmin, xmax], [XMIN, XMAX]);
+					DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
+				} else {
+					X = lintrans(xg, [ca.xmin, ca.xmax], [XMIN, XMAX]);
+					DX = lintrans(dx, [ca.xmin, ca.xmax], [XMIN, XMAX]);
+				}
+				
 				var D = DX - X;
 				var Y = lintrans(yg, [ymin, ymax], [YMIN, YMAX]);
 				
 				cx.beginPath();
-				cx.strokeStyle = o.c;
-				cx.arc(X, Y, D, 0, 2 * Math.PI);
+				if(o.c instanceof Array) {
+					cx.strokeStyle = o.c[0];
+					if(o.c.length > 1) {
+						cx.fillStyle = o.c[1];
+					}
+				} else {
+					cx.strokeStyle = o.c;
+				}
+				
+				if(o.c instanceof Array && o.c.length > 1) {
+					cx.arc(X, Y, 0.5 * D, 0, 2 * Math.PI);
+					cx.fill();
+				}
+				cx.lineWidth = "2";
+				cx.arc(X, Y, 0.5 * D, 0, 2 * Math.PI);
 				cx.stroke();
 			} else if(o instanceof Path) {
 				var qi = o.qi * 2 * Math.PI;
@@ -425,6 +518,7 @@ function draw() {
 				
 				cx.beginPath();
 				cx.strokeStyle = color;
+				cx.lineWidth = "1";
 				for(i = 0; i < N; i++) {
 					var X = lintrans(xx[i], [xmin, xmax], [XMIN, XMAX]);
 					var Y = lintrans(yy[i], [ymin, ymax], [YMIN, YMAX]);
@@ -443,7 +537,29 @@ function draw() {
 				cx.arc(X, Y, 2, 0, 2 * Math.PI);
 				cx.stroke();
 				
-			} else {
+			} else if(o instanceof Points) {
+				var N = o.data[0].length;
+				cx.beginPath();
+				cx.lineWidth = "2";
+				cx.strokeStyle = "#00f";
+				for(var i = 0; i <= N; i++) {
+					var X;
+					if(ca.xmin == undefined) {
+						X = lintrans(o.data[0][i], [xmin, xmax],
+							[XMIN, XMAX]);
+					} else {
+						X = lintrans(o.data[0][i], [ca.xmin, ca.xmax],
+							[XMIN, XMAX]);
+					}
+					var Y = lintrans(o.data[1][i], [ymin, ymax],
+						[YMIN, YMAX]);
+					if(i == 0) {
+						cx.moveTo(X, Y);
+					} else {
+						cx.lineTo(X, Y);
+					}
+				}
+				cx.stroke();
 			}
 		}
 	};
@@ -493,6 +609,10 @@ function getValue() {
 							parseFloat(words[2]),
 							parseFloat(words[3])
 						);
+					} else if(Nw == 3) {
+						value = [];
+						value.push(parseFloat(words[1]));
+						value.push(parseFloat(words[2]));
 					}
 					return value;
 				}

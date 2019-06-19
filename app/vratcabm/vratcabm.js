@@ -28,6 +28,8 @@
 	Simulation of rest area along highway between two cities
 	for its visited events and possibility of economic
 	benefits
+	1621 Add select for choosing scenario.
+	1724 Finish this stage.
 	
 	References
 	1. S Viridi, P Premadi, P Aditiawati, E S Maqdir,
@@ -63,6 +65,7 @@ function main() {
 	createAndArrangeElements();
 	
 	// Initiate parameters
+	scenario = -1;
 	initParams();
 		
 	// Draw system
@@ -73,7 +76,7 @@ function main() {
 // Initiate parameters
 function initParams() {
 	// Scenario (-1), 0-4, 10-22
-	scenario = 22;
+	//scenario = 22;
 
 	Tproc = 10;
 	
@@ -129,6 +132,7 @@ function initParams() {
 		[0, 1, []],
 	];
 	digit = 3;
+	tout("\n");	
 	tout("# it ii  LLR LRL RA1 RA2 L\n");	
 }
 
@@ -365,9 +369,11 @@ function buttonClick() {
 	if(target.innerHTML == "Start") {
 		target.innerHTML = "Stop";
 		proc = setInterval(simulate, Tproc);
+		selIn.disabled = true;
 	} else if(target.innerHTML == "Stop"){
 		target.innerHTML = "Start";
 		clearInterval(proc);
+		selIn.disabled = false;
 	}
 }
 
@@ -396,6 +402,7 @@ function createAndArrangeElements() {
 	btnStart.style.width = "92px";
 	btnStart.style.float = "left";
 	btnStart.addEventListener("click", buttonClick);
+	btnStart.disabled = true;
 	
 	ta = document.createElement("textarea");
 	ta.style.width = "250px";
@@ -423,17 +430,27 @@ function createAndArrangeElements() {
 	div2.style.float = "left";
 	div2.style.border = "1px solid #aaa";
 	
-	selIn = document.createElement("select");
-	var optText = [
+	var scenText = [
 		-1,
 		0, 1, 2, 3, 4,
 		10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22
 	];
-	for(var i = 0; i < optText.length; i++) {
+	selIn = document.createElement("select");
+	for(var i = 0; i < scenText.length; i++) {
 		var opt = document.createElement("option");
-		opt.text = "Scenario " + optText[i];
+		opt.text = "Scenario " + scenText[i];
 		selIn.options.add(opt);
 	}
+	selIn.addEventListener("change", function() {
+		var sidx = selIn.selectedIndex;
+		var sval = selIn.value;
+		var scenNum = parseInt(sval.split(" ")[1]);
+		scenario = scenNum;
+		//console.log(scenario);
+		initParams();
+		drawSystem();
+		btnStart.disabled = false;
+	});
 	
 	document.body.append(div);
 		div.append(can);

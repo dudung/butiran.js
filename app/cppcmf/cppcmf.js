@@ -4,8 +4,9 @@
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
 	
+	20150417 Date of AIP proceedings.
 	20190528
-	0446 Start this app.
+	0446 Start recreating this app.
 	0754 Continue at campus.
 	1222 Finish at campus, proposed color c --> c1, c2.
 	1658 Implement correction from [1] and it works.
