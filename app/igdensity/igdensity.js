@@ -270,18 +270,21 @@ function simulate() {
 					var i2 = i + 1;
 					var j2 = j;
 					var k2 = i2 + j2 * widi;
+					color[k2 + did] = ["#f00", "#fff"];
 					var l2 = Vect3.sub(
 						r[k + did], r[k2 + did]).len();
 					idle.push([k2, l2]);
+					
 					var i3 = i;
 					var j3 = j + 1;
 					var k3 = i3 + j3 * widi;
+					color[k3 + did] = ["#00f", "#fff"];
 					var l3 = Vect3.sub(
 						r[k + did], r[k3 + did]).len();
 					idle.push([k3, l3]);
 				} else if(0 < k && k < widi-2) {
 				} else if(k == widi-1) {
-					/**/
+					/**
 					var i2 = i - 1;
 					var j2 = j;
 					var k2 = i2 + j2 * widi;
@@ -294,7 +297,7 @@ function simulate() {
 					var l3 = Vect3.sub(
 						r[k + did], r[k3 + did]).len();
 					idle.push([k3, l3]);
-					/**/
+					*/
 				}
 			}
 			if(idle.length > 0) {
