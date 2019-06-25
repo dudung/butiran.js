@@ -12,6 +12,7 @@
 	0321 Beg from ipendepthf as app template, all as copied
 			 first.
 	0415 Add second author.
+	20190625
 	0520 Try to adjust it for the project, but not yet
 			 compatible with the (new) butiran.js, force lib
 			 has not been used.
@@ -19,6 +20,8 @@
 	0731 Add block form spring force inside intruder at L193.
 	1049 Fix color but not spring force.
 	1755 Still error. Add color for tracing.
+	20190626
+	0404 Try again at home.
 	xxxx y.
 */
 
@@ -205,6 +208,7 @@ function simulate() {
 				var nij = rij.unit();
 				var lij = rij.len();
 				var fs1 = -kspr * (lij - lo) * 1;
+				//if(lij - lo  < 0) fs1 = 0;
 				var Fs1 = Vect3.mul(fs1, nij);
 				
 				var vij = Vect3.sub(v[i + bid], v[j + bid]);
@@ -265,47 +269,78 @@ function simulate() {
 		// Get initial length
 		var did = numg - Nint;
 		for(var j = 0; j < Nint; j++) {
-			var idle = [];
 			for(var i = 0; i < Nint; i++) {
+				var idle = [];
 				var k = i + j * widi;
 				if(k == 0) {
-					color[k + did] = ["#000", "#f00"];
+					// bottom-left
+					//color[k + did] = ["#000", "#f00"];
+					//color[k2 + did] = ["#000", "#0f0"];
+					//color[k1 + did] = ["#000", "#00f"];
 					
 					var i2 = i + 1;
 					var j2 = j;
 					var k2 = i2 + j2 * widi;
-					color[k2 + did] = ["#000", "#0f0"];
 					var l2 = Vect3.sub(
 						r[k + did], r[k2 + did]).len();
 					idle.push([k2, l2]);
 					
-					var i3 = i;
-					var j3 = j + 1;
-					var k3 = i3 + j3 * widi;
-					color[k3 + did] = ["#000", "#00f"];
-					var l3 = Vect3.sub(
-						r[k + did], r[k3 + did]).len();
-					idle.push([k3, l3]);
-				} else if(0 < k && k < widi-2) {
-				} else if(k == widi-1) {
-					/**
-					var i2 = i - 1;
+					var i1 = i;
+					var j1 = j + 1;
+					var k1 = i1 + j1 * widi;
+					var l1 = Vect3.sub(
+						r[k + did], r[k1 + did]).len();
+					idle.push([k1, l1]);
+				} else if(0 < k && k < widi-1) {
+					// bottom-center
+					//color[k + did] = ["#000", "#f00"];
+					//color[k4 + did] = ["#000", "#0f0"];
+					//color[k1 + did] = ["#000", "#00f"];
+					//color[k2 + did] = ["#000", "#0f0"];
+					
+					var i4 = i - 1;
+					var j4 = j;
+					var k4 = i4 + j4 * widi;
+					var l4 = Vect3.sub(
+						r[k + did], r[k4 + did]).len();
+					idle.push([k4, l4]);
+					
+					var i1 = i;
+					var j1 = j + 1;
+					var k1 = i1 + j1 * widi;
+					var l1 = Vect3.sub(
+						r[k + did], r[k1 + did]).len();
+					idle.push([k1, l1]);
+					
+					var i2 = i + 1;
 					var j2 = j;
 					var k2 = i2 + j2 * widi;
 					var l2 = Vect3.sub(
 						r[k + did], r[k2 + did]).len();
 					idle.push([k2, l2]);
-					var i3 = i;
-					var j3 = j + 1;
-					var k3 = i3 + j3 * widi;
-					var l3 = Vect3.sub(
-						r[k + did], r[k3 + did]).len();
-					idle.push([k3, l3]);
-					*/
+				} else if(k == widi-1) {
+					// bottom-right
+					//color[k + did] = ["#000", "#f00"];
+					//color[k1 + did] = ["#000", "#00f"];
+					//color[k4 + did] = ["#000", "#0f0"];
+					
+					var i4 = i - 1;
+					var j4 = j;
+					var k4 = i4 + j4 * widi;
+					var l4 = Vect3.sub(
+						r[k + did], r[k4 + did]).len();
+					idle.push([k4, l4]);
+					
+					var i1 = i;
+					var j1 = j + 1;
+					var k1 = i1 + j1 * widi;
+					var l1 = Vect3.sub(
+						r[k + did], r[k1 + did]).len();
+					idle.push([k1, l1]);
 				}
-			}
-			if(idle.length > 0) {
-				leno.push(idle);
+				if(idle.length > 0) {
+					leno.push(idle);
+				}
 			}
 		}
 		
@@ -528,12 +563,12 @@ function loadParameters() {
 	lines += "VELF 0\n";        // Fluid velocity   m/s
 	lines += "KCOL 400\n";      // Normal constant  N/m
 	lines += "GCOL 0.1\n";      // Normal damping   N/m
-	lines += "KSPR 3000\n";     // Spring constant  N/m
+	lines += "KSPR 1000\n";     // Spring constant  N/m
 	lines += "GSPR 0.1\n";      // Spring damping   N/m
 	
 	lines += "\n";
 	lines += "# Simulation\n";
-	lines += "TSTEP 0.001\n";   // Time step         s
+	lines += "TSTEP 0.001\n";  // Time step         s
 	lines += "TBEG 0\n";        // Initial time      s
 	lines += "TEND 6\n";        // Final time        s
 	lines += "TDATA 0.01\n";    // Data period       s
@@ -561,12 +596,12 @@ function loadParameters() {
 	
 	lines += "\n";
 	lines += "# An intruder\n";
-	lines += "DIAI 0.01\n"       // Intruder diameter m
-	lines += "WIDI 3\n"       // Intruder width (in D)
-	lines += "HEII 3\n"       // Intruder height(in D)
-	lines += "RHOI 2000\n";      // Intruder density  kg/m3
-	lines += "ZINT 0.18\n";      // Intruder position m
-	lines += "TINT 0.3\n";       // Time appearance   kg/m3
+	lines += "DIAI 0.01\n"      // Intruder diameter m
+	lines += "WIDI 3\n"         // Intruder width (in D)
+	lines += "HEII 3\n"         // Intruder height(in D)
+	lines += "RHOI 2000\n";     // Intruder density  kg/m3
+	lines += "ZINT 0.12\n";     // Intruder position m
+	lines += "TINT 0.3\n";      // Time appearance   kg/m3
 	
 	var ta = arguments[0];
 	ta.value = lines;
