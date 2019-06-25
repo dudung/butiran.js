@@ -17,6 +17,7 @@
 			 has not been used.
 	0722 Begin add spring force to floating object.
 	0731 Add block form spring force inside intruder at L193.
+	1049 Fix color but not spring force.
 	xxxx y.
 */
 
@@ -40,7 +41,7 @@ var xmin, ymin, xmax, ymax, XMIN, YMIN, XMAX, YMAX;
 var boxh, boxw, boxt;
 
 // Define global variables for bed particles
-var diag, rhog, numg, geng, r, v, m, D;
+var diag, rhog, numg, geng, r, v, m, D, color;
 
 // Define global variables for intruder
 var diai, widi, heii, rhoi, Tint, zint, INTRUDER_CREATED;
@@ -192,8 +193,8 @@ function simulate() {
 	
 	// Calculate spring force only on intruder
 	if(INTRUDER_CREATED) {
-		var bid = numg + Nint;
-		for(var i = 0; i < Nint; i++) {
+		var bid = numg - Nint;
+		for(var i = 0; i < leno.length; i++) {
 			var Fs = new Vect3();
 			for(var k = 0; k < leno[i].length; k++) {
 				var j = leno[i][k][0];
@@ -202,19 +203,21 @@ function simulate() {
 				var rij = Vect3.sub(r[i + bid], r[j + bid]);
 				var nij = rij.unit();
 				var lij = rij.len();
-				var fs1 = kspr * (lij - lo);
+				var fs1 = kspr * (lij - lo) * 0;
 				var Fs1 = Vect3.mul(fs1, nij);
 				
 				var vij = Vect3.sub(v[i + bid], v[j + bid]);
 				var mij = vij.unit();
 				var uij = vij.len();
 				var ksidot = uij;
-				var fs2 = -gspr * uij;
+				var fs2 = -gspr * uij * 0;
 				var Fs2 = Vect3.mul(fs2, mij);
+				
+				console.log(i, j, i + bid, j + bid);
 				
 				Fs = Vect3.add(Fn, Vect3.add(Fs1, Fs2));
 			}
-			F[i] = Vect3.add(F[i], Fs);
+			F[i + bid] = Vect3.add(F[i + bid], Fs);
 		}
 	}
 	
@@ -247,6 +250,8 @@ function simulate() {
 				var y = -0.5 * diai * (widi - 1) + diai * i;
 				var z = zint + 0.5 * diai * (heii - 1) + diai * j;
 				r.push(new Vect3(x, y, z));
+				
+				color.push(["#000", "#fa8"]);
 				
 				numg++;
 				Nint++;
@@ -435,7 +440,7 @@ function buttonClick() {
 	} else if(cap == "Info") {
 		tout(taOut1, "igdensity.js -- 20190619\n"
 			+ "Intruder and granular density\n"
-			+ "Sparisoma Viridi, Dewi Muliyati\n"
+			+ "Sparisoma Viridi, Dewi Muliyati, Nuryati, Johri Sabaryati\n"
 			+ "https://github.com/dudung/butiran"
 			+ "\n\n"
 		);
@@ -454,17 +459,13 @@ function drawSystem() {
 		
 		cx.beginPath();
 		cx.arc(R1.X, R1.Y, (R2.X - R1.X), 0, 2 * Math.PI);
-		if(INTRUDER_CREATED && i > numg - Nint - 1) {
-			cx.fillStyle = "#fa8";
-		} else {
-			cx.fillStyle = "#8af";
-		}
+		cx.fillStyle = color[i][1];
 		cx.closePath();
 		cx.fill();
 		
 		cx.beginPath();
 		cx.arc(R1.X, R1.Y, (R2.X - R1.X), 0, 2 * Math.PI);
-		cx.strokeStyle = "#000";
+		cx.strokeStyle = color[i][0];
 		cx.stroke();
 	}
 	
@@ -504,7 +505,7 @@ function loadParameters() {
 	lines += "VELF 0\n";        // Fluid velocity   m/s
 	lines += "KCOL 400\n";      // Normal constant  N/m
 	lines += "GCOL 0.1\n";      // Normal damping   N/m
-	lines += "KSPR 1000\n";     // Spring constant  N/m
+	lines += "KSPR 5000\n";     // Spring constant  N/m
 	lines += "GSPR 0.1\n";      // Spring damping   N/m
 	
 	lines += "\n";
@@ -538,8 +539,8 @@ function loadParameters() {
 	lines += "\n";
 	lines += "# An intruder\n";
 	lines += "DIAI 0.01\n"       // Intruder diameter m
-	lines += "WIDI 7\n"       // Intruder width (in D)
-	lines += "HEII 4\n"       // Intruder height(in D)
+	lines += "WIDI 3\n"       // Intruder width (in D)
+	lines += "HEII 3\n"       // Intruder height(in D)
 	lines += "RHOI 2000\n";      // Intruder density  kg/m3
 	lines += "ZINT 0.18\n";      // Intruder position m
 	lines += "TINT 0.3\n";       // Time appearance   kg/m3
@@ -648,6 +649,7 @@ function initParams() {
 	v = [];
 	m = [];
 	D = [];
+	color = [];
 	if(geng == 0) {
 		for(var i = 0; i < numg; i++) {
 			D.push(diag);
@@ -655,6 +657,7 @@ function initParams() {
 			var Vg = (4 * Math.PI / 3) * Rg * Rg * Rg;
 			m.push(rhog * Vg);
 			v.push(new Vect3());
+			color.push(["#000", "#8af"]);
 		}
 		
 		var Nperlayer = parseInt(0.75 * boxw / diag);
