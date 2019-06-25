@@ -15,6 +15,8 @@
 	0520 Try to adjust it for the project, but not yet
 			 compatible with the (new) butiran.js, force lib
 			 has not been used.
+	0722 Begin add spring force to floating object.
+	0731 Add block form spring force inside intruder at L193.
 	xxxx y.
 */
 
@@ -26,7 +28,7 @@ var wL, wR, wT, wB;
 var wall, Nw, kw;
 
 // Define global variables for parameters
-var gacc, rhof, etaf, velf, kcol, gcol;
+var gacc, rhof, etaf, velf, kcol, gcol, kspr, gspr, leno;
 
 // Define global variables for simulation
 var tstep, tbeg, tend, tdata, tproc, proc, t, Ndata, idata;
@@ -187,7 +189,36 @@ function simulate() {
 		}
 		F[i] = Vect3.add(F[i], Fn);
 	}
-		
+	
+	// Calculate spring force only on intruder
+	if(INTRUDER_CREATED) {
+		var bid = numg + Nint;
+		for(var i = 0; i < Nint; i++) {
+			var Fs = new Vect3();
+			for(var k = 0; k < leno[i].length; k++) {
+				var j = leno[i][k][0];
+				var lo = leno[i][k][1];
+				
+				var rij = Vect3.sub(r[i + bid], r[j + bid]);
+				var nij = rij.unit();
+				var lij = rij.len();
+				var fs1 = kspr * (lij - lo);
+				var Fs1 = Vect3.mul(fs1, nij);
+				
+				var vij = Vect3.sub(v[i + bid], v[j + bid]);
+				var mij = vij.unit();
+				var uij = vij.len();
+				var ksidot = uij;
+				var fs2 = -gspr * uij;
+				var Fs2 = Vect3.mul(fs2, mij);
+				
+				Fs = Vect3.add(Fn, Vect3.add(Fs1, Fs2));
+			}
+			F[i] = Vect3.add(F[i], Fs);
+		}
+	}
+	
+	
 	// Calculate acceleration, velocity, and position
 	for(var i = 0; i < numg; i++) {
 		var a = Vect3.div(F[i], m[i]);
@@ -222,6 +253,33 @@ function simulate() {
 			}
 		}
 		INTRUDER_CREATED = true;
+		
+		
+		// Get initial length
+		var did = numg - Nint;
+		for(var j = 0; j < Nint; j++) {
+			var idle = [];
+			for(var i = 0; i < Nint; i++) {
+				var k = i + j * widi;
+				if(k == 0) {
+					var i2 = i + 1;
+					var j2 = j;
+					var k2 = i2 + j2 * widi;
+					var l2 = Vect3.sub(
+						r[k + did], r[k2 + did]).len();
+					idle.push([k2, l2]);
+					var i3 = i;
+					var j3 = j + 1;
+					var k3 = i3 + j3 * widi;
+					var l3 = Vect3.sub(
+						r[k + did], r[k3 + did]).len();
+					idle.push([k3, l3]);
+				}
+			}
+			if(idle.length > 0) {
+				leno.push(idle);
+			}
+		}
 		
 		// View condensed middle configuration
 		viewConf("Initial configuration");
@@ -397,9 +455,9 @@ function drawSystem() {
 		cx.beginPath();
 		cx.arc(R1.X, R1.Y, (R2.X - R1.X), 0, 2 * Math.PI);
 		if(INTRUDER_CREATED && i > numg - Nint - 1) {
-			cx.fillStyle = "#f8a";
+			cx.fillStyle = "#fa8";
 		} else {
-			cx.fillStyle = "#a8f";
+			cx.fillStyle = "#8af";
 		}
 		cx.closePath();
 		cx.fill();
@@ -445,7 +503,9 @@ function loadParameters() {
 	lines += "ETAF 8.90E-4\n";  // Fluid vicosity   Pa.s
 	lines += "VELF 0\n";        // Fluid velocity   m/s
 	lines += "KCOL 400\n";      // Normal constant  N/m
-	lines += "GCOL 0.1\n";      // Normal constant  N/m
+	lines += "GCOL 0.1\n";      // Normal damping   N/m
+	lines += "KSPR 1000\n";     // Spring constant  N/m
+	lines += "GSPR 0.1\n";      // Spring damping   N/m
 	
 	lines += "\n";
 	lines += "# Simulation\n";
@@ -472,7 +532,7 @@ function loadParameters() {
 	lines += "# Bed particles\n";
 	lines += "DIAG 0.01\n"      // Grains diameter   m
 	lines += "RHOG 2000\n";     // Grains density    kg/m3
-	lines += "NUMG 44\n";      // Number of grains  -
+	lines += "NUMG 154\n";      // Number of grains  -
 	lines += "GENG 0\n";        // Generation type   0 random
 	
 	lines += "\n";
@@ -501,6 +561,8 @@ function readParameters() {
 	velf = getValue(lines, "VELF");
 	kcol = getValue(lines, "KCOL");
 	gcol = getValue(lines, "GCOL");
+	kspr = getValue(lines, "KSPR");
+	gspr = getValue(lines, "GSPR");
 
 	// Get simulation information
 	tstep = getValue(lines, "TSTEP");
@@ -618,6 +680,7 @@ function initParams() {
 	
 	// Set intruder parameters
 	INTRUDER_CREATED = false;
+	leno = [];
 	
 	// Initialize simulation parameters
 	t = tbeg;
