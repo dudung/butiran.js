@@ -203,7 +203,7 @@ function simulate() {
 				var rij = Vect3.sub(r[i + bid], r[j + bid]);
 				var nij = rij.unit();
 				var lij = rij.len();
-				var fs1 = kspr * (lij - lo) * 0;
+				var fs1 = kspr * (lij - lo) * 1;
 				var Fs1 = Vect3.mul(fs1, nij);
 				
 				var vij = Vect3.sub(v[i + bid], v[j + bid]);
@@ -213,7 +213,7 @@ function simulate() {
 				var fs2 = -gspr * uij * 0;
 				var Fs2 = Vect3.mul(fs2, mij);
 				
-				console.log(i, j, i + bid, j + bid);
+				//console.log(i + bid, j + bid, lij, lo);
 				
 				Fs = Vect3.add(Fn, Vect3.add(Fs1, Fs2));
 			}
@@ -279,6 +279,22 @@ function simulate() {
 					var l3 = Vect3.sub(
 						r[k + did], r[k3 + did]).len();
 					idle.push([k3, l3]);
+				} else if(0 < k && k < widi-2) {
+				} else if(k == widi-1) {
+					/**/
+					var i2 = i - 1;
+					var j2 = j;
+					var k2 = i2 + j2 * widi;
+					var l2 = Vect3.sub(
+						r[k + did], r[k2 + did]).len();
+					idle.push([k2, l2]);
+					var i3 = i;
+					var j3 = j + 1;
+					var k3 = i3 + j3 * widi;
+					var l3 = Vect3.sub(
+						r[k + did], r[k3 + did]).len();
+					idle.push([k3, l3]);
+					/**/
 				}
 			}
 			if(idle.length > 0) {
@@ -505,7 +521,7 @@ function loadParameters() {
 	lines += "VELF 0\n";        // Fluid velocity   m/s
 	lines += "KCOL 400\n";      // Normal constant  N/m
 	lines += "GCOL 0.1\n";      // Normal damping   N/m
-	lines += "KSPR 5000\n";     // Spring constant  N/m
+	lines += "KSPR 1000\n";     // Spring constant  N/m
 	lines += "GSPR 0.1\n";      // Spring damping   N/m
 	
 	lines += "\n";
