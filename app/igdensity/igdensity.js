@@ -18,6 +18,7 @@
 	0722 Begin add spring force to floating object.
 	0731 Add block form spring force inside intruder at L193.
 	1049 Fix color but not spring force.
+	1755 Still error. Add color for tracing.
 	xxxx y.
 */
 
@@ -203,21 +204,22 @@ function simulate() {
 				var rij = Vect3.sub(r[i + bid], r[j + bid]);
 				var nij = rij.unit();
 				var lij = rij.len();
-				var fs1 = kspr * (lij - lo) * 1;
+				var fs1 = -kspr * (lij - lo) * 1;
 				var Fs1 = Vect3.mul(fs1, nij);
 				
 				var vij = Vect3.sub(v[i + bid], v[j + bid]);
 				var mij = vij.unit();
 				var uij = vij.len();
 				var ksidot = uij;
-				var fs2 = -gspr * uij * 0;
+				var fs2 = -gspr * uij * 1;
 				var Fs2 = Vect3.mul(fs2, mij);
 				
 				//console.log(i + bid, j + bid, lij, lo);
 				
 				Fs = Vect3.add(Fn, Vect3.add(Fs1, Fs2));
+				
+				F[i + bid] = Vect3.add(F[i + bid], Fs);
 			}
-			F[i + bid] = Vect3.add(F[i + bid], Fs);
 		}
 	}
 	
@@ -267,10 +269,12 @@ function simulate() {
 			for(var i = 0; i < Nint; i++) {
 				var k = i + j * widi;
 				if(k == 0) {
+					color[k + did] = ["#000", "#f00"];
+					
 					var i2 = i + 1;
 					var j2 = j;
 					var k2 = i2 + j2 * widi;
-					color[k2 + did] = ["#f00", "#fff"];
+					color[k2 + did] = ["#000", "#0f0"];
 					var l2 = Vect3.sub(
 						r[k + did], r[k2 + did]).len();
 					idle.push([k2, l2]);
@@ -278,7 +282,7 @@ function simulate() {
 					var i3 = i;
 					var j3 = j + 1;
 					var k3 = i3 + j3 * widi;
-					color[k3 + did] = ["#00f", "#fff"];
+					color[k3 + did] = ["#000", "#00f"];
 					var l3 = Vect3.sub(
 						r[k + did], r[k3 + did]).len();
 					idle.push([k3, l3]);
@@ -524,7 +528,7 @@ function loadParameters() {
 	lines += "VELF 0\n";        // Fluid velocity   m/s
 	lines += "KCOL 400\n";      // Normal constant  N/m
 	lines += "GCOL 0.1\n";      // Normal damping   N/m
-	lines += "KSPR 1000\n";     // Spring constant  N/m
+	lines += "KSPR 3000\n";     // Spring constant  N/m
 	lines += "GSPR 0.1\n";      // Spring damping   N/m
 	
 	lines += "\n";
