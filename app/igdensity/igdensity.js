@@ -563,12 +563,12 @@ function loadParameters() {
 	lines += "VELF 0\n";        // Fluid velocity   m/s
 	lines += "KCOL 400\n";      // Normal constant  N/m
 	lines += "GCOL 0.1\n";      // Normal damping   N/m
-	lines += "KSPR 1000\n";     // Spring constant  N/m
+	lines += "KSPR 3000\n";     // Spring constant  N/m
 	lines += "GSPR 0.1\n";      // Spring damping   N/m
 	
 	lines += "\n";
 	lines += "# Simulation\n";
-	lines += "TSTEP 0.001\n";  // Time step         s
+	lines += "TSTEP 0.0001\n";  // Time step         s
 	lines += "TBEG 0\n";        // Initial time      s
 	lines += "TEND 6\n";        // Final time        s
 	lines += "TDATA 0.01\n";    // Data period       s
@@ -597,8 +597,8 @@ function loadParameters() {
 	lines += "\n";
 	lines += "# An intruder\n";
 	lines += "DIAI 0.01\n"      // Intruder diameter m
-	lines += "WIDI 3\n"         // Intruder width (in D)
-	lines += "HEII 3\n"         // Intruder height(in D)
+	lines += "WIDI 4\n"         // Intruder width (in D)
+	lines += "HEII 5\n"         // Intruder height(in D)
 	lines += "RHOI 2000\n";     // Intruder density  kg/m3
 	lines += "ZINT 0.12\n";     // Intruder position m
 	lines += "TINT 0.3\n";      // Time appearance   kg/m3
