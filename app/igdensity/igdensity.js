@@ -22,6 +22,7 @@
 	1755 Still error. Add color for tracing.
 	20190626
 	0404 Try again at home.
+	0521 Seems good. Try to implement to all interuder parts.
 	xxxx y.
 */
 
@@ -265,11 +266,37 @@ function simulate() {
 		}
 		INTRUDER_CREATED = true;
 		
+		// 8 1 2
+		// 7 0 3
+		// 6 5 4
+		function getRegion(j, i) {
+			var region = -1;
+			if(j == heii - 1 && i == widi - 1) {
+				region = 6;
+			} else if() {
+				
+			} else if() {
+				
+			} else if() {
+				
+			} else if() {
+				
+			} else if() {
+				
+			} else if() {
+				
+			} else if() {
+				
+			} else {
+				region = 0;
+			}
+		}
 		
-		// Get initial length
+		
+		// Get initial length	
 		var did = numg - Nint;
-		for(var j = 0; j < Nint; j++) {
-			for(var i = 0; i < Nint; i++) {
+		for(var j = 0; j < heii; j++) {
+			for(var i = 0; i < widi; i++) {
 				var idle = [];
 				var k = i + j * widi;
 				if(k == 0) {
@@ -292,7 +319,7 @@ function simulate() {
 						r[k + did], r[k1 + did]).len();
 					idle.push([k1, l1]);
 				} else if(0 < k && k < widi-1) {
-					// bottom-center
+					// bottom-middle
 					//color[k + did] = ["#000", "#f00"];
 					//color[k4 + did] = ["#000", "#0f0"];
 					//color[k1 + did] = ["#000", "#00f"];
@@ -337,6 +364,114 @@ function simulate() {
 					var l1 = Vect3.sub(
 						r[k + did], r[k1 + did]).len();
 					idle.push([k1, l1]);
+				} else if(i == 0 && (0 < j && j < heii - 1)) {
+					// middle-left
+					var i1 = i;
+					var j1 = j + 1;
+					var k1 = i1 + j1 * widi;
+					var l1 = Vect3.sub(
+						r[k + did], r[k1 + did]).len();
+					idle.push([k1, l1]);
+					
+					var i2 = i + 1;
+					var j2 = j;
+					var k2 = i2 + j2 * widi;
+					var l2 = Vect3.sub(
+						r[k + did], r[k2 + did]).len();
+					idle.push([k2, l2]);
+					
+					var i3 = i;
+					var j3 = j - 1;
+					var k3 = i3 + j3 * widi;
+					var l3 = Vect3.sub(
+						r[k + did], r[k3 + did]).len();
+					idle.push([k3, l3]);
+				} else if(
+						(0 < j && j < heii - 1) &&
+						(0 < i && i < widi - 1)
+				) {
+					// middle-middle
+					var i1 = i;
+					var j1 = j + 1;
+					var k1 = i1 + j1 * widi;
+					var l1 = Vect3.sub(
+						r[k + did], r[k1 + did]).len();
+					idle.push([k1, l1]);
+					
+					var i2 = i + 1;
+					var j2 = j;
+					var k2 = i2 + j2 * widi;
+					var l2 = Vect3.sub(
+						r[k + did], r[k2 + did]).len();
+					idle.push([k2, l2]);
+					
+					var i3 = i;
+					var j3 = j - 1;
+					var k3 = i3 + j3 * widi;
+					var l3 = Vect3.sub(
+						r[k + did], r[k3 + did]).len();
+					idle.push([k3, l3]);
+					
+					var i4 = i - 1;
+					var j4 = j;
+					var k4 = i4 + j4 * widi;
+					var l4 = Vect3.sub(
+						r[k + did], r[k4 + did]).len();
+					idle.push([k4, l4]);
+				} else if(i == widi - 1 && (0 < j && j < heii - 1)) {
+					// middle-right
+					var i1 = i;
+					var j1 = j + 1;
+					var k1 = i1 + j1 * widi;
+					var l1 = Vect3.sub(
+						r[k + did], r[k1 + did]).len();
+					idle.push([k1, l1]);
+					
+					var i3 = i;
+					var j3 = j - 1;
+					var k3 = i3 + j3 * widi;
+					var l3 = Vect3.sub(
+						r[k + did], r[k3 + did]).len();
+					idle.push([k3, l3]);
+					
+					var i4 = i - 1;
+					var j4 = j;
+					var k4 = i4 + j4 * widi;
+					var l4 = Vect3.sub(
+						r[k + did], r[k4 + did]).len();
+					idle.push([k4, l4]);
+				} else if(k == Nint - 1 - widi) {
+					// top-left
+					var i2 = i + 1;
+					var j2 = j;
+					var k2 = i2 + j2 * widi;
+					var l2 = Vect3.sub(
+						r[k + did], r[k2 + did]).len();
+					idle.push([k2, l2]);
+					
+					var i3 = i;
+					var j3 = j - 1;
+					var k3 = i3 + j3 * widi;
+					var l3 = Vect3.sub(
+						r[k + did], r[k3 + did]).len();
+					idle.push([k3, l3]);
+				} else if(Nint - 1 - widi < k && k < Nint - 1) {
+					// top-middle
+				} else if(k == Nint - 1) {
+					// top-right
+					var i4 = i - 1;
+					var j4 = j;
+					var k4 = i4 + j4 * widi;
+					var l4 = Vect3.sub(
+						r[k + did], r[k4 + did]).len();
+					idle.push([k4, l4]);
+					
+					var i3 = i;
+					var j3 = j - 1;
+					var k3 = i3 + j3 * widi;
+					var l3 = Vect3.sub(
+						r[k + did], r[k3 + did]).len();
+					idle.push([k3, l3]);
 				}
 				if(idle.length > 0) {
 					leno.push(idle);
@@ -597,8 +732,8 @@ function loadParameters() {
 	lines += "\n";
 	lines += "# An intruder\n";
 	lines += "DIAI 0.01\n"      // Intruder diameter m
-	lines += "WIDI 4\n"         // Intruder width (in D)
-	lines += "HEII 5\n"         // Intruder height(in D)
+	lines += "WIDI 3\n"         // Intruder width (in D)
+	lines += "HEII 3\n"         // Intruder height(in D)
 	lines += "RHOI 2000\n";     // Intruder density  kg/m3
 	lines += "ZINT 0.12\n";     // Intruder position m
 	lines += "TINT 0.3\n";      // Time appearance   kg/m3
