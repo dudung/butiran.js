@@ -106,7 +106,6 @@ function simulate() {
 		}
 		zi = zi.toFixed(digit + 2);
 		
-		
 		// Display header for first run
 		if(t == tbeg) {
 			tout(taOut0, "# t     zavg   zmax   zint\n");
