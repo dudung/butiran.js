@@ -25,6 +25,8 @@
 	0521 Seems good. Try to implement to all interuder parts.
 	0745 Good results and try to vary params.
 	0751 Correct zint.
+	0819 Fix calculating zbavg, zbmax, zimax.
+	0822 Ready for data gathering.
 	xxxx y.
 */
 
@@ -91,10 +93,8 @@ function simulate() {
 		var digit = -Math.floor(Math.log10(tdata));
 		var tt = t.toExponential(digit);
 		
-		var ravg = vect3Average(r);
-		var zavg = (ravg.z).toFixed(digit + 2);
-		
-		var zmax = vect3MaxZ(r).toFixed(digit + 2);
+		var zavg = vect3AvgZ(r, Nint).toFixed(digit + 2);
+		var zmax = vect3MaxZ(r, Nint).toFixed(digit + 2);
 		
 		var bid = numg - Nint;
 		var zi = 0;
@@ -108,7 +108,7 @@ function simulate() {
 		
 		// Display header for first run
 		if(t == tbeg) {
-			tout(taOut0, "# t     zavg   zmax   zint\n");
+			tout(taOut0, "# t     zbavg  zbmax  ziavg\n");
 			//            0.00e+0 0.0689 0.1309 0.0000
 		}
 		
@@ -248,7 +248,6 @@ function simulate() {
 	// Create an intruder
 	if(t >= Tint && !INTRUDER_CREATED) {
 		
-		Nint = 0;
 		for(var j = 0; j < heii; j++) {
 			for(var i = 0; i < widi; i++) {
 				D.push(diai);
@@ -732,7 +731,7 @@ function loadParameters() {
 	lines += "# Simulation\n";
 	lines += "TSTEP 0.001\n";  // Time step         s
 	lines += "TBEG 0\n";        // Initial time      s
-	lines += "TEND 10\n";        // Final time        s
+	lines += "TEND 5\n";        // Final time        s
 	lines += "TDATA 0.01\n";    // Data period       s
 	lines += "TPROC 1\n";       // Event period      ms
 	
@@ -816,6 +815,8 @@ function readParameters() {
 	rhoi = getValue(lines, "RHOI");
 	zint = getValue(lines, "ZINT");
 	Tint = getValue(lines, "TINT");
+	
+	Nint = 0;
 }
 
 
@@ -916,7 +917,6 @@ function initParams() {
 function vect3Average() {
 	var r = arguments[0];
 	var N = r.length;
-	N = INTRUDER_CREATED ? N - Nint : N;
 	var c = new Vect3;
 	for(var i = 0; i < N; i++) {
 		c = Vect3.add(c, r[i]);
@@ -929,8 +929,8 @@ function vect3Average() {
 // Get max of a component of some Vect3s
 function vect3MaxZ() {
 	var r = arguments[0];
-	var N = r.length;
-	N = INTRUDER_CREATED ? N - Nint : N;
+	var Nint = arguments[1];
+	var N = r.length - Nint;
 	var zmax = r[0].z;
 	for(var i = 1; i < N; i++) {
 		if(r[i].z > zmax) {
@@ -940,6 +940,18 @@ function vect3MaxZ() {
 	return zmax;
 }
 
+// Get average of a component of some Vect3s
+function vect3AvgZ() {
+	var r = arguments[0];
+	var Nint = arguments[1];
+	var N = r.length - Nint;
+	var zavg = 0;
+	for(var i = 0; i < N; i++) {
+		zavg += r[i].z;
+	}
+	zavg /= N;
+	return zavg;
+}
 
 // Display text in an output textarea
 function tout() {
