@@ -208,23 +208,19 @@ function simulate() {
 				var rij = Vect3.sub(r[i + bid], r[j + bid]);
 				var nij = rij.unit();
 				var lij = rij.len();
-				var fs1 = -kspr * (lij - lo) * 1;
-				//if(lij - lo  < 0) fs1 = 0;
+				var fs1 = -kspr * (lij - lo);
 				var Fs1 = Vect3.mul(fs1, nij);
 				
 				var vij = Vect3.sub(v[i + bid], v[j + bid]);
 				var mij = vij.unit();
 				var uij = vij.len();
 				var ksidot = uij;
-				var fs2 = -gspr * uij * 1;
+				var fs2 = -gspr * uij;
 				var Fs2 = Vect3.mul(fs2, mij);
 				
-				//console.log(i + bid, j + bid, lij, lo);
-				
-				Fs = Vect3.add(Fn, Vect3.add(Fs1, Fs2));
-				
-				F[i + bid] = Vect3.add(F[i + bid], Fs);
+				Fs = Vect3.add(Fs, Vect3.add(Fs1, Fs2));
 			}
+			F[i + bid] = Vect3.add(F[i + bid], Fs);
 		}
 	}
 	
@@ -266,6 +262,7 @@ function simulate() {
 		}
 		INTRUDER_CREATED = true;
 		
+		/*
 		// 8 1 2
 		// 7 0 3
 		// 6 5 4
@@ -291,6 +288,7 @@ function simulate() {
 				region = 0;
 			}
 		}
+		*/
 		
 		
 		// Get initial length	
@@ -440,7 +438,7 @@ function simulate() {
 					var l4 = Vect3.sub(
 						r[k + did], r[k4 + did]).len();
 					idle.push([k4, l4]);
-				} else if(k == Nint - 1 - widi) {
+				} else if(k == Nint - widi) {
 					// top-left
 					var i2 = i + 1;
 					var j2 = j;
@@ -455,8 +453,28 @@ function simulate() {
 					var l3 = Vect3.sub(
 						r[k + did], r[k3 + did]).len();
 					idle.push([k3, l3]);
-				} else if(Nint - 1 - widi < k && k < Nint - 1) {
+				} else if(Nint - widi < k && k < Nint - 1) {
 					// top-middle
+					var i2 = i + 1;
+					var j2 = j;
+					var k2 = i2 + j2 * widi;
+					var l2 = Vect3.sub(
+						r[k + did], r[k2 + did]).len();
+					idle.push([k2, l2]);
+					
+					var i3 = i;
+					var j3 = j - 1;
+					var k3 = i3 + j3 * widi;
+					var l3 = Vect3.sub(
+						r[k + did], r[k3 + did]).len();
+					idle.push([k3, l3]);
+					
+					var i4 = i - 1;
+					var j4 = j;
+					var k4 = i4 + j4 * widi;
+					var l4 = Vect3.sub(
+						r[k + did], r[k4 + did]).len();
+					idle.push([k4, l4]);
 				} else if(k == Nint - 1) {
 					// top-right
 					var i4 = i - 1;
@@ -698,12 +716,12 @@ function loadParameters() {
 	lines += "VELF 0\n";        // Fluid velocity   m/s
 	lines += "KCOL 400\n";      // Normal constant  N/m
 	lines += "GCOL 0.1\n";      // Normal damping   N/m
-	lines += "KSPR 3000\n";     // Spring constant  N/m
-	lines += "GSPR 0.1\n";      // Spring damping   N/m
+	lines += "KSPR 500\n";      // Spring constant  N/m
+	lines += "GSPR 0.01\n";      // Spring damping   N/m
 	
 	lines += "\n";
 	lines += "# Simulation\n";
-	lines += "TSTEP 0.0001\n";  // Time step         s
+	lines += "TSTEP 0.001\n";  // Time step         s
 	lines += "TBEG 0\n";        // Initial time      s
 	lines += "TEND 6\n";        // Final time        s
 	lines += "TDATA 0.01\n";    // Data period       s
@@ -732,8 +750,8 @@ function loadParameters() {
 	lines += "\n";
 	lines += "# An intruder\n";
 	lines += "DIAI 0.01\n"      // Intruder diameter m
-	lines += "WIDI 3\n"         // Intruder width (in D)
-	lines += "HEII 3\n"         // Intruder height(in D)
+	lines += "WIDI 5\n"         // Intruder width (in D)
+	lines += "HEII 4\n"         // Intruder height(in D)
 	lines += "RHOI 2000\n";     // Intruder density  kg/m3
 	lines += "ZINT 0.12\n";     // Intruder position m
 	lines += "TINT 0.3\n";      // Time appearance   kg/m3
