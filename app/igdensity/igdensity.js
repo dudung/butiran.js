@@ -23,6 +23,8 @@
 	20190626
 	0404 Try again at home.
 	0521 Seems good. Try to implement to all interuder parts.
+	0745 Good results and try to vary params.
+	0751 Correct zint.
 	xxxx y.
 */
 
@@ -94,8 +96,16 @@ function simulate() {
 		
 		var zmax = vect3MaxZ(r).toFixed(digit + 2);
 		
-		var zi = INTRUDER_CREATED ? r[numg - 1].z : zint;
+		var bid = numg - Nint;
+		var zi = 0;
+		if(INTRUDER_CREATED) {
+			for(i = 0; i < Nint; i++) {
+				zi += r[i + bid].z;
+			}
+			zi /= Nint;
+		}
 		zi = zi.toFixed(digit + 2);
+		
 		
 		// Display header for first run
 		if(t == tbeg) {
@@ -723,7 +733,7 @@ function loadParameters() {
 	lines += "# Simulation\n";
 	lines += "TSTEP 0.001\n";  // Time step         s
 	lines += "TBEG 0\n";        // Initial time      s
-	lines += "TEND 6\n";        // Final time        s
+	lines += "TEND 10\n";        // Final time        s
 	lines += "TDATA 0.01\n";    // Data period       s
 	lines += "TPROC 1\n";       // Event period      ms
 	
@@ -907,7 +917,7 @@ function initParams() {
 function vect3Average() {
 	var r = arguments[0];
 	var N = r.length;
-	N = INTRUDER_CREATED ? N - 1 : N;
+	N = INTRUDER_CREATED ? N - Nint : N;
 	var c = new Vect3;
 	for(var i = 0; i < N; i++) {
 		c = Vect3.add(c, r[i]);
@@ -921,7 +931,7 @@ function vect3Average() {
 function vect3MaxZ() {
 	var r = arguments[0];
 	var N = r.length;
-	N = INTRUDER_CREATED ? N - 1 : N;
+	N = INTRUDER_CREATED ? N - Nint : N;
 	var zmax = r[0].z;
 	for(var i = 1; i < N; i++) {
 		if(r[i].z > zmax) {
