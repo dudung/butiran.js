@@ -50,3 +50,7 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/gpcspp/gpcspp.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/gpcspp/gpcspp.html
+11. **mdfhcp.js** | Molecular dynamics simulation of floating HCP structure | 20190709<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/mdfhcp/mdfhcp.js<br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/mdfhcp/mdfhcp.html
