@@ -15,6 +15,7 @@
 	1156 Implement gravitational-like attractive force.
 	1208 Try to draw in xz plane.
 	1218 Not yet success.
+	1359 Better visualization.
 	
 	References
 	1. Sparisoma Viridi, Veinardi Suendo, "Molecular dynamics
@@ -79,8 +80,8 @@ function initParams() {
 	p += "TPRC 1\n";
 	p += "\n";
 	p += "# Coordinates\n";
-	p += "RMIN -1.5 -0.5 -1.5\n";
-	p += "RMAX +1.5 +0.5 +1.5\n";
+	p += "RMIN -0.75 -0.25 -0.75\n";
+	p += "RMAX +0.75 +0.25 +0.75\n";
 	p += "\n";
 	
 	params = p;
@@ -123,13 +124,13 @@ function readParams() {
 
 	// Define initial position
 	o = [];
-	var Nx = 4;
+	var Nx = 8;
 	var Ny = 1;
-	var Nz = 4;
+	var Nz = 8;
 
 	for(var ix = 0; ix < Nx; ix++) {
 		for(var iy = 0; iy < Ny; iy++) {
-			for(var iz = 0; iz < Nx; iz++) {
+			for(var iz = 0; iz < Nz; iz++) {
 				oi = new Grain();
 				oi.m = m;
 				oi.q = 0;
@@ -506,21 +507,21 @@ function simulate() {
 	
 	// Clear all canvas
 	clearCanvas(caOut1);	
-	//clearCanvas(caOut2);
+	clearCanvas(caOut2);
 	//clearCanvas(caOut3);
 	//clearCanvas(caOut4);
 	
 	// Draw object in all canvas
 	for(var i = 0; i < o.length; i++) {
 		draw(o[i]).onCanvas(caOut1);
-		draw(o[i]).onCanvas(caOut2);
+		draw(o[i], "xz").onCanvas(caOut2);
 		//draw(o[i]).onCanvas(caOut3);
 		//draw(o[i]).onCanvas(caOut4);
 	}
 	
 	// Draw wave in all canvas
 	draw(p).onCanvas(caOut1);
-	draw(p).onCanvas(caOut2);
+	//draw(p).onCanvas(caOut2);
 	//draw(p).onCanvas(caOut3);
 	//draw(p).onCanvas(caOut4);
 	
@@ -551,6 +552,7 @@ function clearCanvas(caOut) {
 // Draw Grain, Path, Points on canvas
 function draw() {
 	var o = arguments[0];
+	var plane = arguments[1];
 	var result = {
 		onCanvas: function() {
 			var ca = arguments[0];
@@ -562,17 +564,26 @@ function draw() {
 				var dx = xg + 0.5 * o.D;
 				var yg = o.r.y;
 				
+				if(plane != undefined) {
+					xg = o.r.x;
+					yg = o.r.z;
+				}
+				
 				var X, DX;
 				if(ca.xmin == undefined) {
-					X = lintrans(xg, [xmin, xmax], [XMIN, XMAX]);
-					DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
+					X = lintrans(xg, [xmin, xmax], [0, ca.width]);
+					DX = lintrans(dx, [xmin, xmax], [0, ca.width]);
 				} else {
-					X = lintrans(xg, [ca.xmin, ca.xmax], [XMIN, XMAX]);
-					DX = lintrans(dx, [ca.xmin, ca.xmax], [XMIN, XMAX]);
+					X = lintrans(xg, [ca.xmin, ca.xmax], [0, ca.width]);
+					DX = lintrans(dx, [ca.xmin, ca.xmax], [0, ca.width]);
 				}
 				
 				var D = DX - X;
-				var Y = lintrans(yg, [ymin, ymax], [YMIN, YMAX]);
+				var Y = lintrans(yg, [ymin, ymax], [ca.height, 0]);
+				
+				if(plane != undefined) {
+					Y = lintrans(yg, [zmin, zmax], [ca.height, 0]);
+				}
 				
 				cx.beginPath();
 				if(o.c instanceof Array) {
