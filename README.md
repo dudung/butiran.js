@@ -30,7 +30,7 @@ Library of butiran.js can be downloaded from
     `refs` [https://doi.org/10.21009/03.SNF2018.02.PA.12](http://journal.unj.ac.id/unj/index.php/prosidingsnf/article/view/9181)<br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/gcm2d/gcm2d.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/gcm2d/gcm2d.html
-07. **scspg.js** | Spherical particle floating on waving fluid surface | 20181120<br>
+07. **spfwfs.js** | Spherical particle floating on waving fluid surface | 20181120<br>
     `refs` https://doi.org/10.21009/SPEKTRA.033.01<br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/spfwfs/spfwfs.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/spfwfs/spfwfs.html
