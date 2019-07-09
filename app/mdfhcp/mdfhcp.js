@@ -21,6 +21,7 @@
 	20190710
 	0522 Change data time output format to 2 digit every 1 s.
 	0545 Create distribution function.
+	0554 Change layout.
 	
 	References
 	1. Sparisoma Viridi, Veinardi Suendo, "Molecular dynamics
@@ -41,6 +42,7 @@ var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var wA, wT, wL;
 var o;
 var buoyant, gravitational, drag, normal, attractive;
+var ND;
 
 // Execute main function
 main();
@@ -218,7 +220,7 @@ function createVisualElements() {
 	taOut = document.createElement("textarea");
 	with(taOut.style) {
 		overflowY = "scroll";
-		width = "214px";
+		width = "464px";
 		height = "200px";
 	}
 	
@@ -281,11 +283,20 @@ function createVisualElements() {
 		border = "1px solid #aaa";
 		background = "#fff";
 	}
+	caOut3 = document.createElement("canvas");
+	caOut3.width = "248";
+	caOut3.height = "211";
+	with(caOut3.style) {
+		width = caOut3.width +  "px";
+		height = caOut3.height +  "px";
+		border = "1px solid #aaa";
+		background = "#fff";
+	}
 		
 	// Create div for left part
 	var dvLeft = document.createElement("div");
 	with(dvLeft.style) {
-		width = "220px";
+		width = "470px";
 		height = "450px";
 		border = "1px solid #eee";
 		background = "#eee";
@@ -305,6 +316,7 @@ function createVisualElements() {
 	// Append element in structured order
 	document.body.append(dvLeft);
 		dvLeft.append(taIn);
+		dvLeft.append(caOut3);
 		dvLeft.append(taOut);
 		dvLeft.append(btLoad);
 		dvLeft.append(btRead);
@@ -435,20 +447,37 @@ function simulate() {
 		}
 		Davg /= o.length;
 		
-		var ND = [];
-		ND.length = 10;
+		var Nclass = 100;
+		ND = [];
+		ND.length = Nclass;
 		ND.fill(0);
 		for(var i = 0; i < o.length - 1; i++) {
 			for(var j = i + 1; j < o.length; j++) {
 				var ri = o[i].r;
 				var rj = o[j].r;
 				var rij = Vect3.sub(ri, rj).len();
-				var k = Math.floor((rij - 0.5 *Davg) / (0.1 * Davg));
+				var k = Math.floor((rij - 0.5 *Davg) / (Davg / Nclass));
 				if(k < ND.length) ND[k]++
 			}
 		}
+		var NDtot = 0;
+		for(var i = 0; i < ND.length; i++) {
+			NDtot += ND[i];
+		}
+		var NDstr = [];
+		for(var i = 0; i < ND.length; i++) {
+			ND[i] /= NDtot;
+			NDstr.push(ND[i].toFixed(2));
+		}
+		var NDstra = "";
+		for(var i = 0; i < ND.length; i++) {
+			NDstra += NDstr[i];
+			if(i < ND.length - 1) {
+				NDstra += " ";
+			}
+		}
 		
-		var info = tt + " " + C + " " + ND + "\n";
+		var info = tt + " " + C + " " + NDstra + "\n";
 		addText(info).to(taOut);
 	}
 	
@@ -517,6 +546,7 @@ function simulate() {
 	// Clear all canvas
 	clearCanvas(caOut1);	
 	clearCanvas(caOut2);
+	clearCanvas(caOut3);
 	
 	// Draw object in all canvas
 	for(var i = 0; i < o.length; i++) {
@@ -527,6 +557,8 @@ function simulate() {
 	// Draw wave in all canvas
 	draw(p).onCanvas(caOut1);
 	
+	drawDist(ND, caOut3);
+	
 	if(t >= tend) {
 		btLoad.disabled = false;
 		btRead.disabled = false;
@@ -536,9 +568,32 @@ function simulate() {
 		clearInterval(proc);
 		addText("\n").to(taOut);
 	}
-	
+		
 	iter++;
 	t += dt;
+}
+
+
+// Draw distribution on canvas
+function drawDist() {
+	var x = arguments[0];
+	var N = x.length;
+	
+	var can = arguments[1];
+	var cx = can.getContext("2d");
+	
+	var lx = 9;
+	var ly = 10;
+	var dx = (can.width - 2 * lx) / N;
+	var xo = lx;
+	var yo = can.height - ly;
+	var h = can.height - 2 * ly;
+	
+	cx.beginPath();
+	for(var i = 0; i < N; i++) {
+		cx.rect(xo + i * dx, yo, dx, -h * x[i]);
+	}
+	cx.stroke();
 }
 
 
