@@ -16,6 +16,8 @@
 	1208 Try to draw in xz plane.
 	1218 Not yet success.
 	1359 Better visualization.
+	1741 Con to get data from app.
+	1838 Find better wave parameters.
 	
 	References
 	1. Sparisoma Viridi, Veinardi Suendo, "Molecular dynamics
@@ -52,9 +54,9 @@ function main() {
 function initParams() {
 	var p = "";
 	p += "# Environment\n";
-	p += "WAMP 0.00100\n";
-	p += "WTIM 1.75000\n";
-	p += "WLEN 1.25000\n";
+	p += "WAMP 0.001\n";
+	p += "WTIM 2.000\n";
+	p += "WLEN 1.000\n";
 	p += "LSTP 0.0100\n";
 	p += "RHOF 1000.0\n";
 	p += "ETAF 8.9E-4\n";
@@ -71,12 +73,13 @@ function initParams() {
 	p += "DIAM 0.1000\n";
 	p += "POST 0.0000 0.0000 0.0000\n";
 	p += "VELO 0.0000 0.0000 0.0000\n";
+	p += "NXYZ 2 1 2\n";
 	p += "\n";
 	p += "# Iteration\n";
-	p += "TBEG 0.0000\n";
-	p += "TEND 90.000\n";
-	p += "TSTP 0.0050\n";
-	p += "TDAT 0.1000\n";
+	p += "TBEG 0\n";
+	p += "TEND 100\n";
+	p += "TSTP 0.005\n";
+	p += "TDAT 0.100\n";
 	p += "TPRC 1\n";
 	p += "\n";
 	p += "# Coordinates\n";
@@ -118,15 +121,16 @@ function readParams() {
 	var D = getValue("DIAM").from(taIn);
 	var r = getValue("POST").from(taIn);
 	var v = getValue("VELO").from(taIn);
+	var NXYZ = getValue("NXYZ").from(taIn);
 
 	var V = (Math.PI / 6) * D * D * D;
 	var m = rhog * V;
 
 	// Define initial position
 	o = [];
-	var Nx = 8;
-	var Ny = 1;
-	var Nz = 8;
+	var Nx = NXYZ.x;
+	var Ny = NXYZ.y;
+	var Nz = NXYZ.z;
 
 	for(var ix = 0; ix < Nx; ix++) {
 		for(var iy = 0; iy < Ny; iy++) {
@@ -135,9 +139,14 @@ function readParams() {
 				oi.m = m;
 				oi.q = 0;
 				oi.D = D;
-				var x = D * (ix - 0.5 * (Nx - 1));
-				var y = D * (iy - 0.5 * (Ny - 1));
-				var z = D * (iz - 0.5 * (Nz - 1));
+				
+				var rndx = 0.01 * D * Math.random();
+				var rndy = 0.00 * D * Math.random();
+				var rndz = 0.01 * D * Math.random();
+				
+				var x = D * (ix - 0.5 * (Nx - 1)) * (1 + rndx);
+				var y = D * (iy - 0.5 * (Ny - 1)) * (1 + rndy);
+				var z = D * (iz - 0.5 * (Nz - 1)) * (1 + rndz);
 				oi.r = Vect3.add(r, new Vect3(x, y, z));
 				oi.v = v;
 				oi.c = ["#f00"];
@@ -172,7 +181,7 @@ function readParams() {
 
 	var rmin = getValue("RMIN").from(taIn);
 	var rmax = getValue("RMAX").from(taIn);
-
+	
 	xmin = rmin.x;
 	ymin = rmin.y;
 	zmin = rmin.z;
@@ -180,21 +189,9 @@ function readParams() {
 	ymax = rmax.y;
 	zmax = rmax.z;
 
-	/*
-	var xlength = xmax - xmin;
-	caOut1.xmin = xmin - 1.5 * xlength;
-	caOut1.xmax = caOut1.xmin + xlength;
-	caOut2.xmin = caOut1.xmax
-	caOut2.xmax = caOut2.xmin + xlength;
-	caOut3.xmin = caOut2.xmax
-	caOut3.xmax = caOut3.xmin + xlength;
-	caOut4.xmin = caOut3.xmax
-	caOut4.xmax = caOut4.xmin + xlength;
-	*/
 	caOut1.xmin = xmin;
 	caOut1.xmax = xmax;
-
-
+	
 	XMIN = 0;
 	XMAX = caOut1.width;
 	YMIN = caOut1.height;
@@ -313,8 +310,6 @@ function createVisualElements() {
 	document.body.append(dvRight);
 		dvRight.append(caOut1);
 		dvRight.append(caOut2);
-		//dvRight.append(caOut3);
-		//dvRight.append(caOut4);
 }
 
 
@@ -411,14 +406,29 @@ function simulate() {
 	
 	if(t == tbeg) {
 		//       0.0740 -0.0009 -0.0162
-		addText("#t      x       y\n").to(taOut);
+		addText("#t    x   y\n").to(taOut);
 	}
 	
 	if(iter == 0) {
-		var tt = t.toFixed(digit);
-		var xx = o[0].r.x.toFixed(digit);
-		var yy = o[0].r.y.toFixed(digit);
-		var info = tt + " " + xx + " " + yy + "\n";
+		var tt = ("00" + t.toFixed(1)).slice(-5);
+		
+		var C = 0;
+		for(var i = 0; i < o.length - 1; i++) {
+			for(var j = i + 1; j < o.length; j++) {
+				var ri = o[i].r;
+				var rj = o[j].r;
+				var rij = Vect3.sub(ri, rj).len();
+				var Ri = 0.5 * o[i].D;
+				var Rj = 0.5 * o[j].D;
+				var ksi = Math.max(0, Ri + Rj - rij);
+				if(ksi > 0) C++;
+			}
+		}
+		C = ("000" + C).slice(-3);
+		
+		var D = 0;
+		
+		var info = tt + " " + C + " " + D + "\n";
 		addText(info).to(taOut);
 	}
 	
