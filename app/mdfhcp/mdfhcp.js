@@ -6,7 +6,15 @@
 	Veinardi Suendo | suendo@gmail.com
 	
 	20190709
-	Create from spfwfs as template.
+	0958 Create from spfwfs as template.
+	1006 Remove o0.
+	1010 Try to add more than one o.
+	1102 Try with 10 liniear configuration.
+	1142 Fix wrong drawing D --> R.
+	1150 Change coordinates on canvas1.
+	1156 Implement gravitational-like attractive force.
+	1208 Try to draw in xz plane.
+	1218 Not yet success.
 	
 	References
 	1. Sparisoma Viridi, Veinardi Suendo, "Molecular dynamics
@@ -25,8 +33,8 @@ var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var wA, wT, wL;
-var o, o0;
-var buoyant, gravitational, drag;
+var o;
+var buoyant, gravitational, drag, normal, attractive;
 
 // Execute main function
 main();
@@ -43,7 +51,7 @@ function main() {
 function initParams() {
 	var p = "";
 	p += "# Environment\n";
-	p += "WAMP 0.0200\n";
+	p += "WAMP 0.00100\n";
 	p += "WTIM 1.75000\n";
 	p += "WLEN 1.25000\n";
 	p += "LSTP 0.0100\n";
@@ -51,6 +59,11 @@ function initParams() {
 	p += "ETAF 8.9E-4\n";
 	p += "TEMF 298\n";
 	p += "GACC 0 -9.8067 0\n";
+	p += "\n";
+	p += "# Interaction\n";
+	p += "KNXX 1000\n";
+	p += "GNXX 0.1\n";
+	p += "KAXX 0.01\n";
 	p += "\n";
 	p += "# Particle\n";
 	p += "RHOG 500.0\n";
@@ -66,8 +79,8 @@ function initParams() {
 	p += "TPRC 1\n";
 	p += "\n";
 	p += "# Coordinates\n";
-	p += "RMIN -2.000 -0.125 -1.000\n";
-	p += "RMAX +2.000 +0.125 +1.000\n";
+	p += "RMIN -1.5 -0.5 -1.5\n";
+	p += "RMAX +1.5 +0.5 +1.5\n";
 	p += "\n";
 	
 	params = p;
@@ -85,83 +98,108 @@ function loadParams() {
 
 // Read parameters
 function readParams() {
-tbeg = getValue("TBEG").from(taIn);
-tend = getValue("TEND").from(taIn);
-dt = getValue("TSTP").from(taIn);
-Tdata = getValue("TDAT").from(taIn);
-Tproc = getValue("TPRC").from(taIn);
+	tbeg = getValue("TBEG").from(taIn);
+	tend = getValue("TEND").from(taIn);
+	dt = getValue("TSTP").from(taIn);
+	Tdata = getValue("TDAT").from(taIn);
+	Tproc = getValue("TPRC").from(taIn);
 
-wA = getValue("WAMP").from(taIn);
-wT = getValue("WTIM").from(taIn);
-wL = getValue("WLEN").from(taIn);
-dx = getValue("LSTP").from(taIn);
+	wA = getValue("WAMP").from(taIn);
+	wT = getValue("WTIM").from(taIn);
+	wL = getValue("WLEN").from(taIn);
+	dx = getValue("LSTP").from(taIn);
 
-iter = 0;
-Niter = Math.floor(Tdata / dt);
-t = tbeg;
+	iter = 0;
+	Niter = Math.floor(Tdata / dt);
+	t = tbeg;
 
-var rhog = getValue("RHOG").from(taIn);
-var D = getValue("DIAM").from(taIn);
-var r = getValue("POST").from(taIn);
-var v = getValue("VELO").from(taIn);
+	var rhog = getValue("RHOG").from(taIn);
+	var D = getValue("DIAM").from(taIn);
+	var r = getValue("POST").from(taIn);
+	var v = getValue("VELO").from(taIn);
 
-var V = (Math.PI / 6) * D * D * D;
-var m = rhog * V;
+	var V = (Math.PI / 6) * D * D * D;
+	var m = rhog * V;
 
-o = new Grain();
-o.m = m;
-o.q = 0;
-o.D = D;
-o.r = r;
-o.v = v;
-o.c = ["#f00"];
+	// Define initial position
+	o = [];
+	var Nx = 4;
+	var Ny = 1;
+	var Nz = 4;
 
-o0 = new Grain();
-o0.D = D;
-o0.r = new Vect3(r);
-o0.c = ["#fff", "#fcc"];
+	for(var ix = 0; ix < Nx; ix++) {
+		for(var iy = 0; iy < Ny; iy++) {
+			for(var iz = 0; iz < Nx; iz++) {
+				oi = new Grain();
+				oi.m = m;
+				oi.q = 0;
+				oi.D = D;
+				var x = D * (ix - 0.5 * Nx);
+				var y = D * (iy - 0.5 * Ny);
+				var z = D * (iz - 0.5 * Nz);
+				oi.r = Vect3.add(r, new Vect3(x, y, z));
+				oi.v = v;
+				oi.c = ["#f00"];
+				o.push(oi);
+			}
+		}
+	}
 
-var rhof = getValue("RHOF").from(taIn);
-var etaf = getValue("ETAF").from(taIn);
-var Temf = getValue("TEMF").from(taIn);
-var g = getValue("GACC").from(taIn);
+	var rhof = getValue("RHOF").from(taIn);
+	var etaf = getValue("ETAF").from(taIn);
+	var Temf = getValue("TEMF").from(taIn);
+	var g = getValue("GACC").from(taIn);
+	var kN = getValue("KNXX").from(taIn);
+	var gN = getValue("GNXX").from(taIn);
+	var kA = getValue("KAXX").from(taIn);
 
-buoyant = new Buoyant();
-buoyant.setFluidDensity(rhof);
-buoyant.setGravity(g);
+	buoyant = new Buoyant();
+	buoyant.setFluidDensity(rhof);
+	buoyant.setGravity(g);
 
-gravitational = new Gravitational();
-gravitational.setField(g);
+	gravitational = new Gravitational();
+	gravitational.setField(g);
 
-drag = new Drag();
-drag.setConstants(0, 3 * Math.PI * etaf * D, 0);
+	drag = new Drag();
+	drag.setConstants(0, 3 * Math.PI * etaf * D, 0);
 
-var rmin = getValue("RMIN").from(taIn);
-var rmax = getValue("RMAX").from(taIn);
+	normal = new Normal();
+	normal.setConstants(kN, gN);
 
-xmin = rmin.x;
-ymin = rmin.y;
-zmin = rmin.z;
-xmax = rmax.x;
-ymax = rmax.y;
-zmax = rmax.z;
+	attractive = new Gravitational();
+	attractive.setConstant(kA);
 
-var xlength = xmax - xmin;
-caOut1.xmin = xmin - 1.5 * xlength;
-caOut1.xmax = caOut1.xmin + xlength;
-caOut2.xmin = caOut1.xmax
-caOut2.xmax = caOut2.xmin + xlength;
-caOut3.xmin = caOut2.xmax
-caOut3.xmax = caOut3.xmin + xlength;
-caOut4.xmin = caOut3.xmax
-caOut4.xmax = caOut4.xmin + xlength;
+	var rmin = getValue("RMIN").from(taIn);
+	var rmax = getValue("RMAX").from(taIn);
 
-XMIN = 0;
-XMAX = caOut1.width;
-YMIN = caOut1.height;
-YMAX = 0;
-ZMIN = -1;
-ZMAX = 1;
+	xmin = rmin.x;
+	ymin = rmin.y;
+	zmin = rmin.z;
+	xmax = rmax.x;
+	ymax = rmax.y;
+	zmax = rmax.z;
+
+	/*
+	var xlength = xmax - xmin;
+	caOut1.xmin = xmin - 1.5 * xlength;
+	caOut1.xmax = caOut1.xmin + xlength;
+	caOut2.xmin = caOut1.xmax
+	caOut2.xmax = caOut2.xmin + xlength;
+	caOut3.xmin = caOut2.xmax
+	caOut3.xmax = caOut3.xmin + xlength;
+	caOut4.xmin = caOut3.xmax
+	caOut4.xmax = caOut4.xmin + xlength;
+	*/
+	caOut1.xmin = xmin;
+	caOut1.xmax = xmax;
+
+
+	XMIN = 0;
+	XMAX = caOut1.width;
+	YMIN = caOut1.height;
+	YMAX = 0;
+	ZMIN = -1;
+	ZMAX = 1;
 }
 
 
@@ -172,7 +210,7 @@ function createVisualElements() {
 	with(taIn.style) {
 		overflowY = "scroll";
 		width = "214px";
-		height = "200px";
+		height = "207px";
 	}
 	
 	// Create textarea for output
@@ -224,10 +262,9 @@ function createVisualElements() {
 	}
 	
 	// Create canvas for output
-	var canHeight = "105";	
 	caOut1 = document.createElement("canvas");
-	caOut1.width = "439";
-	caOut1.height = canHeight;
+	caOut1.width = "330";
+	caOut1.height = "110";
 	with(caOut1.style) {
 		width = caOut1.width +  "px";
 		height = caOut1.height +  "px";
@@ -235,14 +272,16 @@ function createVisualElements() {
 		background = "#fff";
 	}
 	caOut2 = document.createElement("canvas");
-	caOut2.width = "439";
-	caOut2.height = canHeight;
+	caOut2.width = "330";
+	caOut2.height = "330";
 	with(caOut2.style) {
 		width = caOut2.width +  "px";
 		height = caOut2.height +  "px";
 		border = "1px solid #aaa";
 		background = "#fff";
 	}
+	
+	/*
 	caOut3 = document.createElement("canvas");
 	caOut3.width = "439";
 	caOut3.height = canHeight;
@@ -261,12 +300,13 @@ function createVisualElements() {
 		border = "1px solid #aaa";
 		background = "#fff";
 	}
+	*/
 	
 	// Create div for left part
 	var dvLeft = document.createElement("div");
 	with(dvLeft.style) {
 		width = "220px";
-		height = "442px";
+		height = "450px";
 		border = "1px solid #eee";
 		background = "#eee";
 		float = "left";
@@ -275,8 +315,8 @@ function createVisualElements() {
 	// Create div for right part
 	var dvRight = document.createElement("div");
 	with(dvRight.style) {
-		width = "442px";
-		height = "442px";
+		width = "334px";
+		height = "450px";
 		border = "1px solid #eee";
 		background = "#eee";
 		float = "left";
@@ -293,8 +333,8 @@ function createVisualElements() {
 	document.body.append(dvRight);
 		dvRight.append(caOut1);
 		dvRight.append(caOut2);
-		dvRight.append(caOut3);
-		dvRight.append(caOut4);
+		//dvRight.append(caOut3);
+		//dvRight.append(caOut4);
 }
 
 
@@ -327,10 +367,9 @@ function buttonClick() {
 	break;
 	case "Info":
 		var info = "";
-		info += "spfwfss.js\n";
-		info += "Spherical particle floating on waving fluid ";
-		info += "surface\n";
-		info += "Sparisoma Viridi, Nuryahati, Johri Sabaryati, Dewi Muliyai\n";
+		info += "mdfhcp.js\n";
+		info += "Molecular dynamics simulation of HCP structure\n";
+		info += "Sparisoma Viridi, Veinardi Suendo\n";
 		info += "https://github.com/dudung/butiran.js\n";
 		info += "Load  load parameters\n";
 		info += "Read  read parameters\n";
@@ -397,67 +436,93 @@ function simulate() {
 	
 	if(iter == 0) {
 		var tt = t.toFixed(digit);
-		var xx = o.r.x.toFixed(digit);
-		var yy = o.r.y.toFixed(digit);
+		var xx = o[0].r.x.toFixed(digit);
+		var yy = o[0].r.y.toFixed(digit);
 		var info = tt + " " + xx + " " + yy + "\n";
 		addText(info).to(taOut);
 	}
+	
+	// Calculate total force acted on all particles
+	var SF = [];
+	for(var i = 0; i < o.length; i++) {
+
+		var F = new Vect3();
 		
-	var F = new Vect3();
-	
-	// Calculate gravitational force
-	var Fg = gravitational.force(o);
-	F = Vect3.add(F, Fg);
+		// Calculate gravitational force
+		var Fg = gravitational.force(o[i]);
+		F = Vect3.add(F, Fg);
+			
+		// Calculate buoyant force
+		var V = (Math.PI / 6) * o[i].D * o[i].D * o[i].D;
+		var yA = waveFunction(o[i].r.x + 0.5 * o[i].D, t);
+		var yB = waveFunction(o[i].r.x - 0.5 * o[i].D, t);
+		var yf = waveFunction(o[i].r.x, t);
+		var Fb = buoyant.force(o[i], yA, yB, yf);
+		F = Vect3.add(F, Fb);
 		
-	// Calculate buoyant force
-	var V = (Math.PI / 6) * o.D * o.D * o.D;
-	var yA = waveFunction(o.r.x + 0.5 * o.D, t);
-	var yB = waveFunction(o.r.x - 0.5 * o.D, t);
-	var yf = waveFunction(o.r.x, t);
-	var Fb = buoyant.force(o, yA, yB, yf);
-	F = Vect3.add(F, Fb);
+		// Calculate drag force
+		var dy = waveFunction(o[i].r.x, t + dt)
+			- waveFunction(o[i].r.x, t);
+		var vf = new Vect3(0, dy / dt, 0);
+		drag.setField(vf);
+		var Fd = drag.force(o[i])
+		F = Vect3.add(F, Fd);
+		
+		// Calculate normal force
+		var Fn = new Vect3();
+		for(var j = 0; j < o.length; j++) {
+			if(j != i) {
+				var Fni = normal.force(o[i], o[j]);
+				Fn = Vect3.add(Fn, Fni);
+			}
+		}
+		F = Vect3.add(F, Fn);
+		
+		// Calculate attractive force
+		var Fa = new Vect3();
+		for(var j = 0; j < o.length; j++) {
+			if(j != i) {
+				var Fai = attractive.force(o[i], o[j]);
+				Fa = Vect3.add(Fa, Fai);
+			}
+		}
+		F = Vect3.add(F, Fa);
+		
+		SF.push(F);
+	}
 	
-	// Calculate drag force
-	var dy = waveFunction(o.r.x, t + dt)
-		- waveFunction(o.r.x, t);
-	var vf = new Vect3(0, dy / dt, 0);
-	drag.setField(vf);
-	var Fd = drag.force(o)
-	F = Vect3.add(F, Fd);
-	
-	// Apply Newton second law of motion
-	var a = Vect3.div(F, o.m);
-	
-	// Implement Euler algorithm
-	o.v = Vect3.add(o.v, Vect3.mul(a, dt));
-	o.r = Vect3.add(o.r, Vect3.mul(o.v, dt));
+	// Update motion variables
+	for(var i = 0; i < o.length; i++) {
+		// Apply Newton second law of motion
+		var a = Vect3.div(SF[i], o[i].m);
+		
+		// Implement Euler algorithm
+		o[i].v = Vect3.add(o[i].v, Vect3.mul(a, dt));
+		o[i].r = Vect3.add(o[i].r, Vect3.mul(o[i].v, dt));
+	}
 	
 	// Create wave curve
 	p = createWave(t);
 	
 	// Clear all canvas
 	clearCanvas(caOut1);	
-	clearCanvas(caOut2);
-	clearCanvas(caOut3);
-	clearCanvas(caOut4);
-	
-	// Draw object initial position
-	draw(o0).onCanvas(caOut1);
-	draw(o0).onCanvas(caOut2);
-	draw(o0).onCanvas(caOut3);
-	draw(o0).onCanvas(caOut4);
+	//clearCanvas(caOut2);
+	//clearCanvas(caOut3);
+	//clearCanvas(caOut4);
 	
 	// Draw object in all canvas
-	draw(o).onCanvas(caOut1);
-	draw(o).onCanvas(caOut2);
-	draw(o).onCanvas(caOut3);
-	draw(o).onCanvas(caOut4);
+	for(var i = 0; i < o.length; i++) {
+		draw(o[i]).onCanvas(caOut1);
+		draw(o[i]).onCanvas(caOut2);
+		//draw(o[i]).onCanvas(caOut3);
+		//draw(o[i]).onCanvas(caOut4);
+	}
 	
 	// Draw wave in all canvas
 	draw(p).onCanvas(caOut1);
 	draw(p).onCanvas(caOut2);
-	draw(p).onCanvas(caOut3);
-	draw(p).onCanvas(caOut4);
+	//draw(p).onCanvas(caOut3);
+	//draw(p).onCanvas(caOut4);
 	
 	if(t >= tend) {
 		btLoad.disabled = false;
@@ -494,7 +559,7 @@ function draw() {
 			
 			if(o instanceof Grain) {
 				var xg = o.r.x;
-				var dx = xg + o.D;
+				var dx = xg + 0.5 * o.D;
 				var yg = o.r.y;
 				
 				var X, DX;
