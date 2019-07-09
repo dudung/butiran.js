@@ -135,9 +135,9 @@ function readParams() {
 				oi.m = m;
 				oi.q = 0;
 				oi.D = D;
-				var x = D * (ix - 0.5 * Nx);
-				var y = D * (iy - 0.5 * Ny);
-				var z = D * (iz - 0.5 * Nz);
+				var x = D * (ix - 0.5 * (Nx - 1));
+				var y = D * (iy - 0.5 * (Ny - 1));
+				var z = D * (iz - 0.5 * (Nz - 1));
 				oi.r = Vect3.add(r, new Vect3(x, y, z));
 				oi.v = v;
 				oi.c = ["#f00"];
@@ -281,28 +281,7 @@ function createVisualElements() {
 		border = "1px solid #aaa";
 		background = "#fff";
 	}
-	
-	/*
-	caOut3 = document.createElement("canvas");
-	caOut3.width = "439";
-	caOut3.height = canHeight;
-	with(caOut3.style) {
-		width = caOut3.width +  "px";
-		height = caOut3.height +  "px";
-		border = "1px solid #aaa";
-		background = "#fff";
-	}
-	caOut4 = document.createElement("canvas");
-	caOut4.width = "439";
-	caOut4.height = canHeight;
-	with(caOut4.style) {
-		width = caOut4.width +  "px";
-		height = caOut4.height +  "px";
-		border = "1px solid #aaa";
-		background = "#fff";
-	}
-	*/
-	
+		
 	// Create div for left part
 	var dvLeft = document.createElement("div");
 	with(dvLeft.style) {
@@ -508,22 +487,15 @@ function simulate() {
 	// Clear all canvas
 	clearCanvas(caOut1);	
 	clearCanvas(caOut2);
-	//clearCanvas(caOut3);
-	//clearCanvas(caOut4);
 	
 	// Draw object in all canvas
 	for(var i = 0; i < o.length; i++) {
 		draw(o[i]).onCanvas(caOut1);
 		draw(o[i], "xz").onCanvas(caOut2);
-		//draw(o[i]).onCanvas(caOut3);
-		//draw(o[i]).onCanvas(caOut4);
 	}
 	
 	// Draw wave in all canvas
 	draw(p).onCanvas(caOut1);
-	//draw(p).onCanvas(caOut2);
-	//draw(p).onCanvas(caOut3);
-	//draw(p).onCanvas(caOut4);
 	
 	if(t >= tend) {
 		btLoad.disabled = false;
