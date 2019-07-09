@@ -18,6 +18,9 @@
 	1359 Better visualization.
 	1741 Con to get data from app.
 	1838 Find better wave parameters.
+	20190710
+	0522 Change data time output format to 2 digit every 1 s.
+	0545 Create distribution function.
 	
 	References
 	1. Sparisoma Viridi, Veinardi Suendo, "Molecular dynamics
@@ -77,9 +80,9 @@ function initParams() {
 	p += "\n";
 	p += "# Iteration\n";
 	p += "TBEG 0\n";
-	p += "TEND 100\n";
+	p += "TEND 20\n";
 	p += "TSTP 0.005\n";
-	p += "TDAT 0.100\n";
+	p += "TDAT 1.000\n";
 	p += "TPRC 1\n";
 	p += "\n";
 	p += "# Coordinates\n";
@@ -405,12 +408,12 @@ function simulate() {
 	}
 	
 	if(t == tbeg) {
-		//       0.0740 -0.0009 -0.0162
-		addText("#t    x   y\n").to(taOut);
+		//       00 000
+		addText("#t x   y\n").to(taOut);
 	}
 	
 	if(iter == 0) {
-		var tt = ("00" + t.toFixed(1)).slice(-5);
+		var tt = ("00" + t.toFixed(0)).slice(-2);
 		
 		var C = 0;
 		for(var i = 0; i < o.length - 1; i++) {
@@ -426,9 +429,26 @@ function simulate() {
 		}
 		C = ("000" + C).slice(-3);
 		
-		var D = 0;
+		var Davg = 0;
+		for(var i = 0; i < o.length; i++) {
+			Davg += o[i].D;
+		}
+		Davg /= o.length;
 		
-		var info = tt + " " + C + " " + D + "\n";
+		var ND = [];
+		ND.length = 10;
+		ND.fill(0);
+		for(var i = 0; i < o.length - 1; i++) {
+			for(var j = i + 1; j < o.length; j++) {
+				var ri = o[i].r;
+				var rj = o[j].r;
+				var rij = Vect3.sub(ri, rj).len();
+				var k = Math.floor((rij - 0.5 *Davg) / (0.1 * Davg));
+				if(k < ND.length) ND[k]++
+			}
+		}
+		
+		var info = tt + " " + C + " " + ND + "\n";
 		addText(info).to(taOut);
 	}
 	
