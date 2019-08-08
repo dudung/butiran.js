@@ -8,6 +8,11 @@
 	Freddy Haryanto
 	
 	20190808 Start from cppcmf.js app.
+	1020 W matrix ok.
+	1027 Output time stamp ok.
+	1040 Get drawMatrixOnCanvas() from vratcabm.
+	1056 Fin coloring of three types of particles.
+	1113 Generating three types of particles randomly ok.
 */
 
 // Define global variables
@@ -17,9 +22,10 @@ var btLoad, btRead, btStart, btInfo;
 var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var digit;
 var XMIN, XMAX, YMIN, YMAX;
-var Numx, Numy, Numb, Ntyp;
+var Numx, Numy, Btyp, Ntyp;
 var Nums, Cofs;
 var W, A;
+var colors;
 
 // Execute main function
 main();
@@ -43,21 +49,23 @@ function initParams() {
 	p += "TPRC 1\n";
 	p += "\n";
 	p += "# Environment\n";
-	p += "NUMX 100\n";
-	p += "NUMY 100\n";
-	p += "BORD 1\n";
+	p += "NUMX 10\n";
+	p += "NUMY 10\n";
+	p += "BTYP 1\n";
 	p += "\n";
 	p += "# Particles\n";
-	p += "NTYP 2\n";
-	p += "NUM1 10\n";
-	p += "NUM2 10\n";
+	p += "NTYP 3\n";
+	p += "NUM1 5\n";
+	p += "NUM2 2\n";
+	p += "NUM3 3\n";
 	p += "COF1 1\n";
 	p += "COF2 2\n";
+	p += "COF3 3\n";
 	p += "\n";
 	
 	params = p;
 	
-	digit = 4;
+	digit = 0;
 }
 
 
@@ -78,7 +86,7 @@ function readParams() {
 	
 	Numx = getValue("NUMX").from(taIn);
 	Numy = getValue("NUMY").from(taIn);
-	Numb = getValue("NUMB").from(taIn);
+	Btyp = getValue("BTYP").from(taIn);
 	Ntyp = getValue("NTYP").from(taIn);
 	Nums = [];
 	for(var i = 0; i < Ntyp; i++) {
@@ -109,7 +117,47 @@ function readParams() {
 	YMIN = caOut.height;
 	YMAX = 0;
 	
+	W = [];
+	for(var j = 0; j < Numy; j++) {
+		var row = [];
+		for(var i = 0; i < Numx; i++) {
+			row.push(0);
+		}
+		W.push(row);
+	}
 	
+	if(Btyp == 1) {
+		for(var i = 0; i < Numx; i++) {
+			W[0][i] = 1;
+			W[Numy - 1][i] = 1;
+		}
+		for(var j = 0; j < Numy; j++) {
+			W[j][0] = 1;
+			W[j][Numx - 1] = 1;
+		}
+	}
+	
+	colors = [
+		["#fff", "#fff"],
+		["#000", "#000"],
+		["#aaf", "#00f"],
+		["#afa", "#0f0"],
+		["#faa", "#f00"]
+	];
+	
+	for(var i = 0; i < Ntyp; i++) {
+		var j = 0;
+		while(j < Nums[i]) {
+			var x = Random.randInt(1, Numx - 2);
+			var y = Random.randInt(1, Numy - 2);
+			if(W[y][x] == 0) {
+				W[y][x] = i + 2;
+				j++;
+			}
+		}
+	}
+	
+	drawMatrixOnCanvas(W, 1);
 }
 
 
@@ -128,7 +176,7 @@ function createVisualElements() {
 	with(taOut.style) {
 		overflowY = "scroll";
 		width = "214px";
-		height = "200px";
+		height = "161px";
 	}
 	
 	// Create button for loading default parameters
@@ -173,8 +221,8 @@ function createVisualElements() {
 	
 	// Create canvas for output
 	caOut = document.createElement("canvas");
-	caOut.width = "439";
-	caOut.height = "439";
+	caOut.width = "400";
+	caOut.height = "400";
 	with(caOut.style) {
 		width = caOut.width +  "px";
 		height = caOut.height +  "px";
@@ -186,7 +234,7 @@ function createVisualElements() {
 	var dvLeft = document.createElement("div");
 	with(dvLeft.style) {
 		width = "220px";
-		height = "442px";
+		height = "403px";
 		border = "1px solid #eee";
 		background = "#eee";
 		float = "left";
@@ -195,8 +243,8 @@ function createVisualElements() {
 	// Create div for right part
 	var dvRight = document.createElement("div");
 	with(dvRight.style) {
-		width = "442px";
-		height = "442px";
+		width = "403px";
+		height = "403px";
 		border = "1px solid #eee";
 		background = "#eee";
 		float = "left";
@@ -274,27 +322,15 @@ function simulate() {
 	}
 	
 	if(iter == 0) {
-		var tt = t.toFixed(digit);
-		var xx = o.r.x.toFixed(digit);
-		var yy = o.r.y.toFixed(digit);
-		var text = tt + " " + xx + " " + yy;
+		var tt = "0000" + t;
+		tt = tt.slice(-4);
+		var text = tt;
 		addText(text + "\n").to(taOut);
 	}
 	
-	var FB = magnetic.force(o);
-	var F = FB;
-	var a = Vect3.div(F, o.m);
-	o.v = Vect3.add(o.v, Vect3.mul(a, dt));
-	if(corv != 0) {
-		var un = o.q * magnetic.B.len() * dt / o.m;
-		var alpha = 1 / Math.sqrt(1 + un * un);
-		o.v = Vect3.mul(o.v, alpha);
-	}
-	o.r = Vect3.add(o.r, Vect3.mul(o.v, dt));
-	
 	
 	clearCanvas(caOut);
-	draw(o).onCanvas(caOut);
+	//draw(o).onCanvas(caOut);
 	
 	if(t >= tend) {
 		btLoad.disabled = false;
@@ -397,4 +433,36 @@ function getValue() {
 		}
 	};
 	return result;	
+}
+
+// Draw a matrix on canvas with certain style
+function drawMatrixOnCanvas() {
+	var M = arguments[0];
+	var style = arguments[1];
+	
+	var Rows = W.length;
+	var Cols = W[0].length;
+	
+	var w = Math.round(caOut.width / Cols);
+	var h = Math.round(caOut.height / Rows);
+	
+	var cx = caOut.getContext("2d");
+	
+	var strokeColor;
+	var fillColor;
+	for(var i = 0; i < Rows; i++) {
+		for(var j = 0; j < Cols; j++) {
+			var x = j * w;
+			var y = i * h;
+			var c = M[i][j];
+			strokeColor = colors[c][0];
+			fillColor = colors[c][1];
+			cx.fillStyle = fillColor;
+			cx.fillRect(x, y, w, h);
+			cx.stroke();
+			cx.strokeStyle = strokeColor;
+			cx.lineWidth = 1;
+			cx.strokeRect(x+1, y+1, w-2, h-2);
+		}
+	}
 }
