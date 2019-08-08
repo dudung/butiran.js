@@ -13,6 +13,8 @@
 	1040 Get drawMatrixOnCanvas() from vratcabm.
 	1056 Fin coloring of three types of particles.
 	1113 Generating three types of particles randomly ok.
+	1118 Remove draw() frin cppcmf.js (template).
+	1137 Agents can move, but only blue.
 */
 
 // Define global variables
@@ -23,7 +25,7 @@ var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var digit;
 var XMIN, XMAX, YMIN, YMAX;
 var Numx, Numy, Btyp, Ntyp;
-var Nums, Cofs;
+var Nums, N, Cofs;
 var W, A;
 var colors;
 
@@ -45,19 +47,19 @@ function initParams() {
 	p += "TBEG 0\n";
 	p += "TEND 100\n";
 	p += "TSTP 1\n";
-	p += "TDAT 10\n";
+	p += "TDAT 1\n";
 	p += "TPRC 1\n";
 	p += "\n";
 	p += "# Environment\n";
-	p += "NUMX 10\n";
-	p += "NUMY 10\n";
+	p += "NUMX 100\n";
+	p += "NUMY 100\n";
 	p += "BTYP 1\n";
 	p += "\n";
 	p += "# Particles\n";
 	p += "NTYP 3\n";
-	p += "NUM1 5\n";
-	p += "NUM2 2\n";
-	p += "NUM3 3\n";
+	p += "NUM1 50\n";
+	p += "NUM2 20\n";
+	p += "NUM3 30\n";
 	p += "COF1 1\n";
 	p += "COF2 2\n";
 	p += "COF3 3\n";
@@ -145,11 +147,13 @@ function readParams() {
 		["#faa", "#f00"]
 	];
 	
+	N = 0;
 	for(var i = 0; i < Ntyp; i++) {
+		N += Nums[i];
 		var j = 0;
 		while(j < Nums[i]) {
-			var x = Random.randInt(1, Numx - 2);
-			var y = Random.randInt(1, Numy - 2);
+			var x = Random.randInt(0, Numx - 1);
+			var y = Random.randInt(0, Numy - 1);
 			if(W[y][x] == 0) {
 				W[y][x] = i + 2;
 				j++;
@@ -157,7 +161,7 @@ function readParams() {
 		}
 	}
 	
-	drawMatrixOnCanvas(W, 1);
+	drawMatrixOnCanvas(W);
 }
 
 
@@ -328,9 +332,9 @@ function simulate() {
 		addText(text + "\n").to(taOut);
 	}
 	
-	
+	updateMatrix(W);
 	clearCanvas(caOut);
-	//draw(o).onCanvas(caOut);
+	drawMatrixOnCanvas(W);
 	
 	if(t >= tend) {
 		btLoad.disabled = false;
@@ -353,34 +357,6 @@ function clearCanvas(caOut) {
 	var height = caOut.height;
 	var cx = caOut.getContext("2d");
 	cx.clearRect(0, 0, width, height);
-}
-
-
-// Draw grain on canvas
-function draw() {
-	var o = arguments[0];
-	var result = {
-		onCanvas: function() {
-			var ca = arguments[0];
-			var cx = ca.getContext("2d");
-			
-			var x = o.r.x;
-			var dx = x + o.D;
-			var y = o.r.y;
-			
-			var lintrans = Transformation.linearTransform;
-			var X = lintrans(x, [xmin, xmax], [XMIN, XMAX]);
-			var DX = lintrans(dx, [xmin, xmax], [XMIN, XMAX]);
-			var D = DX - X;
-			var Y = lintrans(y, [ymin, ymax], [YMIN, YMAX]);
-			
-			cx.beginPath();
-			cx.strokeStyle = o.c;
-			cx.arc(X, Y, D, 0, 2 * Math.PI);
-			cx.stroke();
-		}
-	};
-	return result;
 }
 
 
@@ -463,6 +439,40 @@ function drawMatrixOnCanvas() {
 			cx.strokeStyle = strokeColor;
 			cx.lineWidth = 1;
 			cx.strokeRect(x+1, y+1, w-2, h-2);
+		}
+	}
+}
+
+// Update a matrix using ABM
+function updateMatrix() {
+	var M = arguments[0];
+	
+	var Rows = W.length;
+	var Cols = W[0].length;
+	
+	var i = 0;
+	while(i < N) {
+		var xsrc = Random.randInt(0, Numx - 1);
+		var ysrc = Random.randInt(0, Numy - 1);
+		var typ = W[ysrc][xsrc];
+		
+		if(typ > 1) {
+			var dx = Random.randInt(-Cofs[typ-2], +Cofs[typ-2]);
+			var dy = Random.randInt(-Cofs[typ-2], +Cofs[typ-2]);
+			xdest = xsrc + dx;
+			ydest = ysrc + dy;
+			if(
+				(0 <= xdest && xdest < Numx) &&
+				(0 <= ydest && ydest < Numy)
+			) {
+				if(W[ydest][xdest] == 0) {
+					W[ydest][xdest] = W[ysrc][xsrc];
+					W[ysrc][xsrc] = 0;
+					i++;					
+					
+					addText(typ + "\n").to(taOut);
+				}
+			}
 		}
 	}
 }
