@@ -1,8 +1,6 @@
 /*
 	abmdif.js
 	Particles diffusion using agent-based model
-	cppcmf.js
-	Charged particle in perpendicular constant magnetic field
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
 	Freddy Haryanto
