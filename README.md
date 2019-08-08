@@ -54,3 +54,7 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/mdfhcp/mdfhcp.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/mdfhcp/mdfhcp.html
+12. **abmdif.js** | Particles diffusion using agent-based model | 20190808<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/abmdif/abmdif.js<br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/abmdif/abmdif.html
