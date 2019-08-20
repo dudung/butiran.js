@@ -90,11 +90,11 @@ function simulate() {
 		
 		// Display header for first run
 		if(t == tbeg) {
-			tout(taOut0, "# t     zbavg  zbmax  ziavg\n");
+			tout(taOut1, "# t     zbavg  zbmax  ziavg\n");
 			//            0.00e+0 0.0689 0.1309 0.0000
 		}
 		
-		tout(taOut0,
+		tout(taOut1,
 			tt + " " +
 			zavg + " " +
 			zmax + " " +
@@ -105,7 +105,7 @@ function simulate() {
 			+ " of " + tend;
 		
 		if(t >= tend) {
-			tout(taOut0, "\n");
+			tout(taOut1, "\n");
 		}
 		
 		clearCanvas();
@@ -504,8 +504,8 @@ function setElementsLayout() {
 	
 	// Create output canvas
 	caOut = document.createElement("canvas");
-	caOut.width = "150";
-	caOut.height = "394";
+	caOut.width = "200";
+	caOut.height = "200";
 	caOut.style.width = caOut.width + "px";
 	caOut.style.height = caOut.height + "px";
 	caOut.style.float = "left";
@@ -521,15 +521,15 @@ function setElementsLayout() {
 	
 	// Create ouput textarea 0
 	taOut0 = document.createElement("textarea");
-	taOut0.style.width = "270px";
-	taOut0.style.height = "192px"
+	taOut0.style.width = "219px";
+	taOut0.style.height = "196px"
 	taOut0.style.overflowY = "scroll";
 	taOut0.style.float = "right";
 	
 	// Create ouput textarea 1
 	taOut1 = document.createElement("textarea");
-	taOut1.style.width = "270px";
-	taOut1.style.height = "192px";
+	taOut1.style.width = "424px";
+	taOut1.style.height = "189px";
 	taOut1.style.overflowY = "scroll";
 	taOut1.style.float = "right";
 	
@@ -564,7 +564,7 @@ function setElementsLayout() {
 	// Create main division
 	var div0 = document.createElement("div");
 	div0.style.border = "#aaa 1px solid";
-	div0.style.width = 358
+	div0.style.width = 308
 		+ parseInt(taIn.style.width)
 		+ parseInt(caOut.style.width) + "px";
 	div0.style.height = 6
@@ -605,44 +605,45 @@ function buttonClick() {
 	// Get target and verbose to taOut1
 	var target = event.target;
 	var cap = target.innerHTML;
-	tout(taOut1, cap + "\n");
+	tout(taOut0, cap + "\n");
 	
 	// Perform according to the clicked button
 	if(cap == "Load") {
 		loadParameters(taIn);
 		btRead.disabled = false;
-		tout(taOut1, "Parameters are loaded\n\n");
+		tout(taOut0, "Parameters are loaded\n\n");
 	} else if(cap == "Clear") {
 		clearAll();
 		btRead.disabled = true;
 		btStart.disabled = true;
-		tout(taOut1, "All are cleared except this element\n\n");
+		tout(taOut0, "All are cleared except this element\n\n");
 	} else if(cap == "Read") {
 		readParameters(taIn);
 		initParams();
 		clearCanvas();
 		drawSystem();
 		btStart.disabled = false;
-		tout(taOut1, "Parameters are read\n");
-		tout(taOut1, "Slightly random grains position "
+		tout(taOut0, "Parameters are read\n");
+		tout(taOut0, "Slightly random grains position "
 			+ "are generated\n\n");
 	} else if(cap == "Start") {
 		target.innerHTML = "Stop";
 		btRead.disabled = true;
 		taIn.disabled = true;
-		tout(taOut1, "Simulation starts\n\n");
+		tout(taOut0, "Simulation starts\n\n");
 		proc = setInterval(simulate, tproc);
 	} else if(cap == "Stop") {
 		target.innerHTML = "Start";
 		btRead.disabled = false;
 		taIn.disabled = false;
-		tout(taOut1, "Simulation stops\n\n");
+		tout(taOut0, "Simulation stops\n\n");
 		clearInterval(proc);
 	} else if(cap == "Info") {
-		tout(taOut1, "igdensity.js -- 20190619\n"
-			+ "Intruder and granular density\n"
-			+ "Sparisoma Viridi, Dewi Muliyati, Nuryati, Johri Sabaryati\n"
-			+ "https://github.com/dudung/butiran"
+		tout(taOut0, "hc2sgis.js -- 20190820\n"
+			+ "Head-on collision of two spherical grains "
+			+ "with internal structure\n"
+			+ "Sparisoma Viridi | "
+			+ "https://github.com/dudung/butiran \n"
 			+ "\n\n"
 		);
 	}
@@ -684,7 +685,7 @@ function drawSystem() {
 // Clear all
 function clearAll() {
 	taIn.value = "";
-	taOut0.value = "";
+	taOut1.value = "";
 	clearCanvas();
 }
 
@@ -719,16 +720,16 @@ function loadParameters() {
 	
 	lines += "\n";
 	lines += "# Coordinates\n"; 
-	lines += "XMIN -0.075\n";   // xmin              m
-	lines += "YMIN 0\n";        // ymin              m
-	lines += "XMAX 0.075\n";    // xmax              m
-	lines += "YMAX 0.400\n";    // ymax              m
+	lines += "XMIN 0.00\n";     // xmin              m
+	lines += "YMIN 0.00\n";     // ymin              m
+	lines += "XMAX 1.00\n";     // xmax              m
+	lines += "YMAX 1.00\n";     // ymax              m
 	
 	lines += "\n";
 	lines += "# Box\n"; 
-	lines += "BOXH 0.40\n";     // Box height        m
-	lines += "BOXW 0.15\n";     // Box width         m
-	lines += "BOXT 0.15\n";     // Box thickness     m
+	lines += "BOXH 1.00\n";     // Box height        m
+	lines += "BOXW 1.00\n";     // Box width         m
+	lines += "BOXT 1.00\n";     // Box thickness     m
 	
 	lines += "\n";
 	lines += "# Bed particles\n";
@@ -947,8 +948,8 @@ function tout() {
 // View current configuration
 function viewConf() {
 	var digit = -Math.floor(Math.log10(tdata));
-	tout(taOut1, arguments[0] + " of grains\n");
-	tout(taOut1, "# i x       y       z\n");
+	tout(taOut0, arguments[0] + " of grains\n");
+	tout(taOut0, "# i x       y       z\n");
 	//            000 +0.0000 -0.0670 +0.0052
 	for(var i = 0; i < numg; i++) {
 		var ii = ("000" + i).slice(-3);
@@ -958,7 +959,7 @@ function viewConf() {
 		yy = (yy >= 0) ? "+" + yy : yy;
 		var zz = (r[i].z).toFixed(digit + 2);
 		zz = (zz >= 0) ? "+" + zz : zz;
-		tout(taOut1, ii + " " + xx + " " + yy + " " + zz + "\n");
+		tout(taOut0, ii + " " + xx + " " + yy + " " + zz + "\n");
 	}
-	tout(taOut1, "\n");
+	tout(taOut0, "\n");
 }
