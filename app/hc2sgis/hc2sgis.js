@@ -10,6 +10,9 @@
 	
 	20190820
 	1740 Create this from igensity.js app.
+	20190821
+	0338 Delete unused div2.
+	0458 Two grains can collision in a box.
 */
 
 // Define global variables for walls
@@ -20,7 +23,7 @@ var wL, wR, wT, wB;
 var wall, Nw, kw;
 
 // Define global variables for parameters
-var gacc, rhof, etaf, velf, kcol, gcol, kspr, gspr, leno;
+var gacc, rhof, etaf, velf, kcol, gcol, kspr, gspr, leno, kchg;
 
 // Define global variables for simulation
 var tstep, tbeg, tend, tdata, tproc, proc, t, Ndata, idata;
@@ -31,12 +34,8 @@ var xmin, ymin, xmax, ymax, XMIN, YMIN, XMAX, YMAX;
 // Define global variables for box
 var boxh, boxw, boxt;
 
-// Define global variables for bed particles
-var diag, rhog, numg, geng, r, v, m, D, color;
-
-// Define global variables for intruder
-var diai, widi, heii, rhoi, Tint, zint, INTRUDER_CREATED;
-var Nint;
+// Define global variables for grains and sub-grains
+var diag, rhog, numg, nums, seqc, r, v, m, D, color, velo;
 
 // Define global variables for visual elements
 var taIn, caOut, taOut0, taOut1;
@@ -75,18 +74,18 @@ function simulate() {
 		var digit = -Math.floor(Math.log10(tdata));
 		var tt = t.toExponential(digit);
 		
-		var zavg = vect3AvgZ(r, Nint).toFixed(digit + 2);
-		var zmax = vect3MaxZ(r, Nint).toFixed(digit + 2);
+		//var zavg = vect3AvgZ(r, Nint).toFixed(digit + 2);
+		//var zmax = vect3MaxZ(r, Nint).toFixed(digit + 2);
 		
-		var bid = numg - Nint;
-		var zi = 0;
+		//var bid = numg - Nint;
+		//var zi = 0;
 		if(INTRUDER_CREATED) {
 			for(i = 0; i < Nint; i++) {
-				zi += r[i + bid].z;
+				//zi += r[i + bid].z;
 			}
-			zi /= Nint;
+			//zi /= Nint;
 		}
-		zi = zi.toFixed(digit + 2);
+		//zi = zi.toFixed(digit + 2);
 		
 		// Display header for first run
 		if(t == tbeg) {
@@ -96,9 +95,10 @@ function simulate() {
 		
 		tout(taOut1,
 			tt + " " +
-			zavg + " " +
-			zmax + " " +
-			zi + "\n"
+			//zavg + " " +
+			//zmax + " " +
+			//zi + "\n"
+			+ "\n"
 		);
 		
 		document.title = "ipendepthf: " + t.toFixed(2)
@@ -226,270 +226,6 @@ function simulate() {
 	// Increase time
 	idata++;
 	t += tstep;
-	
-	// Create an intruder
-	if(t >= Tint && !INTRUDER_CREATED) {
-		
-		for(var j = 0; j < heii; j++) {
-			for(var i = 0; i < widi; i++) {
-				D.push(diai);
-				var Ri = 0.5 * diai;
-				var Vi = (4 * Math.PI / 3) * Ri * Ri * Ri;
-				m.push(rhoi * Vi);
-
-				v.push(new Vect3());
-				
-				var x = 0;
-				var y = -0.5 * diai * (widi - 1) + diai * i;
-				var z = zint + 0.5 * diai * (heii - 1) + diai * j;
-				r.push(new Vect3(x, y, z));
-				
-				color.push(["#000", "#fa8"]);
-				
-				numg++;
-				Nint++;
-			}
-		}
-		INTRUDER_CREATED = true;
-		
-		/*
-		// 8 1 2
-		// 7 0 3
-		// 6 5 4
-		function getRegion(j, i) {
-			var region = -1;
-			if(j == heii - 1 && i == widi - 1) {
-				region = 6;
-			} else if() {
-				
-			} else if() {
-				
-			} else if() {
-				
-			} else if() {
-				
-			} else if() {
-				
-			} else if() {
-				
-			} else if() {
-				
-			} else {
-				region = 0;
-			}
-		}
-		*/
-		
-		
-		// Get initial length	
-		var did = numg - Nint;
-		for(var j = 0; j < heii; j++) {
-			for(var i = 0; i < widi; i++) {
-				var idle = [];
-				var k = i + j * widi;
-				if(k == 0) {
-					// bottom-left
-					//color[k + did] = ["#000", "#f00"];
-					//color[k2 + did] = ["#000", "#0f0"];
-					//color[k1 + did] = ["#000", "#00f"];
-					
-					var i2 = i + 1;
-					var j2 = j;
-					var k2 = i2 + j2 * widi;
-					var l2 = Vect3.sub(
-						r[k + did], r[k2 + did]).len();
-					idle.push([k2, l2]);
-					
-					var i1 = i;
-					var j1 = j + 1;
-					var k1 = i1 + j1 * widi;
-					var l1 = Vect3.sub(
-						r[k + did], r[k1 + did]).len();
-					idle.push([k1, l1]);
-				} else if(0 < k && k < widi-1) {
-					// bottom-middle
-					//color[k + did] = ["#000", "#f00"];
-					//color[k4 + did] = ["#000", "#0f0"];
-					//color[k1 + did] = ["#000", "#00f"];
-					//color[k2 + did] = ["#000", "#0f0"];
-					
-					var i4 = i - 1;
-					var j4 = j;
-					var k4 = i4 + j4 * widi;
-					var l4 = Vect3.sub(
-						r[k + did], r[k4 + did]).len();
-					idle.push([k4, l4]);
-					
-					var i1 = i;
-					var j1 = j + 1;
-					var k1 = i1 + j1 * widi;
-					var l1 = Vect3.sub(
-						r[k + did], r[k1 + did]).len();
-					idle.push([k1, l1]);
-					
-					var i2 = i + 1;
-					var j2 = j;
-					var k2 = i2 + j2 * widi;
-					var l2 = Vect3.sub(
-						r[k + did], r[k2 + did]).len();
-					idle.push([k2, l2]);
-				} else if(k == widi-1) {
-					// bottom-right
-					//color[k + did] = ["#000", "#f00"];
-					//color[k1 + did] = ["#000", "#00f"];
-					//color[k4 + did] = ["#000", "#0f0"];
-					
-					var i4 = i - 1;
-					var j4 = j;
-					var k4 = i4 + j4 * widi;
-					var l4 = Vect3.sub(
-						r[k + did], r[k4 + did]).len();
-					idle.push([k4, l4]);
-					
-					var i1 = i;
-					var j1 = j + 1;
-					var k1 = i1 + j1 * widi;
-					var l1 = Vect3.sub(
-						r[k + did], r[k1 + did]).len();
-					idle.push([k1, l1]);
-				} else if(i == 0 && (0 < j && j < heii - 1)) {
-					// middle-left
-					var i1 = i;
-					var j1 = j + 1;
-					var k1 = i1 + j1 * widi;
-					var l1 = Vect3.sub(
-						r[k + did], r[k1 + did]).len();
-					idle.push([k1, l1]);
-					
-					var i2 = i + 1;
-					var j2 = j;
-					var k2 = i2 + j2 * widi;
-					var l2 = Vect3.sub(
-						r[k + did], r[k2 + did]).len();
-					idle.push([k2, l2]);
-					
-					var i3 = i;
-					var j3 = j - 1;
-					var k3 = i3 + j3 * widi;
-					var l3 = Vect3.sub(
-						r[k + did], r[k3 + did]).len();
-					idle.push([k3, l3]);
-				} else if(
-						(0 < j && j < heii - 1) &&
-						(0 < i && i < widi - 1)
-				) {
-					// middle-middle
-					var i1 = i;
-					var j1 = j + 1;
-					var k1 = i1 + j1 * widi;
-					var l1 = Vect3.sub(
-						r[k + did], r[k1 + did]).len();
-					idle.push([k1, l1]);
-					
-					var i2 = i + 1;
-					var j2 = j;
-					var k2 = i2 + j2 * widi;
-					var l2 = Vect3.sub(
-						r[k + did], r[k2 + did]).len();
-					idle.push([k2, l2]);
-					
-					var i3 = i;
-					var j3 = j - 1;
-					var k3 = i3 + j3 * widi;
-					var l3 = Vect3.sub(
-						r[k + did], r[k3 + did]).len();
-					idle.push([k3, l3]);
-					
-					var i4 = i - 1;
-					var j4 = j;
-					var k4 = i4 + j4 * widi;
-					var l4 = Vect3.sub(
-						r[k + did], r[k4 + did]).len();
-					idle.push([k4, l4]);
-				} else if(i == widi - 1 && (0 < j && j < heii - 1)) {
-					// middle-right
-					var i1 = i;
-					var j1 = j + 1;
-					var k1 = i1 + j1 * widi;
-					var l1 = Vect3.sub(
-						r[k + did], r[k1 + did]).len();
-					idle.push([k1, l1]);
-					
-					var i3 = i;
-					var j3 = j - 1;
-					var k3 = i3 + j3 * widi;
-					var l3 = Vect3.sub(
-						r[k + did], r[k3 + did]).len();
-					idle.push([k3, l3]);
-					
-					var i4 = i - 1;
-					var j4 = j;
-					var k4 = i4 + j4 * widi;
-					var l4 = Vect3.sub(
-						r[k + did], r[k4 + did]).len();
-					idle.push([k4, l4]);
-				} else if(k == Nint - widi) {
-					// top-left
-					var i2 = i + 1;
-					var j2 = j;
-					var k2 = i2 + j2 * widi;
-					var l2 = Vect3.sub(
-						r[k + did], r[k2 + did]).len();
-					idle.push([k2, l2]);
-					
-					var i3 = i;
-					var j3 = j - 1;
-					var k3 = i3 + j3 * widi;
-					var l3 = Vect3.sub(
-						r[k + did], r[k3 + did]).len();
-					idle.push([k3, l3]);
-				} else if(Nint - widi < k && k < Nint - 1) {
-					// top-middle
-					var i2 = i + 1;
-					var j2 = j;
-					var k2 = i2 + j2 * widi;
-					var l2 = Vect3.sub(
-						r[k + did], r[k2 + did]).len();
-					idle.push([k2, l2]);
-					
-					var i3 = i;
-					var j3 = j - 1;
-					var k3 = i3 + j3 * widi;
-					var l3 = Vect3.sub(
-						r[k + did], r[k3 + did]).len();
-					idle.push([k3, l3]);
-					
-					var i4 = i - 1;
-					var j4 = j;
-					var k4 = i4 + j4 * widi;
-					var l4 = Vect3.sub(
-						r[k + did], r[k4 + did]).len();
-					idle.push([k4, l4]);
-				} else if(k == Nint - 1) {
-					// top-right
-					var i4 = i - 1;
-					var j4 = j;
-					var k4 = i4 + j4 * widi;
-					var l4 = Vect3.sub(
-						r[k + did], r[k4 + did]).len();
-					idle.push([k4, l4]);
-					
-					var i3 = i;
-					var j3 = j - 1;
-					var k3 = i3 + j3 * widi;
-					var l3 = Vect3.sub(
-						r[k + did], r[k3 + did]).len();
-					idle.push([k3, l3]);
-				}
-				if(idle.length > 0) {
-					leno.push(idle);
-				}
-			}
-		}
-		
-		// View condensed middle configuration
-		viewConf("Initial configuration");
-	}
 }
 
 
@@ -504,7 +240,7 @@ function setElementsLayout() {
 	
 	// Create output canvas
 	caOut = document.createElement("canvas");
-	caOut.width = "200";
+	caOut.width = "400";
 	caOut.height = "200";
 	caOut.style.width = caOut.width + "px";
 	caOut.style.height = caOut.height + "px";
@@ -521,14 +257,14 @@ function setElementsLayout() {
 	
 	// Create ouput textarea 0
 	taOut0 = document.createElement("textarea");
-	taOut0.style.width = "219px";
-	taOut0.style.height = "196px"
+	taOut0.style.width = "141px";
+	taOut0.style.height = "189px"
 	taOut0.style.overflowY = "scroll";
-	taOut0.style.float = "right";
+	taOut0.style.float = "left";
 	
 	// Create ouput textarea 1
 	taOut1 = document.createElement("textarea");
-	taOut1.style.width = "424px";
+	taOut1.style.width = "250px";
 	taOut1.style.height = "189px";
 	taOut1.style.overflowY = "scroll";
 	taOut1.style.float = "right";
@@ -564,7 +300,7 @@ function setElementsLayout() {
 	// Create main division
 	var div0 = document.createElement("div");
 	div0.style.border = "#aaa 1px solid";
-	div0.style.width = 308
+	div0.style.width = 82
 		+ parseInt(taIn.style.width)
 		+ parseInt(caOut.style.width) + "px";
 	div0.style.height = 6
@@ -577,13 +313,6 @@ function setElementsLayout() {
 	div1.style.height = (105 + 290) + "px";
 	div1.style.float = "left";
 	div1.style.border = "#aaa 1px solid";
-	
-	// Create control division
-	var div2 = document.createElement("div");
-	div2.style.width = "70px";
-	div2.style.height = "130px";
-	div2.style.border = "#aaa 1px solid";
-	div2.style.textAlign = "center";
 	
 	// Set layout of visual components
 	document.body.append(div0);
@@ -701,14 +430,17 @@ function clearCanvas() {
 function loadParameters() {
 	var lines = "";
 	lines += "# Parameters\n";
-	lines += "GACC 9.807\n";    // Gravitation      m/s2
+	lines += "GACC 0\n";        // Gravitation      m/s2
+		//9.807
 	lines += "RHOF 1000\n";     // Fluid density    kg/m3
-	lines += "ETAF 8.90E-4\n";  // Fluid vicosity   Pa.s
+	lines += "ETAF 0\n";        // Fluid vicosity   Pa.s
+		//8.90E-4
 	lines += "VELF 0\n";        // Fluid velocity   m/s
-	lines += "KCOL 400\n";      // Normal constant  N/m
+	lines += "KCOL 1E6\n";      // Normal constant  N/m
 	lines += "GCOL 0.1\n";      // Normal damping   N/m
 	lines += "KSPR 500\n";      // Spring constant  N/m
-	lines += "GSPR 0.01\n";      // Spring damping   N/m
+	lines += "GSPR 0.01\n";     // Spring damping   N/m
+	lines += "KCHG 1\n";        // Charge constant  N.m2/C2
 	
 	lines += "\n";
 	lines += "# Simulation\n";
@@ -720,32 +452,25 @@ function loadParameters() {
 	
 	lines += "\n";
 	lines += "# Coordinates\n"; 
-	lines += "XMIN 0.00\n";     // xmin              m
-	lines += "YMIN 0.00\n";     // ymin              m
-	lines += "XMAX 1.00\n";     // xmax              m
-	lines += "YMAX 1.00\n";     // ymax              m
+	lines += "XMIN -1\n";       // xmin              m
+	lines += "YMIN 0\n";        // ymin              m
+	lines += "XMAX 1\n";        // xmax              m
+	lines += "YMAX 1\n";        // ymax              m
 	
 	lines += "\n";
 	lines += "# Box\n"; 
 	lines += "BOXH 1.00\n";     // Box height        m
-	lines += "BOXW 1.00\n";     // Box width         m
-	lines += "BOXT 1.00\n";     // Box thickness     m
+	lines += "BOXW 2.00\n";     // Box width         m
+	lines += "BOXT 2.00\n";     // Box thickness     m
 	
 	lines += "\n";
-	lines += "# Bed particles\n";
-	lines += "DIAG 0.01\n"      // Grains diameter   m
+	lines += "# Grains and sub-grains\n";
+	lines += "DIAG 0.5\n"       // Grains diameter   m
 	lines += "RHOG 2000\n";     // Grains density    kg/m3
-	lines += "NUMG 154\n";      // Number of grains  -
-	lines += "GENG 0\n";        // Generation type   0 random
-	
-	lines += "\n";
-	lines += "# An intruder\n";
-	lines += "DIAI 0.01\n"      // Intruder diameter m
-	lines += "WIDI 5\n"         // Intruder width (in D)
-	lines += "HEII 4\n"         // Intruder height(in D)
-	lines += "RHOI 2000\n";     // Intruder density  kg/m3
-	lines += "ZINT 0.12\n";     // Intruder position m
-	lines += "TINT 0.3\n";      // Time appearance   kg/m3
+	lines += "NUMG 2\n";        // Number of grains  -
+	lines += "NUMS 7\n";        // Number of sub-gr  -
+	lines += "VELO 2\n";       // Velocity          m/s
+	lines += "SEQC 0\n";        // Sequence charge#  0
 	
 	var ta = arguments[0];
 	ta.value = lines;
@@ -766,6 +491,7 @@ function readParameters() {
 	gcol = getValue(lines, "GCOL");
 	kspr = getValue(lines, "KSPR");
 	gspr = getValue(lines, "GSPR");
+	kchg = getValue(lines, "KCHG");
 
 	// Get simulation information
 	tstep = getValue(lines, "TSTEP");
@@ -789,17 +515,9 @@ function readParameters() {
 	diag = getValue(lines, "DIAG");
 	rhog = getValue(lines, "RHOG");
 	numg = getValue(lines, "NUMG");
-	geng = getValue(lines, "GENG");
-	
-	// Get intruder information
-	diai = getValue(lines, "DIAI");
-	widi = getValue(lines, "WIDI");
-	heii = getValue(lines, "HEII");
-	rhoi = getValue(lines, "RHOI");
-	zint = getValue(lines, "ZINT");
-	Tint = getValue(lines, "TINT");
-	
-	Nint = 0;
+	nums = getValue(lines, "NUMS");
+	velo = getValue(lines, "VELO");
+	seqc = getValue(lines, "SEQC");	
 }
 
 
@@ -848,19 +566,18 @@ function initParams() {
 	wT = vect3Average(WT);
 	wB = vect3Average(WB);
 	
-	// Define bed particles properties
+	// Define grains and sub-grains properties
 	r = [];
 	v = [];
 	m = [];
 	D = [];
 	color = [];
-	if(geng == 0) {
+	if(seqc == 0) {
 		for(var i = 0; i < numg; i++) {
 			D.push(diag);
 			var Rg = 0.5 * diag;
 			var Vg = (4 * Math.PI / 3) * Rg * Rg * Rg;
 			m.push(rhog * Vg);
-			v.push(new Vect3());
 			color.push(["#000", "#8af"]);
 		}
 		
@@ -868,8 +585,16 @@ function initParams() {
 		var dx = boxw / Nperlayer
 		var Nlayer = Math.ceil(numg / Nperlayer);
 		
+		
+		r.push(new Vect3(0, -0.5, 0.5));
+		v.push(new Vect3(0, velo, 0));
+		
+		r.push(new Vect3(0, 0.5, 0.5));
+		v.push(new Vect3(0, -velo, 0));
+		
+		/*
 		var k = 0;
-		for(var i = 0; i < Nlayer; i++) {
+		for(var i = 0; i < num; i++) {
 			for(var j = 0; j < Nperlayer; j++) {
 				var x = 0;
 				var rndy = 0.1 * dx * Math.random();
@@ -883,6 +608,7 @@ function initParams() {
 				}
 			}
 		}
+		*/
 	}
 	
 	// Set intruder parameters
