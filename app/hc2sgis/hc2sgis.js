@@ -598,6 +598,7 @@ function initParams() {
 		v.push(new Vect3(0, -velo, 0));
 		
 		// Sub-grains in particle 1
+		var beta = 0;
 		for(var i = 0; i < nums; i++) {
 			var diags = diag / 3;
 			D.push(diags);
@@ -610,6 +611,7 @@ function initParams() {
 		}
 		
 		// Sub-grains in particle 2
+		beta += orid;
 		for(var i = 0; i < nums; i++) {
 			var diags = diag / 3;
 			D.push(diags);
