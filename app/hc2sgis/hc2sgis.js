@@ -13,6 +13,7 @@
 	20190821
 	0338 Delete unused div2.
 	0458 Two grains can collision in a box.
+	0520 Clear unused part of igensity.js app.
 */
 
 // Define global variables for walls
@@ -35,7 +36,8 @@ var xmin, ymin, xmax, ymax, XMIN, YMIN, XMAX, YMAX;
 var boxh, boxw, boxt;
 
 // Define global variables for grains and sub-grains
-var diag, rhog, numg, nums, seqc, r, v, m, D, color, velo;
+var diag, rhog, numg, nums, seqc, r, v, m, D, color;
+var velo, orid;
 
 // Define global variables for visual elements
 var taIn, caOut, taOut0, taOut1;
@@ -469,7 +471,8 @@ function loadParameters() {
 	lines += "RHOG 2000\n";     // Grains density    kg/m3
 	lines += "NUMG 2\n";        // Number of grains  -
 	lines += "NUMS 7\n";        // Number of sub-gr  -
-	lines += "VELO 2\n";       // Velocity          m/s
+	lines += "VELO 2\n";        // Velocity          m/s
+	lines += "ORID 0.000\n";    // Orientation diff  rad
 	lines += "SEQC 0\n";        // Sequence charge#  0
 	
 	var ta = arguments[0];
@@ -517,6 +520,7 @@ function readParameters() {
 	numg = getValue(lines, "NUMG");
 	nums = getValue(lines, "NUMS");
 	velo = getValue(lines, "VELO");
+	orid = getValue(lines, "ORID");
 	seqc = getValue(lines, "SEQC");	
 }
 
@@ -591,29 +595,7 @@ function initParams() {
 		
 		r.push(new Vect3(0, 0.5, 0.5));
 		v.push(new Vect3(0, -velo, 0));
-		
-		/*
-		var k = 0;
-		for(var i = 0; i < num; i++) {
-			for(var j = 0; j < Nperlayer; j++) {
-				var x = 0;
-				var rndy = 0.1 * dx * Math.random();
-				var rndz = 0.1 * dx * Math.random();
-				var y = -0.5 * boxw + (j + 0.5) * dx + rndy;
-				var z = (i + 0.5) * dx + rndz;
-				r.push(new Vect3(x, y, z));
-				k++;
-				if(k >= numg) {
-					break;
-				}
-			}
-		}
-		*/
 	}
-	
-	// Set intruder parameters
-	INTRUDER_CREATED = false;
-	leno = [];
 	
 	// Initialize simulation parameters
 	t = tbeg;
