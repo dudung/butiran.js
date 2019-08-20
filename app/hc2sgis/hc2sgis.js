@@ -14,6 +14,7 @@
 	0338 Delete unused div2.
 	0458 Two grains can collision in a box.
 	0520 Clear unused part of igensity.js app.
+	0528 Create sub-grain 0 in two grains.
 */
 
 // Define global variables for walls
@@ -81,8 +82,8 @@ function simulate() {
 		
 		//var bid = numg - Nint;
 		//var zi = 0;
-		if(INTRUDER_CREATED) {
-			for(i = 0; i < Nint; i++) {
+		if(/*INTRUDER_CREATED*/true) {
+			for(i = 0; i < /*Nint*/10; i++) {
 				//zi += r[i + bid].z;
 			}
 			//zi /= Nint;
@@ -190,6 +191,7 @@ function simulate() {
 	}
 	
 	// Calculate spring force only on intruder
+	var INTRUDER_CREATED = false;
 	if(INTRUDER_CREATED) {
 		var bid = numg - Nint;
 		for(var i = 0; i < leno.length; i++) {
@@ -384,7 +386,7 @@ function buttonClick() {
 // Draw all parts of the system
 function drawSystem() {
 	var cx = caOut.getContext("2d");
-	for(var i = 0; i < numg; i++) {
+	for(var i = 0; i < numg + numg * nums; i++) {
 		var xx = r[i].y;
 		var yy = r[i].z;
 		var R1 = transform(xx, yy);
@@ -592,9 +594,32 @@ function initParams() {
 		
 		r.push(new Vect3(0, -0.5, 0.5));
 		v.push(new Vect3(0, velo, 0));
-		
 		r.push(new Vect3(0, 0.5, 0.5));
 		v.push(new Vect3(0, -velo, 0));
+		
+		// Sub-grains in particle 1
+		for(var i = 0; i < nums; i++) {
+			var diags = diag / 3;
+			D.push(diags);
+			var Rg = 0.5 * diags;
+			var Vg = (4 * Math.PI / 3) * Rg * Rg * Rg;
+			m.push(rhog * Vg);
+			color.push(["#000", "#8af"]);
+			r.push(new Vect3(0, -0.5, 0.5));
+			v.push(new Vect3(0, velo, 0));
+		}
+		
+		// Sub-grains in particle 2
+		for(var i = 0; i < nums; i++) {
+			var diags = diag / 3;
+			D.push(diags);
+			var Rg = 0.5 * diags;
+			var Vg = (4 * Math.PI / 3) * Rg * Rg * Rg;
+			m.push(rhog * Vg);
+			color.push(["#000", "#8af"]);
+			r.push(new Vect3(0, 0.5, 0.5));
+			v.push(new Vect3(0, -velo, 0));			
+		}
 	}
 	
 	// Initialize simulation parameters
