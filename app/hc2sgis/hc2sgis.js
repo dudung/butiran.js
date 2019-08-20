@@ -597,6 +597,17 @@ function initParams() {
 		r.push(new Vect3(0, 0.5, 0.5));
 		v.push(new Vect3(0, -velo, 0));
 		
+		
+		var subgrainsColor = [
+			["#000", "#0f0"],
+			["#000", "#f00"],
+			["#000", "#f00"],
+			["#000", "#0f0"],
+			["#000", "#00f"],
+			["#000", "#00f"],
+			["#000", "#0f0"],
+		];
+		
 		// Sub-grains in particle 1
 		var beta = 0;
 		for(var i = 0; i < nums; i++) {
@@ -605,9 +616,19 @@ function initParams() {
 			var Rg = 0.5 * diags;
 			var Vg = (4 * Math.PI / 3) * Rg * Rg * Rg;
 			m.push(rhog * Vg);
-			color.push(["#000", "#8af"]);
-			r.push(new Vect3(0, -0.5, 0.5));
-			v.push(new Vect3(0, velo, 0));
+			color.push(subgrainsColor[i]);
+			v.push(v[0]);
+			
+			var ri = new Vect3(r[0]);
+			if(i > 0) {
+				var fi = beta + Math.PI * (2 * i - 3) / 6;
+				var xx = 0;
+				var yy = diags * Math.cos(fi);
+				var zz = diags * Math.sin(fi);
+				var dr = new Vect3(xx, yy, zz);
+				ri = Vect3.add(ri, dr);
+			}
+			r.push(ri);
 		}
 		
 		// Sub-grains in particle 2
@@ -620,7 +641,7 @@ function initParams() {
 			m.push(rhog * Vg);
 			color.push(["#000", "#8af"]);
 			r.push(new Vect3(0, 0.5, 0.5));
-			v.push(new Vect3(0, -velo, 0));			
+			v.push(v[1]);
 		}
 	}
 	
