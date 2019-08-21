@@ -15,6 +15,9 @@
 	0458 Two grains can collision in a box.
 	0520 Clear unused part of igensity.js app.
 	0528 Create sub-grain 0 in two grains.
+	0608 Draw sub-grains in grain 0.
+	0744 Add grain charge.
+	0811 Finish draw subgrains in each grain.
 */
 
 // Define global variables for walls
@@ -25,7 +28,8 @@ var wL, wR, wT, wB;
 var wall, Nw, kw;
 
 // Define global variables for parameters
-var gacc, rhof, etaf, velf, kcol, gcol, kspr, gspr, leno, kchg;
+var gacc, rhof, etaf, velf, kcol, gcol, kspr, gspr, leno;
+var kchg, chg;
 
 // Define global variables for simulation
 var tstep, tbeg, tend, tdata, tproc, proc, t, Ndata, idata;
@@ -577,6 +581,7 @@ function initParams() {
 	v = [];
 	m = [];
 	D = [];
+	chg = [];
 	color = [];
 	if(seqc == 0) {
 		for(var i = 0; i < numg; i++) {
@@ -584,7 +589,6 @@ function initParams() {
 			var Rg = 0.5 * diag;
 			var Vg = (4 * Math.PI / 3) * Rg * Rg * Rg;
 			m.push(rhog * Vg);
-			color.push(["#000", "#8af"]);
 		}
 		
 		var Nperlayer = parseInt(0.75 * boxw / diag);
@@ -592,56 +596,53 @@ function initParams() {
 		var Nlayer = Math.ceil(numg / Nperlayer);
 		
 		
+		chg.push(0);
 		r.push(new Vect3(0, -0.5, 0.5));
 		v.push(new Vect3(0, velo, 0));
+		
+		chg.push(0);
 		r.push(new Vect3(0, 0.5, 0.5));
 		v.push(new Vect3(0, -velo, 0));
 		
-		
+		// Define color
 		var subgrainsColor = [
+			["#000f", "#00f"],
 			["#000", "#0f0"],
 			["#000", "#f00"],
-			["#000", "#f00"],
-			["#000", "#0f0"],
-			["#000", "#00f"],
-			["#000", "#00f"],
-			["#000", "#0f0"],
 		];
 		
-		// Sub-grains in particle 1
+		// Define subgrains charge
+		var charge = [0, 1, 1, 0, -1, -1, 0];
+		
+		// Sub-grains i in particle j
 		var beta = 0;
-		for(var i = 0; i < nums; i++) {
-			var diags = diag / 3;
-			D.push(diags);
-			var Rg = 0.5 * diags;
-			var Vg = (4 * Math.PI / 3) * Rg * Rg * Rg;
-			m.push(rhog * Vg);
-			color.push(subgrainsColor[i]);
-			v.push(v[0]);
-			
-			var ri = new Vect3(r[0]);
-			if(i > 0) {
-				var fi = beta + Math.PI * (2 * i - 3) / 6;
-				var xx = 0;
-				var yy = diags * Math.cos(fi);
-				var zz = diags * Math.sin(fi);
-				var dr = new Vect3(xx, yy, zz);
-				ri = Vect3.add(ri, dr);
+		for(j = 0; j < numg; j++) {
+			for(var i = 0; i < nums; i++) {
+				var diags = diag / 3;
+				D.push(diags);
+				var Rg = 0.5 * diags;
+				var Vg = (4 * Math.PI / 3) * Rg * Rg * Rg;
+				m.push(rhog * Vg);
+				v.push(v[0]);
+				chg.push(charge[i]);
+				
+				var ri = new Vect3(r[j]);
+				if(i > 0) {
+					var fi = beta + Math.PI * (2 * i - 3) / 6;
+					var xx = 0;
+					var yy = diags * Math.cos(fi);
+					var zz = diags * Math.sin(fi);
+					var dr = new Vect3(xx, yy, zz);
+					ri = Vect3.add(ri, dr);
+				}
+				r.push(ri);
 			}
-			r.push(ri);
+			beta += orid;
 		}
 		
-		// Sub-grains in particle 2
-		beta += orid;
-		for(var i = 0; i < nums; i++) {
-			var diags = diag / 3;
-			D.push(diags);
-			var Rg = 0.5 * diags;
-			var Vg = (4 * Math.PI / 3) * Rg * Rg * Rg;
-			m.push(rhog * Vg);
-			color.push(["#000", "#8af"]);
-			r.push(new Vect3(0, 0.5, 0.5));
-			v.push(v[1]);
+		// Color all particles
+		for(var i = 0; i < r.length; i++) {
+			color.push(subgrainsColor[chg[i] + 1]);
 		}
 	}
 	
