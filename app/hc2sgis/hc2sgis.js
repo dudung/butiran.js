@@ -18,6 +18,8 @@
 	0608 Draw sub-grains in grain 0.
 	0744 Add grain charge.
 	0811 Finish draw subgrains in each grain.
+	0833 Con in plenary room.
+	0849 All grains and subgrains can move.
 */
 
 // Define global variables for walls
@@ -229,6 +231,27 @@ function simulate() {
 		var a = Vect3.div(F[i], m[i]);
 		v[i] = Vect3.add(v[i], Vect3.mul(tstep, a));
 		r[i] = Vect3.add(r[i], Vect3.mul(tstep, v[i]));
+	}
+	
+	// Move subgrains in grains 
+	var beta = 0;
+	for(j = 0; j < numg; j++) {
+		for(var i = 0; i < nums; i++) {
+			var ri = new Vect3(r[j]);
+			if(i > 0) {
+				var diags = diag / 3;
+				var fi = beta + Math.PI * (2 * i - 3) / 6;
+				var xx = 0;
+				var yy = diags * Math.cos(fi);
+				var zz = diags * Math.sin(fi);
+				var dr = new Vect3(xx, yy, zz);
+				ri = Vect3.add(ri, dr);
+			}
+			var ii = i + j * nums + numg;
+			v[ii] = v[j];
+			r[ii] = ri;
+		}
+		beta += orid;
 	}
 	
 	// Increase time
