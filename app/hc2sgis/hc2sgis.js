@@ -21,6 +21,7 @@
 	0833 Con in plenary room.
 	0849 All grains and subgrains can move.
 	0938 Finish for presentation.
+	1024 In 1612 add precition to output.
 */
 
 // Define global variables for walls
@@ -93,10 +94,10 @@ function simulate() {
 		
 		tout(taOut1,
 			tt + " " +
-			r[0].y.toFixed(digit + 1) + " " +
-			r[0].z.toFixed(digit + 1) + " " +
-			r[1].y.toFixed(digit + 1) + " " +
-			r[1].z.toFixed(digit + 1) + "\n"
+			r[0].y.toFixed(digit + 2) + " " +
+			r[0].z.toFixed(digit + 2) + " " +
+			r[1].y.toFixed(digit + 2) + " " +
+			r[1].z.toFixed(digit + 2) + "\n"
 		);
 		
 		document.title = "ipendepthf: " + t.toFixed(2)
