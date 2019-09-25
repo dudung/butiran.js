@@ -22,6 +22,7 @@
 	0849 All grains and subgrains can move.
 	0938 Finish for presentation.
 	1024 In 1612 add precition to output.
+	1256 Due to last late plenary, try to get binding.
 */
 
 // Define global variables for walls
@@ -644,11 +645,11 @@ function initParams() {
 	
 	
 	chg.push(0);
-	r.push(new Vect3(0, -0.5, 0.5));
+	r.push(new Vect3(0, -0.5, 0.3)); //0.3
 	v.push(new Vect3(0, velo, 0));
 	
 	chg.push(0);
-	r.push(new Vect3(0, 0.5, 0.5));
+	r.push(new Vect3(0, 0.5, 0.7)); //0.7
 	v.push(new Vect3(0, -velo, 0));
 	
 	// Define color
