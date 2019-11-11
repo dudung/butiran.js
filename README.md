@@ -66,3 +66,7 @@ Library of butiran.js can be downloaded from
     `refs` https://doi.org/10.17605/osf.io/8f479<br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/mdfcp/mdfcp.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/mdfcp/mdfcp.html
+16. **agglo.js** | Agglomeration of composite particles due to self-gravitation | 20191111<br>
+    `refs` https://doi.org/10.17605/osf.io/bph8f<br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/agglo/agglo.js<br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/agglo/agglo.html
