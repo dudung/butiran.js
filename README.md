@@ -50,15 +50,19 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/gpcspp/gpcspp.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/gpcspp/gpcspp.html
-12. **mdfhcp.js** | Molecular dynamics simulation of floating HCP structure | 20190709<br>
-    `refs` <br>
+12. **igdensity.js** | Intruder and granular density | 20190626<br>
+    `refs` https://doi.org/10.1063/1.5132668<br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/igdensity/igdensity.js<br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/igdensity/igdensity.html
+13. **mdfhcp.js** | Molecular dynamics simulation of floating HCP structure | 20190709<br>
+    `refs` https://doi.org/10.17605/osf.io/a3gjv<br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/mdfhcp/mdfhcp.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/mdfhcp/mdfhcp.html
-13. **abmdif.js** | Particles diffusion using agent-based model | 20190808<br>
-    `refs` <br>
+14. **abmdif.js** | Particles diffusion using agent-based model | 20190808<br>
+    `refs` https://doi.org/10.17605/osf.io/tg79j<br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/abmdif/abmdif.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/abmdif/abmdif.html
-14. **mdfcp.js** | Molecular dynamics simulation of floating composite particles | 20190925<br>
+15. **mdfcp.js** | Molecular dynamics simulation of floating composite particles | 20190925<br>
     `refs` https://doi.org/10.17605/osf.io/8f479<br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/mdfcp/mdfcp.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/mdfcp/mdfcp.html
