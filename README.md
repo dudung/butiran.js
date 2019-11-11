@@ -55,7 +55,7 @@ Library of butiran.js can be downloaded from
     `code` https://github.com/dudung/butiran.js/blob/master/app/igdensity/igdensity.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/igdensity/igdensity.html
 13. **mdfhcp.js** | Molecular dynamics simulation of floating HCP structure | 20190709<br>
-    `refs` <br>
+    `refs` https://doi.org/10.17605/osf.io/a3gjv<br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/mdfhcp/mdfhcp.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/mdfhcp/mdfhcp.html
 14. **abmdif.js** | Particles diffusion using agent-based model | 20190808<br>
