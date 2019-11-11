@@ -1,8 +1,6 @@
 /*
 	agglo.js
 	Agglomeration of composite particles due to self-gravitation
-	mdfcp.js
-	Molecular dynamics simulation of floating composite particles
 	
 	Sparisoma Viridi | dudung@gmail.com
 	
@@ -321,9 +319,9 @@ function buttonClick() {
 	break;
 	case "Info":
 		var info = "";
-		info += "mdfhcp.js\n";
-		info += "Molecular dynamics simulation of HCP structure\n";
-		info += "Sparisoma Viridi, Veinardi Suendo\n";
+		info += "agglo.js\n";
+		info += "Agglomeration of composite particles due to self-gravitation\n";
+		info += "Sparisoma Viridi\n";
 		info += "https://github.com/dudung/butiran.js\n";
 		info += "Load  load parameters\n";
 		info += "Read  read parameters\n";
