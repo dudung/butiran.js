@@ -5,8 +5,10 @@
 	Sparisoma Viridi | dudung@gmail.com
 	
 	20191111
-	0821 Copy from mdfcp.js and save it to butiran.js in app
-	folder.
+	0821 Copy from mdfcp.js and save it to butiran.js in app folder.
+	20191125
+	0830 Start to make composite particles systematically.
+	1937 Design composite particles function.
 	
 	References
 	1. Sparisoma Viridi et al., "Aggregation of two-dimension
@@ -69,7 +71,7 @@ function initParams() {
 	p += "RMAX +0.75 +0.25 +0.75\n";
 	p += "\n";
 	p += "# Simulation\n";
-	p += "SCEN 4\n";
+	p += "SCEN 0\n";
 	
 	params = p;
 	
@@ -490,7 +492,7 @@ function simulate() {
 }
 
 
-//Create composite particles and bed particles
+//Create composite particles
 function createCompositeParticles() {
 	var NXYZ = arguments[0];
 	var D = arguments[1];
@@ -499,38 +501,39 @@ function createCompositeParticles() {
 	var v = arguments[4];
 	var scenario = arguments[5];
 	
-	if(scenario < 4) {
-		// Get number of particles
-		var Nx = NXYZ.x;
-		var Ny = NXYZ.y * 0 + 1;
-		var Nz = NXYZ.z;
-		
-		// Create particles in grid
-		for(var ix = 0; ix < Nx; ix++) {
-			for(var iy = 0; iy < Ny; iy++) {
-				for(var iz = 0; iz < Nz; iz++) {
-					oi = new Grain();
-					oi.m = m;
-					oi.q = 0;
-					oi.D = D;
-					
-					var rndx = 0.01 * D * Math.random() * 1;
-					var rndy = 0.00 * D * Math.random() * 1;
-					var rndz = 0.01 * D * Math.random() * 1;
-					
-					var x = D * (ix - 0.5 * (Nx - 1)) * (1 + rndx);
-					var y = D * (iy - 0.5 * (Ny - 1)) * (1 + rndy);
-					var z = D * (iz - 0.5 * (Nz - 1)) * (1 + rndz);
-					oi.r = Vect3.add(r, new Vect3(x, y, z));
-					oi.v = v;
-					oi.c = ["#aaa", "#fafafa"];
-					o.push(oi);
-				}
+	// Get number of particles
+	var Nx = NXYZ.x;
+	var Ny = NXYZ.y * 0 + 1;
+	var Nz = NXYZ.z;
+	
+	// Create particles in grid
+	var id = 0;
+	for(var ix = 0; ix < Nx; ix++) {
+		for(var iy = 0; iy < Ny; iy++) {
+			for(var iz = 0; iz < Nz; iz++) {
+				oi = new Grain();
+				oi.m = m;
+				oi.q = 0;
+				oi.D = D;
+				oi.id = id;
+				id++;
+				
+				var rndx = 0.01 * D * Math.random() * 1;
+				var rndy = 0.00 * D * Math.random() * 1;
+				var rndz = 0.01 * D * Math.random() * 1;
+				
+				var x = D * (ix - 0.5 * (Nx - 1)) * (1 + rndx);
+				var y = D * (iy - 0.5 * (Ny - 1)) * (1 + rndy);
+				var z = D * (iz - 0.5 * (Nz - 1)) * (1 + rndz);
+				oi.r = Vect3.add(r, new Vect3(x, y, z));
+				oi.v = v;
+				oi.c = ["#aaa", "#fafafa"];
+				o.push(oi);
 			}
 		}
 	}
 	
-	// Creat composite particles
+	// Create composite particles
 	var D0 = D;
 	var D1 = D0 * Math.sqrt(2);
 	var D2 = 2 * D0;
@@ -539,7 +542,7 @@ function createCompositeParticles() {
 	neighID = [];
 	neighLN = [];
 	
-	if(scenario == 1) {
+	if(scenario == 0) {
 		partID = [
 			// S-Family
 			00, 01, 10, 11, 04, 05, 14, 15, 08, 09, 18, 19,
@@ -556,78 +559,6 @@ function createCompositeParticles() {
 			[D0, D1, D0], [D0, D1, D0], [D0, D1, D0], [D0, D1, D0],
 			[D0, D1, D0], [D0, D1, D0], [D0, D1, D0], [D0, D1, D0],
 		];
-		// S-family
-		o[00].c = ["#f44", "#fcc"];
-		o[01].c = ["#f44", "#fcc"];
-		o[10].c = ["#f44", "#fcc"];
-		o[11].c = ["#f44", "#fcc"];
-		o[04].c = ["#f44", "#fcc"];
-		o[05].c = ["#f44", "#fcc"];
-		o[14].c = ["#f44", "#fcc"];
-		o[15].c = ["#f44", "#fcc"];
-		o[08].c = ["#f44", "#fcc"];
-		o[09].c = ["#f44", "#fcc"];
-		o[18].c = ["#f44", "#fcc"];
-		o[19].c = ["#f44", "#fcc"];		
-	} else if(scenario == 2) {
-		partID = [
-			// H-Family
-			80, 81, 90, 91, 84, 85, 94, 95, 88, 89, 98, 99,
-		];
-		neighID = [
-			// H-Family
-			[90, 81], [80, 91], [80, 91], [90, 81],
-			[94, 85], [84, 95], [84, 95], [94, 85],
-			[98, 89], [88, 99], [88, 99], [98, 89],
-		];
-		neighLN = [
-			// H-family
-			[D0, D0], [D0, D0], [D0, D0], [D0, D0],
-			[D0, D0], [D0, D0], [D0, D0], [D0, D0],
-			[D0, D0], [D0, D0], [D0, D0], [D0, D0],
-		];
-		
-		// H-family
-		o[80].c = ["#44f", "#ccf"];
-		o[81].c = ["#44f", "#ccf"];
-		o[90].c = ["#44f", "#ccf"];
-		o[91].c = ["#44f", "#ccf"];
-		o[84].c = ["#44f", "#ccf"];
-		o[85].c = ["#44f", "#ccf"];
-		o[94].c = ["#44f", "#ccf"];
-		o[95].c = ["#44f", "#ccf"];
-		o[88].c = ["#44f", "#ccf"];
-		o[89].c = ["#44f", "#ccf"];
-		o[98].c = ["#44f", "#ccf"];
-		o[99].c = ["#44f", "#ccf"];
-	} else if(scenario == 3) {
-		partID = [
-			// S-Family
-			00, 01, 10, 11, 04, 05, 14, 15, 08, 09, 18, 19,
-			// H-Family
-			80, 81, 90, 91, 84, 85, 94, 95, 88, 89, 98, 99,
-		];
-		neighID = [
-			// S-family
-			[10, 11, 01], [00, 10, 11], [00, 01, 11], [10, 00, 01],
-			[14, 15, 05], [04, 14, 15], [04, 05, 15], [14, 04, 05],
-			[18, 19, 09], [08, 18, 19], [08, 09, 19], [18, 08, 09],
-			// H-Family
-			[90, 81], [80, 91], [80, 91], [90, 81],
-			[94, 85], [84, 95], [84, 95], [94, 85],
-			[98, 89], [88, 99], [88, 99], [98, 89],
-		];
-		neighLN = [
-			// S-family
-			[D0, D1, D0], [D0, D1, D0], [D0, D1, D0], [D0, D1, D0],
-			[D0, D1, D0], [D0, D1, D0], [D0, D1, D0], [D0, D1, D0],
-			[D0, D1, D0], [D0, D1, D0], [D0, D1, D0], [D0, D1, D0],
-			// H-family
-			[D0, D0], [D0, D0], [D0, D0], [D0, D0],
-			[D0, D0], [D0, D0], [D0, D0], [D0, D0],
-			[D0, D0], [D0, D0], [D0, D0], [D0, D0],
-		];
-		
 		// S-family
 		o[00].c = ["#f44", "#fcc"];
 		o[01].c = ["#f44", "#fcc"];
@@ -641,88 +572,6 @@ function createCompositeParticles() {
 		o[09].c = ["#f44", "#fcc"];
 		o[18].c = ["#f44", "#fcc"];
 		o[19].c = ["#f44", "#fcc"];
-		
-		// H-family
-		o[80].c = ["#44f", "#ccf"];
-		o[81].c = ["#44f", "#ccf"];
-		o[90].c = ["#44f", "#ccf"];
-		o[91].c = ["#44f", "#ccf"];
-		o[84].c = ["#44f", "#ccf"];
-		o[85].c = ["#44f", "#ccf"];
-		o[94].c = ["#44f", "#ccf"];
-		o[95].c = ["#44f", "#ccf"];
-		o[88].c = ["#44f", "#ccf"];
-		o[89].c = ["#44f", "#ccf"];
-		o[98].c = ["#44f", "#ccf"];
-		o[99].c = ["#44f", "#ccf"];
-	}
-	
-	if(scenario == 2 || scenario == 3) {
-		o[81].r.x += 0.5 * D0;
-		o[91].r.x += 0.5 * D0;
-		o[81].r.z += -0.1 * D0;
-		o[91].r.z += -0.1 * D0;
-		
-		o[85].r.x += 0.5 * D0;
-		o[95].r.x += 0.5 * D0;
-		o[85].r.z += -0.1 * D0;
-		o[95].r.z += -0.1 * D0;
-		
-		o[89].r.x += 0.5 * D0;
-		o[99].r.x += 0.5 * D0;
-		o[89].r.z += -0.1 * D0;
-		o[99].r.z += -0.1 * D0;	
-	}
-	
-	/*
-	c = ["#aaa", "#fafafa"];
-	c = ["#f44", "#fcc"];
-	c = ["#44f", "#ccf"];
-	c = ["#4f4", "#cfc"];
-	*/
-	
-	if(scenario == 4) {
-		
-		// Left composite particle -- lock
-		createParticle(-4 * D, 0, -1 * D);
-		createParticle(-5 * D, 0, -1 * D);
-		createParticle(-5 * D, 0,  0 * D);
-		createParticle(-5 * D, 0,  1 * D);
-		createParticle(-4 * D, 0,  1 * D);
-		
-		// Right composite particle -- key
-		createParticle( 5 * D, 0, -1 * D + D);
-		createParticle( 5 * D, 0,  0 * D + D);
-		createParticle( 4 * D, 0,  0 * D + D);
-		createParticle( 5 * D, 0,  1 * D + D);
-		
-		// Design binding network
-		partID = [
-			// S-Family
-			00, 01, 02, 03, 04,
-			05, 06, 07, 08,
-		];
-		neighID = [
-			// S-family
-			[01, 02, 04], [00, 02], [00, 01, 03, 04], [02, 04], [02, 03, 00],
-			[06, 07], [05, 07, 08], [05, 06, 08], [06, 07],
-		];
-		neighLN = [
-			// S-family
-			[D0, D1, D2], [D0, D0], [D1, D0, D0, D1], [D0, D0], [D1, D0, D2],
-			[D0, D1], [D0, D0, D0], [D1, D0, D1], [D0, D1],
-		];
-	}
-	
-	
-	function createParticle(dx, dy, dz) {
-		var oi = new Grain();
-		oi.m = m; oi.q = 0; oi.D = D; oi.v = v;
-		oi.r = Vect3.add(r, new Vect3(dx, dy, dz));
-		oi.c = ["#f44", "#fcc"];
-		oi.id = o.length;
-		
-		o.push(oi);
 	}
 }
 
@@ -809,10 +658,13 @@ function draw() {
 					cx.arc(X, Y, D, 0, 2 * Math.PI);
 					cx.fill();
 				}
+				
+				// Draw outline of particles
 				cx.lineWidth = "2";
 				cx.arc(X, Y, D, 0, 2 * Math.PI);
 				cx.stroke();
 				
+				// Draw particle id
 				cx.font = "14px Times";
 				cx.fillStyle = "black";
 				cx.textAlign = "center";
