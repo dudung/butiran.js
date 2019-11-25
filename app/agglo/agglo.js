@@ -665,11 +665,12 @@ function draw() {
 				cx.stroke();
 				
 				// Draw particle id
-				cx.font = "14px Times";
+				cx.font = "12px Times";
 				cx.fillStyle = "black";
 				cx.textAlign = "center";
 				cx.textBaseline = "middle";
-				cx.fillText(o.id, X, Y);
+				var oid = ("0" + o.id).slice(-2);
+				cx.fillText(oid, X, Y);
 				
 			} else if(o instanceof Path) {
 				var qi = o.qi * 2 * Math.PI;
