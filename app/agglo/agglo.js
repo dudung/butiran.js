@@ -14,6 +14,7 @@
 	0841 Fin 2x1 conf, end beg 3x1 conf.
 	0850 Fix 2x1 sub array.
 	0931 Fin 3x1 conf.
+	0941 Fin 4x1 conf.
 	
 	References
 	1. Sparisoma Viridi et al., "Aggregation of two-dimension
@@ -76,7 +77,7 @@ function initParams() {
 	p += "RMAX +0.75 +0.25 +0.75\n";
 	p += "\n";
 	p += "# Simulation\n";
-	p += "SCEN 2\n";
+	p += "SCEN 3\n";
 	
 	params = p;
 	
@@ -690,37 +691,135 @@ function createCompositeParticles() {
 		var c = Math.floor(Math.random() * colors.length);		
 		o[69].c = colors[c];
 		o[79].c = colors[c];
-		o[89].c = colors[c];
+		o[89].c = colors[c];		
+	}
+	
+	if(scenario == 3) {
+		partID = [];
+		neighID = [];
+		neighLN = [];
 		
-		/*
-		for(var i = 0; i < Ni; i++) {
-			var i1 = 3 * i;
-			
-			partID.push(i1);
-			partID.push(i2);
-			partID.push(i3);
-			
-			neighID.push(i2);
-			neighID.push(i1);
-			
-			neighLN.push(D0);
-			neighLN.push(D0);
-			
-			var c1 = (Math.floor(Math.random() * 16)) * 8 + 135;
-			var c2 = (Math.floor(Math.random() * 16)) * 8 + 135;
-			var c3 = (Math.floor(Math.random() * 16)) * 8 + 135;
-			
-			c1 = ("0" + c1.toString(16)).slice(-2);
-			c2 = ("0" + c2.toString(16)).slice(-2);
-			c3 = ("0" + c3.toString(16)).slice(-2);
-			
-			var fill = c1 = "#" + c1 + c2 + c3;
-			var line = "#000";
-			var colors = [line, fill];
-			o[i1].c = colors;
-			o[i2].c = colors;
+		var x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+		var y = [0, 1];
+		
+		for(var ix in x) {
+			for(var iy in y) {
+				var i1 = ix * Nz + iy * 4;
+				var i2 = i1 + 1;
+				var i3 = i1 + 2;
+				var i4 = i1 + 3;
+				
+				partID.push(i1);
+				neighID.push([i2, i3, i4]);
+				neighLN.push([D1, 2*D1, 3*D1]);
+
+				partID.push(i2);
+				neighID.push([i1, i3, i4]);
+				neighLN.push([D1, D1, 2 *D1]);
+
+				partID.push(i3);
+				neighID.push([i1, i2, i4]);
+				neighLN.push([2*D1, D1, D1]);
+
+				partID.push(i4);
+				neighID.push([i1, i2, i3]);
+				neighLN.push([3*D1, 2*D1, D1]);
+
+				var c = Math.floor(Math.random() * colors.length);		
+				o[i1].c = colors[c];
+				o[i2].c = colors[c];
+				o[i3].c = colors[c];
+				o[i4].c = colors[c];
+			}
 		}
-		*/
+		
+		partID.push(09);
+		neighID.push([19, 29, 39]);
+		neighLN.push([D1, 2*D1, 3*D1]);
+
+		partID.push(19);
+		neighID.push([09, 29, 39]);
+		neighLN.push([D1, D1, 2*D1]);
+
+		partID.push(29);
+		neighID.push([09, 19, 39]);
+		neighLN.push([2*D1, D1, D1]);
+		
+		partID.push(39);
+		neighID.push([09, 19, 29]);
+		neighLN.push([3*D1, 2*D1, D1]);
+		
+		var c = Math.floor(Math.random() * colors.length);		
+		o[09].c = colors[c];
+		o[19].c = colors[c];
+		o[29].c = colors[c];
+		o[39].c = colors[c];		
+		
+		partID.push(49);
+		neighID.push([59, 69, 79]);
+		neighLN.push([D1, 2*D1, 3*D1]);
+
+		partID.push(59);
+		neighID.push([49, 69, 79]);
+		neighLN.push([D1, D1, 2*D1]);
+
+		partID.push(69);
+		neighID.push([49, 59, 79]);
+		neighLN.push([2*D1, D1, D1]);
+		
+		partID.push(79);
+		neighID.push([49, 59, 69]);
+		neighLN.push([3*D1, 2*D1, D1]);
+		
+		var c = Math.floor(Math.random() * colors.length);		
+		o[49].c = colors[c];
+		o[59].c = colors[c];
+		o[69].c = colors[c];
+		o[79].c = colors[c];		
+		
+		partID.push(08);
+		neighID.push([18, 28, 38]);
+		neighLN.push([D1, 2*D1, 3*D1]);
+
+		partID.push(18);
+		neighID.push([08, 28, 38]);
+		neighLN.push([D1, D1, 2*D1]);
+
+		partID.push(28);
+		neighID.push([08, 18, 38]);
+		neighLN.push([2*D1, D1, D1]);
+		
+		partID.push(38);
+		neighID.push([08, 18, 28]);
+		neighLN.push([3*D1, 2*D1, D1]);
+		
+		var c = Math.floor(Math.random() * colors.length);		
+		o[08].c = colors[c];
+		o[18].c = colors[c];
+		o[28].c = colors[c];
+		o[38].c = colors[c];		
+		
+		partID.push(48);
+		neighID.push([58, 68, 78]);
+		neighLN.push([D1, 2*D1, 3*D1]);
+
+		partID.push(58);
+		neighID.push([48, 68, 78]);
+		neighLN.push([D1, D1, 2*D1]);
+
+		partID.push(68);
+		neighID.push([48, 58, 78]);
+		neighLN.push([2*D1, D1, D1]);
+		
+		partID.push(78);
+		neighID.push([48, 58, 68]);
+		neighLN.push([3*D1, 2*D1, D1]);
+		
+		var c = Math.floor(Math.random() * colors.length);		
+		o[48].c = colors[c];
+		o[58].c = colors[c];
+		o[68].c = colors[c];
+		o[78].c = colors[c];		
 	}
 	
 	/*
