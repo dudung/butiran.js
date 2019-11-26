@@ -16,6 +16,9 @@
 	0931 Fin 3x1 conf.
 	0941 Fin 4x1 conf.
 	1142 Fix 4x1 with final 2x2 --> 4x1.
+	1246 Fin L conf 2-1.
+	1252 Fin 2x2 conf.
+	1314 Fin T conf 1-2-1.
 	
 	References
 	1. Sparisoma Viridi et al., "Aggregation of two-dimension
@@ -78,7 +81,7 @@ function initParams() {
 	p += "RMAX +0.75 +0.25 +0.75\n";
 	p += "\n";
 	p += "# Simulation\n";
-	p += "SCEN 4\n";
+	p += "SCEN 7\n";
 	
 	params = p;
 	
@@ -871,8 +874,415 @@ function createCompositeParticles() {
 			}
 		}
 		
+		for(var ix in x) {
+			for(var iy in y) {
+				var i1 = ix * 2 * Nz + iy * 3 + Nz + 2;
+				var i2 = i1 - Nz;
+				var i3 = i1 - 1;
+				
+				partID.push(i1);
+				neighID.push([i2, i3]);
+				neighLN.push([D1, D1]);
+
+				partID.push(i2);
+				neighID.push([i1, i3]);
+				neighLN.push([D1, D2]);
+
+				partID.push(i3);
+				neighID.push([i1, i2]);
+				neighLN.push([D1, D2]);
+
+				var c = Math.floor(Math.random() * colors.length);		
+				o[i1].c = colors[c];
+				o[i2].c = colors[c];
+				o[i3].c = colors[c];
+			}
+		}
+
+		partID.push(19);
+		neighID.push([09, 29]);
+		neighLN.push([D1, D1]);
+		
+		o[09].r.x += D1;
+		o[09].r.z += D1;
+		partID.push(09);
+		neighID.push([19, 29]);
+		neighLN.push([D1, D2]);
+
+		partID.push(29);
+		neighID.push([19, 09]);
+		neighLN.push([D1, D2]);
+
+		var c = Math.floor(Math.random() * colors.length);		
+		o[19].c = colors[c];
+		o[09].c = colors[c];
+		o[29].c = colors[c];
+
+		partID.push(49);
+		neighID.push([39, 59]);
+		neighLN.push([D1, D1]);
+		
+		o[39].r.x += D1;
+		o[39].r.z += D1;
+		partID.push(39);
+		neighID.push([49, 59]);
+		neighLN.push([D1, D2]);
+
+		partID.push(59);
+		neighID.push([49, 39]);
+		neighLN.push([D1, D2]);
+
+		var c = Math.floor(Math.random() * colors.length);		
+		o[49].c = colors[c];
+		o[39].c = colors[c];
+		o[59].c = colors[c];
+		
+		partID.push(79);
+		neighID.push([69, 89]);
+		neighLN.push([D1, D1]);
+		
+		o[69].r.x += D1;
+		o[69].r.z += D1;
+		partID.push(69);
+		neighID.push([79, 89]);
+		neighLN.push([D1, D2]);
+
+		partID.push(89);
+		neighID.push([79, 69]);
+		neighLN.push([D1, D2]);
+
+		var c = Math.floor(Math.random() * colors.length);		
+		o[79].c = colors[c];
+		o[69].c = colors[c];
+		o[89].c = colors[c];
 	}
 	
+	if(scenario == 5) {
+		partID = [];
+		neighID = [];
+		neighLN = [];
+		
+		var x = [0, 1, 2, 3, 4];
+		var y = [0, 1, 2, 3, 4];
+		
+		for(var ix in x) {
+			for(var iy in y) {
+				var i1 = ix * 2 * Nz + iy * 2;
+				var i2 = i1 + 1;
+				var i3 = i1 + Nz;
+				var i4 = i1 + Nz + 1;
+				
+				partID.push(i1);
+				neighID.push([i2, i3, i4]);
+				neighLN.push([D1, D1, D2]);
+
+				partID.push(i2);
+				neighID.push([i1, i3, i4]);
+				neighLN.push([D1, D2, D1]);
+
+				partID.push(i3);
+				neighID.push([i1, i2, i4]);
+				neighLN.push([D1, D2, D1]);
+
+				partID.push(i4);
+				neighID.push([i1, i2, i3]);
+				neighLN.push([D2, D1, D1]);
+
+				var c = Math.floor(Math.random() * colors.length);		
+				o[i1].c = colors[c];
+				o[i2].c = colors[c];
+				o[i3].c = colors[c];
+				o[i4].c = colors[c];
+			}
+		}		
+	}
+	
+	if(scenario == 6) {
+		partID = [];
+		neighID = [];
+		neighLN = [];
+		
+		var x = [0, 1, 2, 3, 4];
+		var y = [0, 1];
+		
+		for(var ix in x) {
+			for(var iy in y) {
+				var i1 = ix * 2 * Nz + iy * 4 + 1;
+				var i2 = i1 - 1;
+				var i3 = i1 + Nz;
+				var i4 = i1 + 1;
+				
+				partID.push(i1);
+				neighID.push([i2, i3, i4]);
+				neighLN.push([D1, D1, D1]);
+
+				partID.push(i2);
+				neighID.push([i1, i3, i4]);
+				neighLN.push([D1, D2, 2*D1]);
+
+				partID.push(i3);
+				neighID.push([i1, i2, i4]);
+				neighLN.push([D1, D2, D2]);
+
+				partID.push(i4);
+				neighID.push([i1, i2, i3]);
+				neighLN.push([D1, 2*D1, D2]);
+
+				var c = Math.floor(Math.random() * colors.length);		
+				o[i1].c = colors[c];
+				o[i2].c = colors[c];
+				o[i3].c = colors[c];
+				o[i4].c = colors[c];
+			}
+		}		
+
+		for(var ix in x) {
+			for(var iy in y) {
+				var i1 = ix * 2 * Nz + iy * 4 + 3 + Nz;
+				var i2 = i1 - 1;
+				var i3 = i1 - Nz;
+				var i4 = i1 + 1;
+				
+				partID.push(i1);
+				neighID.push([i2, i3, i4]);
+				neighLN.push([D1, D1, D1]);
+
+				partID.push(i2);
+				neighID.push([i1, i3, i4]);
+				neighLN.push([D1, D2, 2*D1]);
+
+				partID.push(i3);
+				neighID.push([i1, i2, i4]);
+				neighLN.push([D1, D2, D2]);
+
+				partID.push(i4);
+				neighID.push([i1, i2, i3]);
+				neighLN.push([D1, 2*D1, D2]);
+
+				var c = Math.floor(Math.random() * colors.length);		
+				o[i1].c = colors[c];
+				o[i2].c = colors[c];
+				o[i3].c = colors[c];
+				o[i4].c = colors[c];
+			}
+		}		
+		
+		var iy = 2;
+		for(var ix in x) {
+			var i1 = ix * 2 * Nz + iy * 4 + 1;
+			var i2 = i1 - 1;
+			var i3 = i1 + Nz;
+			var i4 = i1 + 1;
+			
+			o[i4].r.x -= D1;
+			o[i4].r.z += 10*D1;
+			
+			partID.push(i1);
+			neighID.push([i2, i3, i4]);
+			neighLN.push([D1, D1, D1]);
+
+			partID.push(i2);
+			neighID.push([i1, i3, i4]);
+			neighLN.push([D1, D2, 2*D1]);
+
+			partID.push(i3);
+			neighID.push([i1, i2, i4]);
+			neighLN.push([D1, D2, D2]);
+
+			partID.push(i4);
+			neighID.push([i1, i2, i3]);
+			neighLN.push([D1, 2*D1, D2]);
+
+			var c = Math.floor(Math.random() * colors.length);		
+			o[i1].c = colors[c];
+			o[i2].c = colors[c];
+			o[i3].c = colors[c];
+			o[i4].c = colors[c];
+		}		
+	}
+
+	if(scenario == 7) {
+		partID = [];
+		neighID = [];
+		neighLN = [];
+		
+		var x = [0, 1, 2, 3, 4];
+		var y = [0, 1];
+		
+		for(var ix in x) {
+			for(var iy in y) {
+				var i1 = ix * 2 * Nz + iy * 4;
+				var i2 = i1 + Nz;
+				var i3 = i1 + 1;
+				var i4 = i1 + 2;
+				
+				partID.push(i1);
+				neighID.push([i2, i3, i4]);
+				neighLN.push([D1, D1, 2*D1]);
+
+				partID.push(i2);
+				neighID.push([i1, i3, i4]);
+				neighLN.push([D1, D2, D5]);
+
+				partID.push(i3);
+				neighID.push([i1, i2, i4]);
+				neighLN.push([D1, D2, D1]);
+
+				partID.push(i4);
+				neighID.push([i1, i2, i3]);
+				neighLN.push([2*D1, D5, D1]);
+
+				var c = Math.floor(Math.random() * colors.length);		
+				o[i1].c = colors[c];
+				o[i2].c = colors[c];
+				o[i3].c = colors[c];
+				o[i4].c = colors[c];
+			}
+		}		
+
+		for(var ix in x) {
+			for(var iy in y) {
+				var i1 = ix * 2 * Nz + iy * 4 + 3 + Nz;
+				var i2 = i1 - Nz;
+				var i3 = i1 - 1;
+				var i4 = i1 - 2;
+				
+				partID.push(i1);
+				neighID.push([i2, i3, i4]);
+				neighLN.push([D1, D1, 2*D1]);
+
+				partID.push(i2);
+				neighID.push([i1, i3, i4]);
+				neighLN.push([D1, D2, D5]);
+
+				partID.push(i3);
+				neighID.push([i1, i2, i4]);
+				neighLN.push([D1, D2, D1]);
+
+				partID.push(i4);
+				neighID.push([i1, i2, i3]);
+				neighLN.push([2*D1, D5, D1]);
+
+				var c = Math.floor(Math.random() * colors.length);		
+				o[i1].c = colors[c];
+				o[i2].c = colors[c];
+				o[i3].c = colors[c];
+				o[i4].c = colors[c];
+			}
+		}		
+
+		partID.push(09);
+		neighID.push([08, 19, 29]);
+		neighLN.push([D1, D1, 2*D1]);
+
+		partID.push(08);
+		neighID.push([09, 19, 29]);
+		neighLN.push([D1, D2, D5]);
+
+		partID.push(19);
+		neighID.push([08, 09, 29]);
+		neighLN.push([D2, D1, D1]);
+
+		partID.push(29);
+		neighID.push([08, 09, 19]);
+		neighLN.push([D5, 2*D1, D1]);
+
+		var c = Math.floor(Math.random() * colors.length);		
+		o[09].c = colors[c];
+		o[08].c = colors[c];
+		o[19].c = colors[c];
+		o[29].c = colors[c];
+
+		partID.push(49);
+		neighID.push([48, 59, 69]);
+		neighLN.push([D1, D1, 2*D1]);
+
+		partID.push(48);
+		neighID.push([49, 59, 69]);
+		neighLN.push([D1, D2, D5]);
+
+		partID.push(59);
+		neighID.push([48, 49, 69]);
+		neighLN.push([D2, D1, D1]);
+
+		partID.push(69);
+		neighID.push([48, 49, 59]);
+		neighLN.push([D5, 2*D1, D1]);
+
+		var c = Math.floor(Math.random() * colors.length);		
+		o[49].c = colors[c];
+		o[48].c = colors[c];
+		o[59].c = colors[c];
+		o[69].c = colors[c];
+
+		partID.push(38);
+		neighID.push([39, 28, 18]);
+		neighLN.push([D1, D1, 2*D1]);
+
+		partID.push(39);
+		neighID.push([38, 28, 18]);
+		neighLN.push([D1, D2, D5]);
+
+		partID.push(28);
+		neighID.push([38, 39, 18]);
+		neighLN.push([D1, D2, D1]);
+
+		partID.push(18);
+		neighID.push([38, 39, 28]);
+		neighLN.push([2*D1, D5, D1]);
+
+		var c = Math.floor(Math.random() * colors.length);		
+		o[38].c = colors[c];
+		o[39].c = colors[c];
+		o[28].c = colors[c];
+		o[18].c = colors[c];
+
+		partID.push(78);
+		neighID.push([79, 68, 58]);
+		neighLN.push([D1, D1, 2*D1]);
+
+		partID.push(79);
+		neighID.push([78, 68, 58]);
+		neighLN.push([D1, D2, D5]);
+
+		partID.push(68);
+		neighID.push([78, 79, 58]);
+		neighLN.push([D1, D2, D1]);
+
+		partID.push(58);
+		neighID.push([78, 79, 68]);
+		neighLN.push([2*D1, D5, D1]);
+
+		var c = Math.floor(Math.random() * colors.length);		
+		o[78].c = colors[c];
+		o[79].c = colors[c];
+		o[68].c = colors[c];
+		o[58].c = colors[c];
+
+		partID.push(88);
+		neighID.push([98, 89, 99]);
+		neighLN.push([D1, D1, 2*D1]);
+
+		partID.push(79);
+		neighID.push([78, 68, 58]);
+		neighLN.push([D1, D2, D5]);
+
+		partID.push(68);
+		neighID.push([78, 79, 58]);
+		neighLN.push([D1, D2, D1]);
+
+		partID.push(58);
+		neighID.push([78, 79, 68]);
+		neighLN.push([2*D1, D5, D1]);
+
+		var c = Math.floor(Math.random() * colors.length);		
+		o[78].c = colors[c];
+		o[79].c = colors[c];
+		o[68].c = colors[c];
+		o[58].c = colors[c];
+
+	}
+
 }
 
 
