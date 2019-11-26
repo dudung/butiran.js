@@ -9,6 +9,11 @@
 	20191125
 	0830 Start to make composite particles systematically.
 	1937 Design composite particles function.
+	20191126
+	0626 Beg conf part constr.
+	0841 Fin 2x1 conf, end beg 3x1 conf.
+	0850 Fix 2x1 sub array.
+	0931 Fin 3x1 conf.
 	
 	References
 	1. Sparisoma Viridi et al., "Aggregation of two-dimension
@@ -48,9 +53,9 @@ function initParams() {
 	p += "# Interaction\n";
 	p += "KNXX 1000\n";
 	p += "GNXX 0.1\n";
-	p += "KAXX 0.01\n";
-	p += "KSXX 1000\n";
-	p += "GSXX 10\n";
+	p += "KAXX 1E-2\n";
+	p += "KSXX 8000\n";
+	p += "GSXX 0.2\n";
 	p += "\n";
 	p += "# Particle\n";
 	p += "RHOG 500.0\n";
@@ -71,7 +76,7 @@ function initParams() {
 	p += "RMAX +0.75 +0.25 +0.75\n";
 	p += "\n";
 	p += "# Simulation\n";
-	p += "SCEN 0\n";
+	p += "SCEN 2\n";
 	
 	params = p;
 	
@@ -433,7 +438,6 @@ function simulate() {
 		
 		if(partID.length > 0) {
 			// Calculate spring force
-			spring.setConstants(1000, 10);
 			var Fs = new Vect3();
 			for(var id = 0; id < partID.length; id++) {
 				if(partID[id] == i) {
@@ -474,7 +478,8 @@ function simulate() {
 		draw(o[i], "xz").onCanvas(caOut2);
 	}
 	
-	// Draw distribution of nearest distance between two particles
+	// Draw distribution of nearest distance between two
+	// particles
 	drawDist(ND, caOut3);
 	
 	if(t >= tend) {
@@ -532,16 +537,193 @@ function createCompositeParticles() {
 			}
 		}
 	}
-	
+
+	// Define color table
+	colors = [
+		["#000", "#fff"],
+		["#000", "#faa"],
+		["#000", "#aaf"],
+		["#000", "#afa"],
+		["#000", "#ffa"],
+		["#000", "#aff"],
+		["#000", "#faf"],
+		["#000", "#aaa"],
+		["#000", "#fcc"],
+		["#000", "#ccf"],
+		["#000", "#cfc"],
+		["#000", "#ffc"],
+		["#000", "#cff"],
+		["#000", "#fcf"],
+		["#000", "#ccc"],
+	];
+			
 	// Create composite particles
-	var D0 = D;
-	var D1 = D0 * Math.sqrt(2);
-	var D2 = 2 * D0;
+	var D1 = D;
+	var D2 = D * Math.sqrt(2);
 	
 	partID = [];
 	neighID = [];
 	neighLN = [];
+		
+	if(scenario == 0) {
+		partID = [];
+		neighID = [];
+		neighLN = [];
+	}
 	
+	if(scenario == 1) {
+		partID = [];
+		neighID = [];
+		neighLN = [];
+		
+		var Ni = id / 2;
+		for(var i = 0; i < Ni; i++) {
+			var i1 = 2 * i;
+			var i2 = i1 + 1;
+			
+			partID.push(i1);
+			neighID.push([i2]);
+			neighLN.push([D1]);
+
+			partID.push(i2);
+			neighID.push([i1]);
+			neighLN.push([D1]);
+			
+			/*
+			var c1 = (Math.floor(Math.random() * 16)) * 8 + 135;
+			var c2 = (Math.floor(Math.random() * 16)) * 8 + 135;
+			var c3 = (Math.floor(Math.random() * 16)) * 8 + 135;
+			
+			c1 = ("0" + c1.toString(16)).slice(-2);
+			c2 = ("0" + c2.toString(16)).slice(-2);
+			c3 = ("0" + c3.toString(16)).slice(-2);
+			
+			var fill = c1 = "#" + c1 + c2 + c3;
+			var line = "#000";
+			var colors = [line, fill];
+			*/
+			var c = Math.floor(Math.random() * colors.length);
+			o[i1].c = colors[c];
+			o[i2].c = colors[c];
+		}
+	}
+
+	if(scenario == 2) {
+		partID = [];
+		neighID = [];
+		neighLN = [];
+		
+		var x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+		var y = [0, 1, 2];
+		
+		for(var ix in x) {
+			for(var iy in y) {
+				var i1 = ix * Nz + iy * 3;
+				var i2 = i1 + 1;
+				var i3 = i1 + 2;
+				
+				partID.push(i1);
+				neighID.push([i2, i3]);
+				neighLN.push([D1, 2*D1]);
+
+				partID.push(i2);
+				neighID.push([i1, i3]);
+				neighLN.push([D1, D1]);
+
+				partID.push(i3);
+				neighID.push([i1, i2]);
+				neighLN.push([2*D1, D1]);
+
+				var c = Math.floor(Math.random() * colors.length);		
+				o[i1].c = colors[c];
+				o[i2].c = colors[c];
+				o[i3].c = colors[c];
+			}
+		}
+		
+		partID.push(09);
+		neighID.push([19, 29]);
+		neighLN.push([D1, 2*D1]);
+
+		partID.push(19);
+		neighID.push([09, 29]);
+		neighLN.push([D1, D1]);
+
+		partID.push(29);
+		neighID.push([09, 19]);
+		neighLN.push([2*D1, D1]);
+		
+		var c = Math.floor(Math.random() * colors.length);		
+		o[09].c = colors[c];
+		o[19].c = colors[c];
+		o[29].c = colors[c];
+		
+		partID.push(39);
+		neighID.push([49, 59]);
+		neighLN.push([D1, 2*D1]);
+
+		partID.push(49);
+		neighID.push([39, 59]);
+		neighLN.push([D1, D1]);
+
+		partID.push(59);
+		neighID.push([39, 49]);
+		neighLN.push([2*D1, D1]);
+
+		var c = Math.floor(Math.random() * colors.length);		
+		o[39].c = colors[c];
+		o[49].c = colors[c];
+		o[59].c = colors[c];
+		
+		partID.push(69);
+		neighID.push([79, 89]);
+		neighLN.push([D1, 2*D1]);
+
+		partID.push(79);
+		neighID.push([69, 89]);
+		neighLN.push([D1, D1]);
+
+		partID.push(89);
+		neighID.push([69, 79]);
+		neighLN.push([2*D1, D1]);
+		
+		var c = Math.floor(Math.random() * colors.length);		
+		o[69].c = colors[c];
+		o[79].c = colors[c];
+		o[89].c = colors[c];
+		
+		/*
+		for(var i = 0; i < Ni; i++) {
+			var i1 = 3 * i;
+			
+			partID.push(i1);
+			partID.push(i2);
+			partID.push(i3);
+			
+			neighID.push(i2);
+			neighID.push(i1);
+			
+			neighLN.push(D0);
+			neighLN.push(D0);
+			
+			var c1 = (Math.floor(Math.random() * 16)) * 8 + 135;
+			var c2 = (Math.floor(Math.random() * 16)) * 8 + 135;
+			var c3 = (Math.floor(Math.random() * 16)) * 8 + 135;
+			
+			c1 = ("0" + c1.toString(16)).slice(-2);
+			c2 = ("0" + c2.toString(16)).slice(-2);
+			c3 = ("0" + c3.toString(16)).slice(-2);
+			
+			var fill = c1 = "#" + c1 + c2 + c3;
+			var line = "#000";
+			var colors = [line, fill];
+			o[i1].c = colors;
+			o[i2].c = colors;
+		}
+		*/
+	}
+	
+	/*
 	if(scenario == 0) {
 		partID = [
 			// S-Family
@@ -573,6 +755,12 @@ function createCompositeParticles() {
 		o[18].c = ["#f44", "#fcc"];
 		o[19].c = ["#f44", "#fcc"];
 	}
+	*/
+}
+
+
+function s00() {
+	
 }
 
 
@@ -660,7 +848,7 @@ function draw() {
 				}
 				
 				// Draw outline of particles
-				cx.lineWidth = "2";
+				cx.lineWidth = "1";
 				cx.arc(X, Y, D, 0, 2 * Math.PI);
 				cx.stroke();
 				
