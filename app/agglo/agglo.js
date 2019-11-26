@@ -19,6 +19,7 @@
 	1246 Fin L conf 2-1.
 	1252 Fin 2x2 conf.
 	1314 Fin T conf 1-2-1.
+	1341 Fin L conf 2-1-1.
 	
 	References
 	1. Sparisoma Viridi et al., "Aggregation of two-dimension
@@ -81,7 +82,7 @@ function initParams() {
 	p += "RMAX +0.75 +0.25 +0.75\n";
 	p += "\n";
 	p += "# Simulation\n";
-	p += "SCEN 7\n";
+	p += "SCEN 8\n";
 	
 	params = p;
 	
@@ -564,6 +565,7 @@ function createCompositeParticles() {
 	// Create composite particles
 	var D1 = D;
 	var D2 = D * Math.sqrt(2);
+	var D3 = D * Math.sqrt(3);
 	var D5 = D * Math.sqrt(5);
 	
 	partID = [];
@@ -1263,23 +1265,110 @@ function createCompositeParticles() {
 		neighID.push([98, 89, 99]);
 		neighLN.push([D1, D1, 2*D1]);
 
-		partID.push(79);
-		neighID.push([78, 68, 58]);
+		partID.push(98);
+		neighID.push([88, 89, 99]);
 		neighLN.push([D1, D2, D5]);
 
-		partID.push(68);
-		neighID.push([78, 79, 58]);
+		partID.push(89);
+		neighID.push([88, 98, 99]);
 		neighLN.push([D1, D2, D1]);
-
-		partID.push(58);
-		neighID.push([78, 79, 68]);
+		
+		o[99].r.x -= D1;
+		o[99].r.z += D1;
+		partID.push(99);
+		neighID.push([88, 98, 89]);
 		neighLN.push([2*D1, D5, D1]);
 
 		var c = Math.floor(Math.random() * colors.length);		
-		o[78].c = colors[c];
-		o[79].c = colors[c];
-		o[68].c = colors[c];
-		o[58].c = colors[c];
+		o[88].c = colors[c];
+		o[98].c = colors[c];
+		o[89].c = colors[c];
+		o[99].c = colors[c];
+	}
+
+	if(scenario == 8) {
+		partID = [];
+		neighID = [];
+		neighLN = [];
+		
+		o = [];
+		
+		var id = 0;
+		Nx /= 2;
+		Nz /= 2;
+		for(var ix = 0; ix < Nx; ix++) {
+			for(var iy = 0; iy < Ny; iy++) {
+				for(var iz = 0; iz < Nz; iz++) {
+					var c = Math.floor(Math.random() * colors.length);		
+					
+					oi = new Grain();
+					oi.m = m;
+					oi.q = 0;
+					oi.D = D;
+					oi.id = id;
+					id++;
+					
+					var rndx = 0.01 * D * Math.random() * 1;
+					var rndy = 0.00 * D * Math.random() * 1;
+					var rndz = 0.01 * D * Math.random() * 1;
+					
+					var x = 2.25*D* (ix - 0.5 * (Nx - 1)) * (1 + rndx);
+					var y = 2.25*D* (iy - 0.5 * (Ny - 1)) * (1 + rndy);
+					var z = 2.25*D* (iz - 0.5 * (Nz - 1)) * (1 + rndz);
+					
+					oi.r = Vect3.add(r, new Vect3(x, y, z));
+					oi.v = v;
+					oi.c = colors[c];
+					o.push(oi);
+					
+					var pm = 2 * ix - 1;
+					
+					var Nq = 3;
+					var dq = 2 * Math.PI / Nq;
+					for(var iq = 0; iq < Nq; iq++) {
+						var q = (iq + 0.25 * pm) * dq;
+						var xx = x + D1 * Math.cos(q);
+						var yy = y;
+						var zz = z + D1 * Math.sin(q);
+						
+						oi = new Grain();
+						oi.m = m;
+						oi.q = 0;
+						oi.D = D;
+						oi.id = id;
+						id++;
+
+						oi.r = Vect3.add(r, new Vect3(xx, yy, zz));
+						oi.v = v;
+						oi.c = colors[c];
+						o.push(oi);
+					}
+					
+					var i1 = id - 4;
+					var i2 = i1 + 1;
+					var i3 = i1 + 2;
+					var i4 = i1 + 3;
+					
+					partID.push(i1);
+					neighID.push([i2, i3, i4]);
+					neighLN.push([D1, D1, D1]);
+					
+					partID.push(i2);
+					neighID.push([i1, i3, i4]);
+					neighLN.push([D1, 2*D3, 2*D3]);
+					
+					partID.push(i3);
+					neighID.push([i1, i2, i4]);
+					neighLN.push([D1, 2*D3, 2*D3]);
+					
+					partID.push(i4);
+					neighID.push([i1, i2, i3]);
+					neighLN.push([D1, 2*D3, 2*D3]);
+					
+					console.log(i1, i2, i3, i4);
+				}
+			}
+		}
 
 	}
 
