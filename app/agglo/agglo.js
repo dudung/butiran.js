@@ -15,6 +15,7 @@
 	0850 Fix 2x1 sub array.
 	0931 Fin 3x1 conf.
 	0941 Fin 4x1 conf.
+	1142 Fix 4x1 with final 2x2 --> 4x1.
 	
 	References
 	1. Sparisoma Viridi et al., "Aggregation of two-dimension
@@ -77,7 +78,7 @@ function initParams() {
 	p += "RMAX +0.75 +0.25 +0.75\n";
 	p += "\n";
 	p += "# Simulation\n";
-	p += "SCEN 3\n";
+	p += "SCEN 4\n";
 	
 	params = p;
 	
@@ -533,7 +534,7 @@ function createCompositeParticles() {
 				var z = D * (iz - 0.5 * (Nz - 1)) * (1 + rndz);
 				oi.r = Vect3.add(r, new Vect3(x, y, z));
 				oi.v = v;
-				oi.c = ["#aaa", "#fafafa"];
+				oi.c = ["#000", "#eee"];
 				o.push(oi);
 			}
 		}
@@ -541,7 +542,6 @@ function createCompositeParticles() {
 
 	// Define color table
 	colors = [
-		["#000", "#fff"],
 		["#000", "#faa"],
 		["#000", "#aaf"],
 		["#000", "#afa"],
@@ -561,6 +561,7 @@ function createCompositeParticles() {
 	// Create composite particles
 	var D1 = D;
 	var D2 = D * Math.sqrt(2);
+	var D5 = D * Math.sqrt(5);
 	
 	partID = [];
 	neighID = [];
@@ -590,19 +591,6 @@ function createCompositeParticles() {
 			neighID.push([i1]);
 			neighLN.push([D1]);
 			
-			/*
-			var c1 = (Math.floor(Math.random() * 16)) * 8 + 135;
-			var c2 = (Math.floor(Math.random() * 16)) * 8 + 135;
-			var c3 = (Math.floor(Math.random() * 16)) * 8 + 135;
-			
-			c1 = ("0" + c1.toString(16)).slice(-2);
-			c2 = ("0" + c2.toString(16)).slice(-2);
-			c3 = ("0" + c3.toString(16)).slice(-2);
-			
-			var fill = c1 = "#" + c1 + c2 + c3;
-			var line = "#000";
-			var colors = [line, fill];
-			*/
 			var c = Math.floor(Math.random() * colors.length);
 			o[i1].c = colors[c];
 			o[i2].c = colors[c];
@@ -753,7 +741,7 @@ function createCompositeParticles() {
 		o[09].c = colors[c];
 		o[19].c = colors[c];
 		o[29].c = colors[c];
-		o[39].c = colors[c];		
+		o[39].c = colors[c];
 		
 		partID.push(49);
 		neighID.push([59, 69, 79]);
@@ -775,7 +763,7 @@ function createCompositeParticles() {
 		o[49].c = colors[c];
 		o[59].c = colors[c];
 		o[69].c = colors[c];
-		o[79].c = colors[c];		
+		o[79].c = colors[c];
 		
 		partID.push(08);
 		neighID.push([18, 28, 38]);
@@ -819,46 +807,71 @@ function createCompositeParticles() {
 		o[48].c = colors[c];
 		o[58].c = colors[c];
 		o[68].c = colors[c];
-		o[78].c = colors[c];		
+		o[78].c = colors[c];
+		
+		partID.push(88);
+		neighID.push([98, 99, 89]);
+		neighLN.push([D1, 2*D1, 3*D1]);
+
+		partID.push(98);
+		neighID.push([88, 99, 89]);
+		neighLN.push([D1, D1, 2*D1]);
+
+		partID.push(99);
+		neighID.push([88, 98, 89]);
+		neighLN.push([2*D1, D1, D1]);
+		
+		partID.push(89);
+		neighID.push([88, 98, 99]);
+		neighLN.push([3*D1, 2*D1, D1]);
+		
+		o[99].r.x += D1;
+		o[99].r.z -= D1;
+		
+		o[89].r.x += 3*D1;
+		o[89].r.z -= D1;
+		
+		var c = Math.floor(Math.random() * colors.length);		
+		o[88].c = colors[c];
+		o[98].c = colors[c];
+		o[99].c = colors[c];
+		o[89].c = colors[c];		
 	}
 	
-	/*
-	if(scenario == 0) {
-		partID = [
-			// S-Family
-			00, 01, 10, 11, 04, 05, 14, 15, 08, 09, 18, 19,
-		];
-		neighID = [
-			// S-family
-			[10, 11, 01], [00, 10, 11], [00, 01, 11], [10, 00, 01],
-			[14, 15, 05], [04, 14, 15], [04, 05, 15], [14, 04, 05],
-			[18, 19, 09], [08, 18, 19], [08, 09, 19], [18, 08, 09],
-		];
-		neighLN = [
-			// S-family
-			[D0, D1, D0], [D0, D1, D0], [D0, D1, D0], [D0, D1, D0],
-			[D0, D1, D0], [D0, D1, D0], [D0, D1, D0], [D0, D1, D0],
-			[D0, D1, D0], [D0, D1, D0], [D0, D1, D0], [D0, D1, D0],
-		];
-		// S-family
-		o[00].c = ["#f44", "#fcc"];
-		o[01].c = ["#f44", "#fcc"];
-		o[10].c = ["#f44", "#fcc"];
-		o[11].c = ["#f44", "#fcc"];
-		o[04].c = ["#f44", "#fcc"];
-		o[05].c = ["#f44", "#fcc"];
-		o[14].c = ["#f44", "#fcc"];
-		o[15].c = ["#f44", "#fcc"];
-		o[08].c = ["#f44", "#fcc"];
-		o[09].c = ["#f44", "#fcc"];
-		o[18].c = ["#f44", "#fcc"];
-		o[19].c = ["#f44", "#fcc"];
+	if(scenario == 4) {
+		partID = [];
+		neighID = [];
+		neighLN = [];
+		
+		var x = [0, 1, 2, 3, 4];
+		var y = [0, 1, 2];
+		
+		for(var ix in x) {
+			for(var iy in y) {
+				var i1 = ix * 2 * Nz + iy * 3;
+				var i2 = i1 + 1;
+				var i3 = i1 + Nz;
+				
+				partID.push(i1);
+				neighID.push([i2, i3]);
+				neighLN.push([D1, D1]);
+
+				partID.push(i2);
+				neighID.push([i1, i3]);
+				neighLN.push([D1, D2]);
+
+				partID.push(i3);
+				neighID.push([i1, i2]);
+				neighLN.push([D1, D2]);
+
+				var c = Math.floor(Math.random() * colors.length);		
+				o[i1].c = colors[c];
+				o[i2].c = colors[c];
+				o[i3].c = colors[c];
+			}
+		}
+		
 	}
-	*/
-}
-
-
-function s00() {
 	
 }
 
@@ -1085,4 +1098,22 @@ function getValue() {
 		}
 	};
 	return result;	
+}
+
+
+// Generate random RGB color
+function randColor() {
+	var c1 = (Math.floor(Math.random() * 16)) * 8 + 135;
+	var c2 = (Math.floor(Math.random() * 16)) * 8 + 135;
+	var c3 = (Math.floor(Math.random() * 16)) * 8 + 135;
+	
+	c1 = ("0" + c1.toString(16)).slice(-2);
+	c2 = ("0" + c2.toString(16)).slice(-2);
+	c3 = ("0" + c3.toString(16)).slice(-2);
+	
+	var fill = c1 = "#" + c1 + c2 + c3;
+	var line = "#000";
+	var colors = [line, fill];
+	
+	return colors;
 }
