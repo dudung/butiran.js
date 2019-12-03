@@ -17,6 +17,8 @@
 	1610 Try to implement series and chart from vratcabm.
 	1619 Test drawSeriesOnCanvas().
 	1635 All seems ok.
+	20191204
+	0444 Modify for final exam for adv computational physics.
 */
 
 // Define global variables
@@ -67,8 +69,8 @@ function initParams() {
 	p += "COF2 2\n";
 	p += "COF3 3\n";
 	p += "\n";
-	p += "# Scenario (0-4)\n";
-	p += "SCEN 0\n";
+	p += "# Scenario (0-10)\n";
+	p += "SCEN 5\n";
 	p += "\n";
 	
 	params = p;
@@ -191,6 +193,28 @@ function readParams() {
 			}
 		}
 	}
+	
+	if(5 <= scen && scen <= 10) {
+		// Generate connector between chambers
+		var xmid = W[0].length / 2;
+		var ymax = W.length - 1;
+		var ymid = ymax / 2;
+		console.log(xmid)
+		for(var y = 0; y < ymid - (scen - 5) - 1; y++) {
+			console.log(y);
+			W[y][xmid] = 1;
+			W[ymax - y][xmid] = 1;
+		}
+		
+		// Generate particles
+		N = (ymax - 1) * (xmid - 1) / 1;
+		for(var i = 0; i < N; i++) {
+			var x = Random.randInt(1, xmid - 1);
+			var y = Random.randInt(1, ymax - 1);
+			W[y][x] = 2;
+		}
+	}
+	
 	
 	clearCanvas(caOut);
 	drawMatrixOnCanvas(W);
@@ -527,6 +551,9 @@ function updateMatrix() {
 	var Rows = W.length;
 	var Cols = W[0].length;
 	
+	
+	console.log(N);
+	
 	var i = 0;
 	while(i < N) {
 		var xsrc = Random.randInt(0, Numx - 1);
@@ -589,7 +616,7 @@ function drawSeriesOnCanvas() {
 		cx.lineWidth = 2;
 		for(var i = 0; i < N; i++) {
 			var x = i;
-			var y = series[s][2][i];
+			var y = series[s][2][i] / 2;
 			var p = transform(x, y);
 			if(i == 0) {
 				cx.moveTo(p[0], p[1]);
