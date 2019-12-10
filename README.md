@@ -72,5 +72,5 @@ Library of butiran.js can be downloaded from
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/agglo/agglo.html
 17. **ambphasemat.js** | Simulate phase change of materials using ABM | 20181120<br>
     `refs` https://doi.org/10.1088/1757-899X/599/1/012008<br>
-    `code` https://github.com/dudung/butiran.js/blob/master/app/ambphasemat/ambphasemat.js<br>
-    `demo` https://raw.githack.com/dudung/butiran.js/master/app/ambphasemat/ambphasemat.html
+    `code` https://github.com/dudung/butiran.js/blob/master/app/abmphasemat/abmphasemat.js<br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/abmphasemat/abmphasemat.html
