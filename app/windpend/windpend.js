@@ -7,15 +7,17 @@
 	20191113
 	1253 Derive this from cppcmf.js for KU1102-05.
 	1445 Can animate but not yet right.
+	20191211
+	0853 Relayout.
 	
 	References
-	1. 
+	1. .
 		 url
 */
 
 // Define global variables
 var params;
-var taIn, taOut, caOut;
+var taIn, taOut, caOut, caOut2;
 var btLoad, btRead, btStart, btInfo;
 var tbeg, tend, dt, t, Tdata, Tproc, proc, iter, Niter;
 var digit;
@@ -189,13 +191,24 @@ function createVisualElements() {
 		addEventListener("click", buttonClick);
 	}
 	
-	// Create canvas for output
+	// Create canvas for output -- text
 	caOut = document.createElement("canvas");
-	caOut.width = "200";
-	caOut.height = "200";
+	caOut.width = "204";
+	caOut.height = "204";
 	with(caOut.style) {
-		width = caOut.width +  "px";
-		height = caOut.height +  "px";
+		width = caOut.width + "px";
+		height = caOut.height + "px";
+		border = "1px solid #aaa";
+		background = "#fff";
+	}
+
+	// Create canvas for output -- graphics
+	caOut2 = document.createElement("canvas");
+	caOut2.width = "204";
+	caOut2.height = "229";
+	with(caOut2.style) {
+		width = caOut2.width + "px";
+		height = caOut2.height + "px";
 		border = "1px solid #aaa";
 		background = "#fff";
 	}
@@ -213,7 +226,7 @@ function createVisualElements() {
 	// Create div for right part
 	var dvRight = document.createElement("div");
 	with(dvRight.style) {
-		width = "442px";
+		width = "206px";
 		height = "442px";
 		border = "1px solid #eee";
 		background = "#eee";
@@ -230,6 +243,7 @@ function createVisualElements() {
 		dvLeft.append(btInfo);
 	document.body.append(dvRight);
 		dvRight.append(caOut);
+		dvRight.append(caOut2);
 }
 
 
@@ -319,6 +333,8 @@ function simulate() {
 
 	clearCanvas(caOut);
 	draw(o).onCanvas(caOut);
+	
+	cleraCanvas(caOut2);
 	
 	if(t >= tend) {
 		btLoad.disabled = false;
