@@ -9,6 +9,7 @@
 	1445 Can animate but not yet right.
 	20191211
 	0853 Relayout.
+	0939 Fin editing and transfer from abmdif.js app.
 	
 	References
 	1. .
@@ -24,6 +25,7 @@ var digit;
 var xmin, ymin, zmin, xmax, ymaz, zmax;
 var XMIN, XMAX, YMIN, YMAX, ZMIN, ZMAX;
 var o, gravitational, spring, drag, vwind;
+var data, colors;
 
 // Execute main function
 main();
@@ -42,7 +44,7 @@ function initParams() {
 	p += "# Environment\n";
 	p += "GFLD 0 -10 0\n";
 	p += "SLEN 1\n";
-	p += "ETAF 0.1\n"; // 18.5E-6 Pa.s
+	p += "ETAF 0.2\n"; // 18.5E-6 Pa.s
 	p += "\n";
 	p += "# Particle\n";
 	p += "MASS 1\n";
@@ -62,6 +64,14 @@ function initParams() {
 	params = p;
 	
 	digit = 4;
+	
+	colors = [
+		["#fff", "#fff"],
+		["#000", "#000"],
+		["#aaf", "#00f"],
+		["#faa", "#f00"],
+		["#afa", "#0f0"]
+	];
 }
 
 
@@ -130,6 +140,14 @@ ZMIN = -1;
 ZMAX = 1;
 
 vwind = 0;
+
+var dthmin = -1.25;
+var dthmax = 0.25;
+var dth = [];
+var dwvmin = -1;
+var dwvmax = 3;
+var dwv = [];
+data = [[dthmin, dthmax, dth], [dwvmin, dwvmax, dwv]];
 }
 
 
@@ -312,6 +330,12 @@ function simulate() {
 		var text = tt + "\t" + qq + "\t" + vv;
 		addText(text + "\n").to(taOut);
 		
+		data[0][2].push(parseFloat(qq));
+		if(data[0][2].length > 400) data[0][2].splice(0, 1);
+
+		data[1][2].push(parseFloat(vv));
+		if(data[1][2].length > 400) data[1][2].splice(0, 1);
+		
 		vwind = 0.02 * (Random.randInt(0, 100) - 50);
 		drag.setField(new Vect3(vwind, 0, 0));
 	}
@@ -334,7 +358,8 @@ function simulate() {
 	clearCanvas(caOut);
 	draw(o).onCanvas(caOut);
 	
-	cleraCanvas(caOut2);
+	clearCanvas(caOut2);
+	drawSeriesOnCanvas(data, caOut2);
 	
 	if(t >= tend) {
 		btLoad.disabled = false;
@@ -348,6 +373,64 @@ function simulate() {
 	
 	iter++;
 	t += dt;
+}
+
+// Draw graph of data on canvas
+function drawSeriesOnCanvas() {
+	var series = arguments[0];
+	var Nseries = series.length;
+	
+	var can = arguments[1];
+	var width = can.width;
+	var height = can.height;
+	var cx = can.getContext("2d");
+	
+	//var h = height / Nseries;
+	var h = height;
+	var XMIN = 0;
+	var XMAX = width;
+	var YMIN = height;
+	var YMAX = 0;
+	
+	var xmin = 0;
+	var xmax = 400;
+	var ymax = 1;
+	var ymin = 0;
+	
+	var margin = 10;
+	
+	for(var s = 0; s < Nseries; s++) {
+		//YMAX = s * h + margin;
+		YMAX = margin;
+		YMIN = YMAX + h - margin;
+		ymin = series[s][0];
+		ymax = series[s][1];
+		var N = series[s][2].length;
+		cx.beginPath();
+		cx.strokeStyle = colors[s + 2][1];
+		cx.lineWidth = 2;
+		for(var i = 0; i < N; i++) {
+			var x = i;
+			var y = series[s][2][i] / 2;
+			var p = transform(x, y);
+			if(i == 0) {
+				cx.moveTo(p[0], p[1]);
+			} else {
+				cx.lineTo(p[0], p[1]);
+			}
+		}
+			console.log(N);
+		cx.stroke();
+		cx.closePath();
+	}
+	
+	function transform(x, y) {
+		var XX = (x - xmin) / (xmax - xmin) * (XMAX - XMIN)
+		XX += XMIN;
+		var YY = (y - ymin) / (ymax - ymin) * (YMAX - YMIN)
+		YY += YMIN;
+		return [XX, YY];
+	}
 }
 
 
@@ -413,6 +496,7 @@ function addText() {
 
 
 // Get parameter value from a Textarea
+// From abmdif.js -- 20191211.0908
 function getValue() {
 	var key = arguments[0];
 	var result = {
