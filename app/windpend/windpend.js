@@ -1,6 +1,6 @@
 /*
-	windped.js
-	Wind blows a simple pendulum
+	windpend.js
+	Random wind blows a simple pendulum
 	
 	Sparisoma Viridi | https://github.com/dudung/butiran.js
 	
