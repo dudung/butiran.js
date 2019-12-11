@@ -74,8 +74,8 @@ Library of butiran.js can be downloaded from
     `refs` https://doi.org/10.1088/1757-899X/599/1/012008<br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/abmphasemat/abmphasemat.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/abmphasemat/abmphasemat.html
-18. **windped.js** | Wind blows a simple pendulum | 20191113<br>
+18. **windpend.js** | Random Wind blows a simple pendulum | 20191113<br>
     `refs` <br>
-    `code` https://github.com/dudung/butiran.js/blob/master/app/windped/windped.js<br>
-    `demo` https://raw.githack.com/dudung/butiran.js/master/app/windped/windped.html
+    `code` https://github.com/dudung/butiran.js/blob/master/app/windpend/windpend.js<br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/windpend/windpend.html
 
