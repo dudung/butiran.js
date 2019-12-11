@@ -28,6 +28,7 @@
 	20191211
 	Change ab_phasemat to abmphasemat and integrate to
 	butiran.js in GitHub.
+	Add select for choosing material phase.
 */
 
 // Generate integer random number in [min, max]
@@ -223,8 +224,31 @@ function createDirProb(dir, prob) {
 
 // Configure visual elements
 function configure() {
+	// Set visual elements properties
+	canId = "canvas1";
+	taId = "textarea1";
+	selId = "select1";
+	width = 200;
+	height = 200;
+	background = "#fff";
+	
 	// Set document properties
 	document.body.style.background = "#eee";
+	
+	// Set input property
+	var sel = document.createElement("select");
+	document.body.append(sel);
+	sel.id = selId;
+	sel.style.width = 0.2 * width + "px";
+	sel.size = "9";
+	sel.style.height = (height + 2) + "px";
+	sel.style.float = "left";
+	for(var i = 0; i < 20; i++) {
+		var op = document.createElement("option");
+		op.text = i;
+		sel.append(op);
+	}
+	sel.addEventListener("change", selectPhase);
 	
 	// Set canvas properties
 	var can = document.createElement("canvas");
@@ -235,6 +259,8 @@ function configure() {
 	can.height = height;
 	can.style.width = width + "px";
 	can.style.height = height + "px";
+	can.style.float = "left";
+	can.style.border = "1px solid #aaa";
 	
 	// Set textarea properties
 	var ta = document.createElement("textarea");
@@ -242,23 +268,26 @@ function configure() {
 	ta.id = taId;
 	ta.style.background = background;
 	ta.style.width = width + "px";
-	ta.style.height = height + "px";
+	ta.style.height = (height - 4) + "px";
 	ta.style.overflowY = "scroll";
+	ta.style.float = "left";
 }
 
 // Initialize parameters
 function initialize() {
+	phase = parseInt(arguments[0]);
+	
 	// Set size of system matrix
-	rowSize = 100;
-	colSize = 100;
+	rowSize = 200;
+	colSize = 200;
 	mat = createZeroMatrix(rowSize, colSize);
 	
 	// Set particles initial position
 	N = 10000;
 	xmin = 30;
 	ymin = 30;
-	xmax = 70;
-	ymax = 70;
+	xmax = 170;
+	ymax = 170;
 	M = fillParticle(xmin, ymin, xmax, ymax, N, mat);
 	
 	// Create system border
@@ -301,6 +330,7 @@ function initialize() {
 	var pIS = createDirProb(0, 0.125);
 
 	// Wrap it to a directional probability
+	probs = [];
 	switch(phase) {
 	
 	// Grid 1x1
@@ -443,15 +473,9 @@ function initialize() {
 			pEA, pIS, pWE, pEA, pIS, pWE,
 			pNE, pNO, pNW, pNE, pNO, pNW
 		];
+		console.log(phase, probs);
 	break;
 	}
-	
-	// Set visual elements properties
-	canId = "canvas1";
-	taId = "textarea1";
-	width = 100;
-	height = 100;
-	background = "#fff";
 }
 
 // Add string to a textarea
@@ -481,9 +505,19 @@ function simulate() {
 	}
 }
 
+
+// Select phase
+function selectPhase() {
+	phase = event.target.value;
+	initialize(phase);
+	start();
+}
+
+
 // Start simulation
 function start() {
 	// Call simulate with period time in ms
+	clearInterval(proc);
 	proc = setInterval(simulate, period);
 }
 
@@ -508,14 +542,14 @@ function main() {
 	// 15 = convection center-down, 16 = center up
 	// 17 = two-cw-loop,
 	// 18 = two-center-\, 19 four-center
-	phase = 5;
+	//phase = 5;
 	
 	// Initialize values
-	initialize();
+	//initialize(phase);
 	
 	// Configure visual elements
 	configure();
 	
 	// Start simulation
-	start();
+	//start();
 }
