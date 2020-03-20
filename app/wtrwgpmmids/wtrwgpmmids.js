@@ -30,6 +30,8 @@
 	20200311
 	0533 Correct initial incubation time. Random.
 	0619 Add mode of initial tinf: 0, 1, 2.
+	20200320
+	1043 Replace .min.js with .js for open source.
 	
 	Refs:
 	1. IT: Recover time 14 days, death rate about 2%.
