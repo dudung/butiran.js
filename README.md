@@ -78,7 +78,11 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/windpend/windpend.js<br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/windpend/windpend.html
-18. **wtrwgpmmids.js** | Walk-through and random-walk of granular particles as an alternative for mathematical modelling of infectious disease spread | 20200308<br>
+19. **wtrwgpmmids.js** | Walk-through and random-walk of granular particles as an alternative for mathematical modelling of infectious disease spread | 20200308<br>
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/wtrwgpmmids/wtrwgpmmids.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/wtrwgpmmids/wtrwgpmmids.html
+20. **gmpsa.js** | Granular model for particle size analysis | 20200313<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/gmpsa/gmpsa.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/gmpsa/gmpsa.html
