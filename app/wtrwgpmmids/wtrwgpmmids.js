@@ -6,7 +6,7 @@
 	
 	Sparisoma Viridi | https://github.com/dudung
 	Nuning Nuraini | nuning@math.itb.ac.id
-	Amri Susandi | armisusandi@yahoo.com
+	Armi Susandi | armisusandi@yahoo.com
 	Intan Taufik | i.taufik@sith.itb.ac.id
 	Pingkan Aditiawati | pingkan@sith.itb.ac.id
 	
