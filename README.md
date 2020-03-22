@@ -86,3 +86,7 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/gmpsa/gmpsa.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/gmpsa/gmpsa.html
+21. **ccsasir.js** | Connected Compartment as Spatial Advancement of Suceptible-Infected-Recovery Model for Modelling Spread of Infection | 20200322<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/ccsasir/ccsasir.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/ccsasir/ccsasir.html
