@@ -30,6 +30,10 @@
 	2050 Create createCanvas() function and it works.
 	2212 Charts ok and they work.
 	2219 Finish for today and tell the group for this.
+	20200324
+	2938 Put on the web http://smartclim.info/premise/simulasi
+	2005 Correct Iin and Iout to be Rin and Rout in R block, 
+	at lines 421-422.
 	
 	References
 	1. Sparisoma Viridi, Intan Taufik, Armi Susandi, Pingkan
@@ -414,8 +418,8 @@ function simulate() {
 		Rout = 0;
 		for(var j = 0; j < NA; j++) {
 			if(j != i) {
-				Iin += MR[i][j] * Rt[j];
-				Iout += MR[j][i] * Rt[i];
+				Rin += MR[i][j] * Rt[j];
+				Rout += MR[j][i] * Rt[i];
 			}
 		}
 		Rt[i]	+= Rin - Rout;
