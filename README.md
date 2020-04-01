@@ -90,3 +90,7 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/ccsasir/ccsasir.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/ccsasir/ccsasir.html
+22. **nispm.js** | Numerical integration for single particle motion | 20200401<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/nispm/nispm.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/nispm/nispm.html
