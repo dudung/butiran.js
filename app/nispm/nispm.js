@@ -194,7 +194,7 @@ function calc() {
 }
 
 
-// Perform simulation using SIR model
+// Perform simulation
 function simulate() {
 	clearX(caOut);
 	
