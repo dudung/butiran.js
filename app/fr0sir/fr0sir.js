@@ -24,6 +24,7 @@
 	2137 Disable 2nd button and discuss with Aristyo.
 	2215 View log of error.
 	2237 Finish for today, gradient descent works.
+	2244 Add clickCount for better observation.
 	
 	References
 	1. url https://www.chartjs.org/samples/latest/charts/scatter/basic.html
@@ -37,12 +38,18 @@
 	   [20200512].
 */
 
+// Define globar variables
+var clickCount;
+
+
 // Execute main function
 main();
 
 
 // Define main function
 function main() {
+	var clickCount = 0;
+	
 	var csvData2 = removeEmptyLines(csvData);
 	var header = getHeaderLine(csvData2);
 	var column = getDataColumn(
@@ -136,6 +143,7 @@ function main() {
 		+ Math.log10(error).toFixed(2);
 
 	btn.addEventListener("click", function() {
+		clickCount++;
 		
 		// Change r0 manually only in one direction
 		r0 += 0.5;
@@ -158,12 +166,14 @@ function main() {
 		chart.update();
 		
 		var error = getErr(Nday, y1, ySIR);
-		div2.innerHTML = "log(Error) = "
+		div2.innerHTML = "Attempt " + clickCount
+			+ " | log(Error) = "
 			+ Math.log10(error).toFixed(2);
 		
 	});
 
 	btn2.addEventListener("click", function() {
+		clickCount++;
 		
 		var r0_1 = r0;
 		var error1 = getErr(Nday, y1, ySIR);
@@ -210,8 +220,10 @@ function main() {
 		chart.data.datasets[1].data = ySIR;
 		chart.update();
 		
-		div2.innerHTML = "log(Error) = "
+		div2.innerHTML = "Attempt " + clickCount
+			+ " | log(Error) = "
 			+ Math.log10(error3).toFixed(2);
+		
 	});
 	
 	chart = new Chart(document.getElementById("canvas"), {
