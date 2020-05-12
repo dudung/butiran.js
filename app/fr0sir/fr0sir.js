@@ -22,6 +22,8 @@
 	2105 Clean the code.
 	2120 Find that Npop, I0, a, R0 play different role.
 	2137 Disable 2nd button and discuss with Aristyo.
+	2215 View log of error.
+	2237 Finish for today, gradient descent works.
 	
 	References
 	1. url https://www.chartjs.org/samples/latest/charts/scatter/basic.html
@@ -82,7 +84,6 @@ function main() {
 		x0.push(label);
 	}
 	
-	
 	var r0 = 2;
 	
 	var a = 0.1;
@@ -105,7 +106,7 @@ function main() {
 			R: R0,
 		}
 	);
-	
+
 	var div = document.createElement("div");
 	div.style.width = "80%";
 	
@@ -115,8 +116,28 @@ function main() {
 	var btn = document.createElement("button");
 	btn.id = "button";
 	btn.innerHTML = "Change R0 manually";
+	
+	var btn2 = document.createElement("button");
+	btn2.id = "button2";
+	btn2.innerHTML = "Change R0";
+	//btn2.disabled = true;
+
+	var div2 = document.createElement("div");
+	div2.style.paddingTop = "10px";
+	
+	document.body.append(div);
+	div.append(can);
+	document.body.append(btn);
+	document.body.append(btn2);
+	document.body.append(div2);
+	
+	var error = getErr(Nday, y1, ySIR);
+	div2.innerHTML = "log(Error) = "
+		+ Math.log10(error).toFixed(2);
+
 	btn.addEventListener("click", function() {
 		
+		// Change r0 manually only in one direction
 		r0 += 0.5;
 		b = a / r0;
 		
@@ -136,16 +157,22 @@ function main() {
 		chart.data.datasets[1].data = ySIR;
 		chart.update();
 		
+		var error = getErr(Nday, y1, ySIR);
+		div2.innerHTML = "log(Error) = "
+			+ Math.log10(error).toFixed(2);
+		
 	});
 
-	var btn2 = document.createElement("button");
-	btn2.id = "button2";
-	btn2.innerHTML = "Change R0";
-	btn2.disabled = true;
 	btn2.addEventListener("click", function() {
-		//r0 += 0.5;
-		b = a / r0;
 		
+		var r0_1 = r0;
+		var error1 = getErr(Nday, y1, ySIR);
+		console.log("1", error1, r0_1);
+		
+		// Try to change r0 in false direction
+		r0 -= 0.5;
+		var r0_2 = r0;
+		b = a / r0;
 		ySIR = simulateSIR(
 			2 * Nday,
 			{
@@ -158,15 +185,34 @@ function main() {
 				R: R0,
 			}
 		);
+		var error2 = getErr(Nday, y1, ySIR);
+		console.log("2", error2, r0_2);
+		
+		var c = 2.5E-5;
+		r0 = r0 - c * (error2 - error1) / (r0_2 - r0_1);
+		var r0_3 = r0;
+		b = a / r0;
+		ySIR = simulateSIR(
+			2 * Nday,
+			{
+				Npop: Npop,
+				a: a,
+				b: b,
+				dt: 1,
+				S: S0,
+				I: I0,
+				R: R0,
+			}
+		);
+		var error3 = getErr(Nday, y1, ySIR);
+		console.log("3", error3, r0_3);
 		
 		chart.data.datasets[1].data = ySIR;
 		chart.update();
+		
+		div2.innerHTML = "log(Error) = "
+			+ Math.log10(error3).toFixed(2);
 	});
-
-	document.body.append(div);
-	div.append(can);
-	document.body.append(btn);
-	document.body.append(btn2);
 	
 	chart = new Chart(document.getElementById("canvas"), {
 		type: 'line',
@@ -225,6 +271,21 @@ function main() {
 		}
 	});
 	
+}
+
+
+function getErr() {
+	var Nday = arguments[0];
+	var y1 = arguments[1];
+	var ySIR = arguments[2];
+	
+	var err = 0;
+	for(var i = 0; i < Nday; i++) {
+		var erri = Math.abs(y1[i] - ySIR[i]);
+		err += erri;
+	}
+	
+	return err;
 }
 
 

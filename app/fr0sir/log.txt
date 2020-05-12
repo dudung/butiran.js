@@ -1,4 +1,24 @@
 [20200512]
+[21:44, 12/05/2020] dudung.github.io: https://rawcdn.githack.com/dudung/butiran.js/01f7568f7ced47145ee41b2aedce58cf8a2ebe42/app/fr0sir/fr0sir.html
+
+Ini yang masih manual. Belum menerapkan yang didiskusikan kemarin.
+[21:46, 12/05/2020] PREMISE Aristyo: wah terima kasih, pak... aka kami coba diskusikan disini
+[21:47, 12/05/2020] dudung.github.io: Sourcenya di https://github.com/dudung/butiran.js/tree/master/app/fr0sir  ya
+[21:51, 12/05/2020] dudung.github.io: Yang perlu dibuat adalah fungsi untuk menghitung error dari data dengan prediksi bila digunakan R0 tertentu, seperti
+
+error_1 = func(R0_1, data, waktu-prediksi)
+error_2 = func(R0_2, data, waktu-prediksi)
+
+R0_3 = R0_2 - c * (error_2 - error_1) / (R0_2 - R0_1)
+
+[21:52, 12/05/2020] dudung.github.io: R0_1 dan R_02 adalah dua tebakan awal R0
+
+Nanti setelah beberapa kali iterasi R0_n akan memberikan hasil terbaik dengan error_n terkecil, secara hipotesis demikian.
+
+Parameter c masih perlu dimainkan.
+
+
+[20200511]
 Komunikasi lewat WAG.
 [13:32, 11/05/2020] PREMISE Aristyo: Selamat siang, Pak...
 [13:33, 11/05/2020] PREMISE Aristyo: mohon izin, pak bertanya... untuk menghitung R0 yang sederhana bagaimana ya, pak?
