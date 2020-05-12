@@ -26,6 +26,7 @@
 	2237 Finish for today, gradient descent works.
 	2244 Add clickCount for better observation.
 	2246 Add gradient descent information 2nd button.
+	2251 Add this comment just for updateing file, which does not work?
 	
 	References
 	1. url https://www.chartjs.org/samples/latest/charts/scatter/basic.html
