@@ -19,6 +19,8 @@
 	1952 Change to [4].
 	2006 Modify according to [5].
 	2032 Start to develop model.
+	2105 Clean the code.
+	2120 Find that Npop, I0, a, R0 play different role.
 	
 	References
 	1. url https://www.chartjs.org/samples/latest/charts/scatter/basic.html
@@ -38,8 +40,6 @@ main();
 
 // Define main function
 function main() {
-	//createElements();
-	
 	var csvData2 = removeEmptyLines(csvData);
 	var header = getHeaderLine(csvData2);
 	var column = getDataColumn(
@@ -52,7 +52,6 @@ function main() {
 		header[8], // CumDeath    --> column 5
 	);
 	
-		
 	// Get horizontal axis
 	var x0 = [];
 		
@@ -74,21 +73,35 @@ function main() {
 		y1.push(yy1);
 		y2.push(yy2);
 	}
+
+	var additionalDay = 72;
+	var lastDay = 12;
+	for(var i = 1; i < additionalDay + 1; i++) {
+		var label = "2020-05-" + (lastDay + i);
+		x0.push(label);
+	}
 	
-	var R0 = 0.5;
-	var a = 10;
-	var b = a / R0;
+	
+	var r0 = 2;
+	
+	var a = 0.1;
+	var b = a / r0;
 	var Nday = N;
+	var Npop = 31000;
+	var I0 = 150;
+	var S0 = Npop - I0;
+	var R0 = 0;
+	
 	ySIR = simulateSIR(
-		Nday,
+		2 * Nday,
 		{
-			Npop: 15000,
+			Npop: Npop,
 			a: a,
 			b: b,
 			dt: 1,
-			S: 14999,
-			I: 1,
-			R: 0,
+			S: S0,
+			I: I0,
+			R: R0,
 		}
 	);
 	
@@ -98,33 +111,62 @@ function main() {
 	var can = document.createElement("canvas");
 	can.id = "canvas";
 	
+	var btn = document.createElement("button");
+	btn.id = "button";
+	btn.innerHTML = "Change R0 manually";
+	btn.addEventListener("click", function() {
+		
+		r0 += 0.5;
+		b = a / r0;
+		
+		ySIR = simulateSIR(
+			2 * Nday,
+			{
+				Npop: Npop,
+				a: a,
+				b: b,
+				dt: 1,
+				S: S0,
+				I: I0,
+				R: R0,
+			}
+		);
+		
+		chart.data.datasets[1].data = ySIR;
+		chart.update();
+		
+	});
+
+	var btn2 = document.createElement("button");
+	btn2.id = "button2";
+	btn2.innerHTML = "Change R0";
+	btn2.addEventListener("click", function() {
+		//r0 += 0.5;
+		b = a / r0;
+		
+		ySIR = simulateSIR(
+			2 * Nday,
+			{
+				Npop: Npop,
+				a: a,
+				b: b,
+				dt: 1,
+				S: S0,
+				I: I0,
+				R: R0,
+			}
+		);
+		
+		chart.data.datasets[1].data = ySIR;
+		chart.update();
+	});
+
 	document.body.append(div);
 	div.append(can);
+	document.body.append(btn);
+	document.body.append(btn2);
 	
-	/*
-	var color = Chart.helpers.color;
-	
-	var scatterChartData = {
-		datasets: [
-			{
-				label: 'CumCase',
-				borderColor: window.chartColors.red,
-				backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
-				data: data1,
-			},
-			{
-				label: 'CumDeath',
-				borderColor: window.chartColors.blue,
-				backgroundColor: color(window.chartColors.blue).alpha(0.2).rgbString(),
-				data: data2,
-			},
-		]
-	};
-	
-	createChart(scatterChartData, "2020-03-02 -- 2020-05-12");
-	*/
-	
-	new Chart(document.getElementById("canvas"), {
+	chart = new Chart(document.getElementById("canvas"), {
 		type: 'line',
 		data: {
 			labels: x0,
@@ -149,8 +191,8 @@ function main() {
 					pointBackgroundColor: "#ccf",
 					showLine: true,
 					borderColor: "#f00",
-					borderWidth: 1,
-					borderDash: [6, 2, 6],
+					borderWidth: 2,
+					borderDash: [1, 0],
 					fill: false,
 				},
 			]
@@ -165,7 +207,7 @@ function main() {
 					{
 						ticks: {
 							beginAtZero: false,
-							maxTicksLimit: 11,
+							maxTicksLimit: 14,
 						},
 					},
 				],
@@ -173,7 +215,7 @@ function main() {
 					{
 						ticks: {
 							beginAtZero: true,
-							stepSize: 1000,
+							stepSize: 4000,
 						},
 					},
 				],
@@ -182,6 +224,7 @@ function main() {
 	});
 	
 }
+
 
 function simulateSIR() {
 	var Nday = arguments[0];
@@ -276,7 +319,7 @@ function getHeaderLine() {
 	return header;
 }	
 
-// Create elements
+// Create elements, also from [1]
 function createElements() {
 	var div = document.createElement("div");
 	div.style.width = "75%";
@@ -360,4 +403,31 @@ function generateData() {
 		});
 	}
 	return data;
+}
+
+
+// Learn from [1] and put here change with [4]
+function unused0() {
+	createElements();
+	
+	var color = Chart.helpers.color;
+	
+	var scatterChartData = {
+		datasets: [
+			{
+				label: 'CumCase',
+				borderColor: window.chartColors.red,
+				backgroundColor: color(window.chartColors.red).alpha(0.2).rgbString(),
+				data: data1,
+			},
+			{
+				label: 'CumDeath',
+				borderColor: window.chartColors.blue,
+				backgroundColor: color(window.chartColors.blue).alpha(0.2).rgbString(),
+				data: data2,
+			},
+		]
+	};
+	
+	createChart(scatterChartData, "2020-03-02 -- 2020-05-12");
 }
