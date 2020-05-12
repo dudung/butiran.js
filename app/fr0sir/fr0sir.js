@@ -25,6 +25,7 @@
 	2215 View log of error.
 	2237 Finish for today, gradient descent works.
 	2244 Add clickCount for better observation.
+	2246 Add gradient descent information 2nd button.
 	
 	References
 	1. url https://www.chartjs.org/samples/latest/charts/scatter/basic.html
@@ -126,7 +127,7 @@ function main() {
 	
 	var btn2 = document.createElement("button");
 	btn2.id = "button2";
-	btn2.innerHTML = "Change R0";
+	btn2.innerHTML = "Change R0 with gradient descent";
 	//btn2.disabled = true;
 
 	var div2 = document.createElement("div");
