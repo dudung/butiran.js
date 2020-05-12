@@ -140,6 +140,7 @@ function main() {
 	var btn2 = document.createElement("button");
 	btn2.id = "button2";
 	btn2.innerHTML = "Change R0";
+	btn2.disabled = true;
 	btn2.addEventListener("click", function() {
 		//r0 += 0.5;
 		b = a / r0;
