@@ -1,0 +1,13 @@
+[20200512]
+Komunikasi lewat WAG.
+[13:32, 11/05/2020] PREMISE Aristyo: Selamat siang, Pak...
+[13:33, 11/05/2020] PREMISE Aristyo: mohon izin, pak bertanya... untuk menghitung R0 yang sederhana bagaimana ya, pak?
+[18:33, 11/05/2020] dudung.github.io: Selamat malam, Pak Tyo. Itu pertanyaan saja sejak awal kita diskusi.
+[18:33, 11/05/2020] dudung.github.io: Yang terpikir adalah fiting dengan data.
+[18:37, 11/05/2020] dudung.github.io: 1. Jalankan model dengan R0 tebakan.
+2. Hasil model dihitung errornya dengan data yang ada |obs - model| untuk setiap data ke i. Jumlahkan untuk dapat error total
+3. Lalu R0 diubah dengan suatu nilai, misalnya +dR0 * c. Lalu lakukan langkah ke 2.
+4. Bila error total membesar kembali ke R0 semula akan tetapi -dR0 * c
+5. Bila error total mengecil lakukan langkah semula sampai error diperoleh minimum.
+6. Nilai c akan menentukan seberapa cepat perubahan R0. Terlalu besar hasil bisa tidak stabil
+7. Idealnya bila R0 sudah tepat error akan nol sehingga R0 tidak lagi berubah.
