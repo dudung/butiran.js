@@ -21,6 +21,7 @@
 	2032 Start to develop model.
 	2105 Clean the code.
 	2120 Find that Npop, I0, a, R0 play different role.
+	2137 Disable 2nd button and discuss with Aristyo.
 	
 	References
 	1. url https://www.chartjs.org/samples/latest/charts/scatter/basic.html
