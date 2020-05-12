@@ -1,7 +1,29 @@
 [20200512]
+2258 Capek. Istrirahat dan sholat dulu.
+
+[21:53, 12/05/2020] PREMISE Aristyo: begitu ya pak ya?
+[21:54, 12/05/2020] PREMISE Aristyo: kenapa tidak pakai kasus aktif ya pak?
+[21:54, 12/05/2020] dudung.github.io: https://en.wikipedia.org/wiki/Gradient_descent
+[21:55, 12/05/2020] dudung.github.io: Saya hanya dapat data yang itu.
+[21:55, 12/05/2020] PREMISE Aristyo: oh begitu ya, pak...
+[21:55, 12/05/2020] dudung.github.io: Tapi kuatir juga bahwa Npop, a, S(0), I(0), R(0) juga berpengaruh. Bila, ya, maka optimasinya bisa n-dimensi.
+[21:56, 12/05/2020] PREMISE Aristyo: mungkin bisa kami bantu siapkan aktif case yang se Indonesia, pak..
+[21:56, 12/05/2020] dudung.github.io: Iya, tolong agar saya bisa berikan ilustrasi yang lebih tepat.
+[22:00, 12/05/2020] PREMISE Aristyo: baik pak.. sedang kami siapkan
+[22:02, 12/05/2020] PREMISE Aristyo: berikut datanya, pak...
+[22:53, 12/05/2020] dudung.github.io: https://rawcdn.githack.com/dudung/butiran.js/72dbd056284f3ccea469c183e036abb86647a825/app/fr0sir/fr0sir.html
+
+Sudah jalan yang gradient descent. Bisa dicoba kedua tombolnya untuk melihat perbedaannya.
+[22:55, 12/05/2020] dudung.github.io: Jadi targetnya mencari R0 untuk setiap propinsi, ya?
+[22:55, 12/05/2020] PREMISE Aristyo: betul, pak... karena kita ingin relaksasi PSBB
+[22:55, 12/05/2020] PREMISE Aristyo: soalnya masyarakat tidak bisa makan, pak..
+[22:55, 12/05/2020] dudung.github.io: Iya.
+[22:56, 12/05/2020] dudung.github.io: Sementara ilustrasinya masih pakai SIR, ya. Tinggal nanti dimodif dengan SEIR. Belum sempat saya ngoprek yang SEIR.
+
 [21:44, 12/05/2020] dudung.github.io: https://rawcdn.githack.com/dudung/butiran.js/01f7568f7ced47145ee41b2aedce58cf8a2ebe42/app/fr0sir/fr0sir.html
 
 Ini yang masih manual. Belum menerapkan yang didiskusikan kemarin.
+
 [21:46, 12/05/2020] PREMISE Aristyo: wah terima kasih, pak... aka kami coba diskusikan disini
 [21:47, 12/05/2020] dudung.github.io: Sourcenya di https://github.com/dudung/butiran.js/tree/master/app/fr0sir  ya
 [21:51, 12/05/2020] dudung.github.io: Yang perlu dibuat adalah fungsi untuk menghitung error dari data dengan prediksi bila digunakan R0 tertentu, seperti
