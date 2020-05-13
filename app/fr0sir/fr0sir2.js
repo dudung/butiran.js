@@ -20,6 +20,8 @@
 	1509 Can view chart of SIR model.
 	1529 Fix get region name, skip the header.
 	1555 Create function for updating chart with new data.
+	1721 Problem by select element, can not draw charts.
+	1736 Problem at t = 0 that I = 0, SIR model does not work.
 	
 	References
 	1. url https://github.com/dudung/butiran.js/blob/master/app
@@ -30,7 +32,7 @@
 
 
 // Define some global variables
-var xxx, chart1, chart2, regions;
+var xxx, chart1, chart2, regions, params;
 
 
 // Execute main function
@@ -39,12 +41,40 @@ main();
 
 // Define main function
 function main() {
-	// Region id 0 -- 33, 34 total
-	var id = 20;
-	
 	// Prepare id to get region
 	regions = getRegionName(csv_a);
-	var region = regions[id];
+	
+	// Use SIR model to produce simulation data with Euler
+	params = {
+		model: "SIR",     // model
+		a: 0.5,           // rate of infection
+		b: 0.1,           // rate of recovery
+		N: 120,           // total population
+		S: 100,           // initial susceptible population
+		I: 9,             // initial infected population
+		R: 11,            // initial recovered population
+		method: "Euler",  // numerical method for solving ODE 
+		dt: 1,            // simulation time step (day)
+		tbeg: 0,          // begin time of simulation
+		tend: 105,        // end time of simulation
+	};
+	
+	// Create HTML elemenents with DOM
+	createElements();
+	
+	// Region id 0 -- 33, 34 total, set initial id
+	var id = 20;
+	recalculate(id);
+}
+
+
+// Recalculate
+function recalculate() {
+	var sel = document.getElementById("region-name");
+	var sidx = arguments[0];
+	sel.selectedIndex = sidx;
+	var region = sel.value;
+	console.log(sel.selectedIndex);
 	
 	/*
 		0 date
@@ -59,24 +89,6 @@ function main() {
 	// SIR model requires active (infected) case, observed data
 	var Iobs = data[1];
 	var Robs = data[2];
-
-	// Create HTML elemenents with DOM
-	createElements();
-	
-	// Use SIR model to produce simulation data with Euler
-	var params = {
-		model: "SIR",     // model
-		a: 0.5,           // rate of infection
-		b: 0.1,           // rate of recovery
-		N: 120,           // total population
-		S: 100,           // initial susceptible population
-		I: 9,             // initial infected population
-		R: 11,            // initial recovered population
-		method: "Euler",  // numerical method for solving ODE 
-		dt: 1,            // simulation time step (day)
-		tbeg: 0,          // begin time of simulation
-		tend: 105,        // end time of simulation
-	};
 	
 	// Change params according to observed data
 	params.R = Robs[0];
@@ -93,10 +105,11 @@ function main() {
 	var Isim = sim[2];
 	var Rsim = sim[3];
 	
-	updateChart(chart1, region, day, Iobs, Isim);
-	updateChart(chart2, region, day, Robs, Rsim);
+	console.log(region);
+	
+	updateChart(chart1, region, day, Iobs, Isim, "(active)");
+	updateChart(chart2, region, day, Robs, Rsim, "(recovered)");
 }
-
 
 // Update chart with observed and simulation data
 function updateChart() {
@@ -105,13 +118,19 @@ function updateChart() {
 	var day = arguments[2];
 	var Xobs = arguments[3];
 	var Xsim = arguments[4];
+	var subtitle = arguments[5];
 	
 	chart.options.title.text = region
-		+ " 2020-02-28 -- 2020-05-12 (active)";
+		+ " 2020-02-28 -- 2020-05-12 " + subtitle;
 	chart.data.datasets[0].data = Xobs;
 	chart.data.datasets[1].data = Xsim;
 	chart.data.labels = day;
 	chart.update();
+	
+	var a = params.a;
+	var b = params.b;
+	var r0 = a/b;
+	showParams("r0 = " + r0);
 }
 
 
@@ -125,6 +144,8 @@ function createElements() {
 	span.style.padding = "5px 10px 5px 10px";
 	var sel = document.createElement("select");
 	sel.style.width = "200px";
+	sel.id = "region-name"
+	
 	document.body.append(div0);
 	div0.append(span);
 	div0.append(sel);
@@ -135,10 +156,11 @@ function createElements() {
 		opt.text = regions[i];
 		sel.append(opt);
 	}
-	sel.addEventListener("change", function() {
-		console.log(event.target.value);
-	});
 	
+	sel.addEventListener("change", function () {
+		var idx = event.target.selectedIndex;
+		recalculate(idx);
+	});
 	
 	var div1 = document.createElement("div");
 	div1.style.width = "49.7%";
@@ -158,12 +180,19 @@ function createElements() {
 	var can2 = document.createElement("canvas");
 	can2.id = "line-chart-2";
 	
+	var div3 = document.createElement("div");
+	div3.style.width = "100%";
+	div3.style.background = "#fafafa";
+	div3.id = "params";
+	
 	document.body.append(div1);
 	div1.append(can1);
 	document.body.append(div2);
 	div2.append(can2);
-
-	chart1 = new Chart(document.getElementById("line-chart-1"), {
+	document.body.append(div3);
+	
+	chart1 = new Chart(document.getElementById("line-chart-1"),
+	{
 		type: 'line',
 		data: {
 			//labels: day,
@@ -184,8 +213,8 @@ function createElements() {
 					label: "SIR model",
 					pointRadius: 0,
 					pointStyle: "rect",
-					pointBorderColor: "#00f",
-					pointBackgroundColor: "#ccf",
+					pointBorderColor: "#f00",
+					pointBackgroundColor: "#fcc",
 					showLine: true,
 					borderColor: "#f00",
 					borderWidth: 2,
@@ -221,7 +250,8 @@ function createElements() {
 		}
 	});
 	
-	chart2 = new Chart(document.getElementById("line-chart-2"), {
+	chart2 = new Chart(document.getElementById("line-chart-2"),
+	{
 		type: 'line',
 		data: {
 			//labels: day,
@@ -242,8 +272,8 @@ function createElements() {
 					label: "SIR model",
 					pointRadius: 0,
 					pointStyle: "rect",
-					pointBorderColor: "#00f",
-					pointBackgroundColor: "#ccf",
+					pointBorderColor: "#f00",
+					pointBackgroundColor: "#fcc",
 					showLine: true,
 					borderColor: "#f00",
 					borderWidth: 2,
@@ -426,6 +456,14 @@ function getRegionTimeSeriesFromCSV() {
 	}
 	
 	return series;
+}
+
+
+// Show parameters
+function showParams() {
+	var str = arguments[0];
+	var div = document.getElementById("params");
+	div.innerHTML = str;
 }
 
 
