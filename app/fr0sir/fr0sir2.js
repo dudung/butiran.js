@@ -22,6 +22,12 @@
 	1555 Create function for updating chart with new data.
 	1721 Problem by select element, can not draw charts.
 	1736 Problem at t = 0 that I = 0, SIR model does not work.
+	1915 Able to initiate I > 0 at t = tbeg.
+	1958 Can not fit I and R at the same time.
+	2021 Concentrate first on total case and DKI Jakarta.
+	2034 SIR model seem to be late than the data.
+	2037 Add three buttons.
+	2146 It seems does not work either with artificial data.
 	
 	References
 	1. url https://github.com/dudung/butiran.js/blob/master/app
@@ -33,7 +39,7 @@
 
 // Define some global variables
 var xxx, chart1, chart2, regions, params;
-
+var TEST_AI_DATA = true;
 
 // Execute main function
 main();
@@ -43,20 +49,33 @@ main();
 function main() {
 	// Prepare id to get region
 	regions = getRegionName(csv_a);
+
+	/* Artificial data
+		a: 0.2,           // rate of infection
+		b: 0.05,          // rate of recovery
+		N: 5000,          // total population
+		S: 4999,          // initial susceptible population
+		I: 1,             // initial infected population
+		R: 0,             // initial recovered population
+		method: "Euler",  // numerical method for solving ODE 
+		dt: 0.01,         // simulation time step (day)
+		tbeg: 10,         // begin time of simulation
+		tend: 74,         // end time of simulation
+	*/
 	
 	// Use SIR model to produce simulation data with Euler
 	params = {
 		model: "SIR",     // model
-		a: 0.5,           // rate of infection
-		b: 0.1,           // rate of recovery
-		N: 120,           // total population
-		S: 100,           // initial susceptible population
-		I: 9,             // initial infected population
-		R: 11,            // initial recovered population
+		a: 0.2,           // rate of infection
+		b: 0.05,          // rate of recovery
+		N: 5000,          // total population
+		S: 4999,          // initial susceptible population
+		I: 1,             // initial infected population
+		R: 0,             // initial recovered population
 		method: "Euler",  // numerical method for solving ODE 
-		dt: 1,            // simulation time step (day)
-		tbeg: 0,          // begin time of simulation
-		tend: 105,        // end time of simulation
+		dt: 0.01,         // simulation time step (day)
+		tbeg: 10,         // begin time of simulation
+		tend: 74,         // end time of simulation
 	};
 	
 	// Create HTML elemenents with DOM
@@ -74,7 +93,6 @@ function recalculate() {
 	var sidx = arguments[0];
 	sel.selectedIndex = sidx;
 	var region = sel.value;
-	console.log(sel.selectedIndex);
 	
 	/*
 		0 date
@@ -89,10 +107,22 @@ function recalculate() {
 	// SIR model requires active (infected) case, observed data
 	var Iobs = data[1];
 	var Robs = data[2];
+	var Cobs = data[4];
 	
+	/**/
 	// Change params according to observed data
-	params.R = Robs[0];
-	params.I = Iobs[0];
+	for(var i = 0; i < Iobs.length; i++) {
+		if(Iobs[i] > 0) {
+			params.I = Iobs[i];
+			params.tbeg = i; 
+			break;
+		}
+	}
+	/**/
+
+	if(!TEST_AI_DATA)
+	params.N = Cobs[Cobs.length - 1];
+	params.S = params.N - params.I;
 	
 	/*
 		0 time in day
@@ -105,10 +135,17 @@ function recalculate() {
 	var Isim = sim[2];
 	var Rsim = sim[3];
 	
-	console.log(region);
+	var scale = params.N * 1 + 0;
+	for(var i = 0; i < Isim.length; i++) {
+		Isim[i] *= scale;
+		Rsim[i] *= scale;
+	}
+	
+	var err = errorOf(Iobs, Isim);
 	
 	updateChart(chart1, region, day, Iobs, Isim, "(active)");
-	updateChart(chart2, region, day, Robs, Rsim, "(recovered)");
+	updateChart(chart2, region, day, Robs, Rsim, "(recovered)",
+		err);
 }
 
 // Update chart with observed and simulation data
@@ -119,6 +156,7 @@ function updateChart() {
 	var Xobs = arguments[3];
 	var Xsim = arguments[4];
 	var subtitle = arguments[5];
+	var err = arguments[6];
 	
 	chart.options.title.text = region
 		+ " 2020-02-28 -- 2020-05-12 " + subtitle;
@@ -130,7 +168,18 @@ function updateChart() {
 	var a = params.a;
 	var b = params.b;
 	var r0 = a/b;
-	showParams("r0 = " + r0);
+	var N = params.N;
+	
+	var str = "r0 = " + r0.toFixed(2) + " | ";
+	str += "a = " + a.toFixed(2) + " | ";
+	str += "b = " + b.toFixed(2) + " | ";
+	str += "N = " + N.toFixed(1);
+	
+	if(err != undefined) {
+		str += " | err = " + err;
+	}
+	
+	showParams(str);
 }
 
 
@@ -185,11 +234,30 @@ function createElements() {
 	div3.style.background = "#fafafa";
 	div3.id = "params";
 	
+	var div4 = document.createElement("div");
+	div4.style.width = "100%";
+	div4.style.background = "#fafafa";
+	
+	var btn1 = document.createElement("button");
+	btn1.innerHTML = "Change a";
+	var btn2 = document.createElement("button");
+	btn2.innerHTML = "Change b";
+	var btn3 = document.createElement("button");
+	btn3.innerHTML = "Change N";
+	
+	btn1.addEventListener("click", changeA);
+	btn2.addEventListener("click", changeB);
+	btn3.addEventListener("click", changeN);
+	
 	document.body.append(div1);
 	div1.append(can1);
 	document.body.append(div2);
 	div2.append(can2);
 	document.body.append(div3);
+	document.body.append(div4);
+	div4.append(btn1);
+	div4.append(btn2);
+	div4.append(btn3);
 	
 	chart1 = new Chart(document.getElementById("line-chart-1"),
 	{
@@ -200,6 +268,7 @@ function createElements() {
 				{ 
 					//data: Iobs,
 					label: "Observed",
+					yAxisID: "y-axis-1",
 					pointRadius: 3,
 					pointStyle: "circle",
 					pointBorderColor: "#00f",
@@ -211,6 +280,7 @@ function createElements() {
 				{ 
 					//data: Isim,
 					label: "SIR model",
+					yAxisID: "y-axis-2",
 					pointRadius: 0,
 					pointStyle: "rect",
 					pointBorderColor: "#f00",
@@ -234,12 +304,24 @@ function createElements() {
 					{
 						ticks: {
 							beginAtZero: false,
-							maxTicksLimit: 11,
+							maxTicksLimit: 10,
 						},
 					},
 				],
 				yAxes: [
 					{
+						id: 'y-axis-1',                             
+            type: 'linear',
+            position: 'left',
+						ticks: {
+							beginAtZero: true,
+							//stepSize: 10,
+						},
+					},
+					{
+						id: 'y-axis-2',
+            type: 'linear',
+            position: 'right',
 						ticks: {
 							beginAtZero: true,
 							//stepSize: 10,
@@ -259,6 +341,7 @@ function createElements() {
 				{ 
 					//data: Robs,
 					label: "Observed",
+					yAxisID: "y-axis-1",
 					pointRadius: 3,
 					pointStyle: "circle",
 					pointBorderColor: "#00f",
@@ -270,6 +353,7 @@ function createElements() {
 				{ 
 					//data: Rsim,
 					label: "SIR model",
+					yAxisID: "y-axis-2",
 					pointRadius: 0,
 					pointStyle: "rect",
 					pointBorderColor: "#f00",
@@ -293,12 +377,24 @@ function createElements() {
 					{
 						ticks: {
 							beginAtZero: false,
-							maxTicksLimit: 11,
+							maxTicksLimit: 10,
 						},
 					},
 				],
 				yAxes: [
 					{
+						id: 'y-axis-1',                             
+            type: 'linear',
+            position: 'left',
+						ticks: {
+							beginAtZero: true,
+							//stepSize: 10,
+						},
+					},
+					{
+						id: 'y-axis-2',                             
+            type: 'linear',
+            position: 'right',
 						ticks: {
 							beginAtZero: true,
 							//stepSize: 10,
@@ -308,9 +404,133 @@ function createElements() {
 			},
 		}
 	});
-
 }
 
+
+// Change value of a with gradient descent
+function changeA() {
+	var region = document
+		.getElementById("region-name").value;
+	
+	var data = getAllTimeSerisFromRegion(region);
+	var Iobs = data[1];
+	var Robs = data[2];
+	
+	var a1 = params.a;
+	var a2 = a1 - 0.1 * a1;
+	
+	params.a = a1;
+	var sim = simulate(params);
+	var Isim = sim[2];
+	var err1 = errorOf(Iobs, Isim);
+	
+	params.a = a2;
+	var sim = simulate(params);
+	var Isim = sim[2];
+	var err2 = errorOf(Iobs, Isim);
+	
+	var eta = 0.01;
+	var a3 = a1 - eta * (err2 - err1) / (a2 - a1);
+	
+	params.a = a3;
+	var sim = simulate(params);
+	var Isim = sim[2];
+	var err3 = errorOf(Iobs, Isim);
+	var day = sim[0]
+	var Rsim = sim[3];
+	
+	updateChart(chart1, region, day, Iobs, Isim, "(active)");
+	updateChart(chart2, region, day, Robs, Rsim, "(recovered)",
+		err3);
+}
+
+
+// Change value of b with gradient descent
+function changeB() {
+	var region = document
+		.getElementById("region-name").value;
+	
+	var data = getAllTimeSerisFromRegion(region);
+	var Iobs = data[1];
+	var Robs = data[2];
+	
+	var b1 = params.b;
+	var b2 = b1 + 0.1 * b1;
+	
+	params.b = b1;
+	var sim = simulate(params);
+	var Isim = sim[2];
+	var err1 = errorOf(Iobs, Isim);
+	
+	params.b = b2;
+	var sim = simulate(params);
+	var Isim = sim[2];
+	var err2 = errorOf(Iobs, Isim);
+	
+	var eta = 0.0001;
+	var b3 = b1 - eta * (err2 - err1) / (b2 - b1);
+	
+	params.b = b3;
+	var sim = simulate(params);
+	var Isim = sim[2];
+	var err3 = errorOf(Iobs, Isim);
+	var day = sim[0]
+	var Rsim = sim[3];
+	
+	updateChart(chart1, region, day, Iobs, Isim, "(active)");
+	updateChart(chart2, region, day, Robs, Rsim, "(recovered)",
+		err3);
+}
+
+
+// Change value of N with gradient descent
+function changeN() {
+	var region = document
+		.getElementById("region-name").value;
+	
+	var data = getAllTimeSerisFromRegion(region);
+	var Iobs = data[1];
+	var Robs = data[2];
+	
+	var N1 = params.N;
+	var N2 = N1 + 0.5 * N1;
+	
+	params.N = N1;
+	var sim = simulate(params);
+	var Isim = sim[2];
+	var err1 = errorOf(Iobs, Isim);
+	
+	params.N = N2;
+	var sim = simulate(params);
+	var Isim = sim[2];
+	var err2 = errorOf(Iobs, Isim);
+	
+	var eta = 0.1;
+	var N3 = N1 - eta * (err2 - err1) / (N2 - N1);
+	
+	params.N = N3;
+	var sim = simulate(params);
+	var Isim = sim[2];
+	var err3 = errorOf(Iobs, Isim);
+	var day = sim[0]
+	var Rsim = sim[3];
+	
+	updateChart(chart1, region, day, Iobs, Isim, "(active)");
+	updateChart(chart2, region, day, Robs, Rsim, "(recovered)",
+		err3);
+}
+
+
+// Calculate error
+function errorOf() {
+	var obs = arguments[0];
+	var sim = arguments[1];
+	var err = 0;
+	for(var i = 0; i < obs.length; i++) {
+		err += Math.abs(obs[i] - sim[i]);
+	}
+	return err;
+}
 
 // Perform simulation using a model
 function simulate() {
@@ -338,22 +558,32 @@ function simulate() {
 	var II = [];
 	var RR = [];
 	
-	var S = S0;
-	var I = I0;
-	var R = R0;
+	var S = N;
+	var I = 0;
+	var R = 0;
 	
 	if(model == "SIR" && method == "Euler") {
-		var Ni = Math.ceil((tend - tbeg) / dt);
+		var Ni = Math.ceil((tend - 0) / dt);
 		for(var i = 0; i <= Ni; i++) {
-			var t = tbeg + i * dt;
+			var t = i * dt;
 			
-			tt.push(t);
-			SS.push(S);
-			II.push(I);
-			RR.push(R);
-
-			S = S - a * S * I / N * dt;
-			I = I + a * S * I / N * dt - b * I * dt;
+			if(t == tbeg) {
+				I = I0 / N;
+				R = 0;
+				S = (N - I - R) / N;
+			}
+			
+			if(t == Math.floor(t)) {
+				tt.push(t);
+				SS.push(S);
+				II.push(I);
+				RR.push(R);
+				
+				//console.log(t, (S + I + R) / N);
+			}
+			
+			S = S - a * S * I * dt;
+			I = I + a * S * I * dt - b * I * dt;
 			R = R + b * I * dt;
 			}
 	}
@@ -478,3 +708,42 @@ function unused() {
 	*/
 }
 
+
+//createArtificialData();
+
+// Create artificial data
+function createArtificialData() {
+	// Use SIR model to produce simulation data with Euler
+	params = {
+		model: "SIR",     // model
+		a: 0.2,           // rate of infection
+		b: 0.05,          // rate of recovery
+		N: 5000,          // total population
+		S: 4999,          // initial susceptible population
+		I: 1,             // initial infected population
+		R: 0,             // initial recovered population
+		method: "Euler",  // numerical method for solving ODE 
+		dt: 0.01,         // simulation time step (day)
+		tbeg: 10,         // begin time of simulation
+		tend: 74,         // end time of simulation
+	};
+	
+	var sim = simulate(params);
+	var Isim = sim[2];
+	var Rsim = sim[3];
+	var Dsim = [];
+	var Csim = [];
+	
+	var scale = params.N;
+	for(var i = 0; i < Isim.length; i++) {
+		Isim[i] = Math.floor(Isim[i] * scale);
+		Rsim[i] = Math.floor(Rsim[i] * scale);
+		Dsim.push(0);
+		Csim.push(Isim[i] + Dsim[i] + Rsim[i]);
+	}
+	
+	console.log(Isim.toString());
+	console.log(Dsim.toString());
+	console.log(Rsim.toString());
+	console.log(Csim.toString());
+}
