@@ -31,6 +31,19 @@
 	2238 Adata params works for Bengkulu? Why?
 	2304 Finish change of a (infection rate) for now.
 	2306 Update github and tell the team.
+	20200514
+	0313 Continut with b change, copying a first.
+	0323 Test it wit artifical data.
+	0329 Can find (0.2, 0.05) from (0.15, 0.08) but with
+	     uncertain combination of both buttons.
+	0623 Hack amin by viewing its error evolution.
+	0641 Try the same for bmin.
+	0653 Suppose the solution of (a, b, N) is (0.2, 0.05, 5000)
+	then (0.15, 0.05, 5000) --> (0.2, 0.05, 5000)    btn 1
+	then (0.25, 0.05, 5000) --> (0.2, 0.05, 5000)    btn 1
+	then (0.02, 0.08, 5000) --> (0.2, 0.051, 5000)   btn 2
+	then (0.02, 0.03, 5000) --> (0.2, 0.05, 5000)    btn 2
+	then (0.15, 0.08, 5000) --> (0.201, 0.054, 5000) btn 1,2
 	
 	References
 	1. url https://github.com/dudung/butiran.js/blob/master/app
@@ -43,6 +56,7 @@
 // Define some global variables
 var xxx, chart1, chart2, regions, params;
 var TEST_A_DATA = true;
+var error_series;
 
 // Execute main function
 main();
@@ -69,8 +83,8 @@ function main() {
 	// Use SIR model to produce simulation data with Euler
 	params = {
 		model: "SIR",     // model
-		a: 0.15,          // rate of infection
-		b: 0.05,          // rate of recovery
+		a: 0.15,          // rate of infection 0.199985
+		b: 0.08,          // rate of recovery
 		N: 5000,          // total population
 		S: 4999,          // initial susceptible population
 		I: 1,             // initial infected population
@@ -86,6 +100,7 @@ function main() {
 	
 	// Region id 0 -- 33, 34 total, set initial id
 	var id = 20;
+	if(TEST_A_DATA) id = 35;
 	recalculate(id);
 }
 
@@ -167,10 +182,31 @@ function updateChart() {
 	var r0 = a/b;
 	var N = params.N;
 	
-	var str = "r0 = " + r0.toFixed(2) + " | ";
-	str += "a = " + a.toFixed(2) + " | ";
-	str += "b = " + b.toFixed(2) + " | ";
-	str += "N = " + N.toFixed(1);
+	var stramin = "<b style='color:#f00'>";
+	if(params.amin != undefined) {
+		stramin += params.amin.toFixed(3);
+	}
+	stramin += "</b>";
+
+	var strbmin = "<b style='color:#f00'>";
+	if(params.bmin != undefined) {
+		strbmin += params.bmin.toFixed(3);
+	}
+	strbmin += "</b>";
+
+	var strNmin = "<b style='color:#f00'>";
+	if(params.Nmin != undefined) {
+		strNmin += params.Nmin.toFixed(3);
+	}
+	strNmin += "</b>";
+	
+	var str = "r0 = " + r0.toFixed(3) + " | ";
+	str += "a = " + a.toFixed(3)
+		+ " (" + stramin + ") | ";
+	str += "b = " + b.toFixed(3)
+		+ " (" + strbmin + ") | ";
+	str += "N = " + N.toFixed(3)
+		+ " (" + strNmin + ")";
 	
 	if(err != undefined) {
 		str += " | err = " + err;
@@ -241,6 +277,7 @@ function createElements() {
 	btn2.innerHTML = "Change b";
 	var btn3 = document.createElement("button");
 	btn3.innerHTML = "Change N";
+	btn3.disabled = true;
 	
 	btn1.addEventListener("click", changeA);
 	btn2.addEventListener("click", changeB);
@@ -420,6 +457,11 @@ function changeA() {
 	var err1, err2, err3;
 	var Isim, Rsim;
 	
+	if(params.etaa == undefined) {
+		params.etaa = 1E-8;
+		error_series = "";
+	}
+		
 	if(params.olda == undefined) {
 		params.olda = [];
 		var a1 = params.a;
@@ -437,8 +479,8 @@ function changeA() {
 		err2 = errorOf(Iobs, Isim);
 		params.olda.push(parseFloat(a2.toFixed(3)));
 		
-		var eta = 1E-7;
-		var a3 = a2 - eta * (err2 - err1) / (a2 - a1);
+		var eta = params.etaa;
+		var a3 = a1 - eta * (err2 - err1) / (a2 - a1);
 		
 		params.a = a3;
 		var sim = simulate(params);
@@ -447,11 +489,23 @@ function changeA() {
 		day = sim[0]
 		Rsim = sim[3];
 		params.olda.push(parseFloat(a3.toFixed(3)));
+		
+		/*
+		error_series += a1 + "\t" + err1 + "\n";
+		error_series += a2 + "\t" + err2 + "\n";
+		error_series += a3 + "\t" + err3 + "\n";
+		*/
+		
+		if(params.amin == undefined) {
+			params.amin = a3;
+		}
 	} else {
 		var idx = params.olda.length;
 		
 		var a1 = params.olda[params.olda.length - 2];
 		var a2 = params.olda[params.olda.length - 1];
+		
+		var eta = params.etaa;
 		
 		params.a = a1;
 		var sim = simulate(params);
@@ -462,14 +516,25 @@ function changeA() {
 		var sim = simulate(params);
 		var Isim = sim[2];
 		err2 = errorOf(Iobs, Isim);
-		
-		var eta = 1E-8;
+
+		/**/
 		var a3;
 		if(a2 != a1) {
-			a3 = a2 - eta * (err2 - err1) / (a2 - a1);
+			a3 = a1 - eta * (err2 - err1) / (a2 - a1);
 		} else {
 			a3 = a2;
 		}
+		if(
+			(params.olda[params.olda.length - 1] ==
+			params.olda[params.olda.length - 3])
+			&&
+			(params.olda[params.olda.length - 2] ==
+			params.olda[params.olda.length - 4])
+		) {
+			a3 = 0.5 * (a2 + a1);
+		}
+		/**/
+		
 		params.a = a3;
 		var sim = simulate(params);
 		var Isim = sim[2];
@@ -477,13 +542,26 @@ function changeA() {
 		day = sim[0]
 		Rsim = sim[3];
 		params.olda.push(parseFloat(a3.toFixed(3)));
-	}
-	
-	console.log(params.olda);
+		
+		//error_series += a3 + "\t" + err3 + "\n";
+		
+		params.a = params.amin;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		var errmin = errorOf(Iobs, Isim);
+		if(err3 < errmin) {
+			params.amin = a3;
+		}
+		
+		params.a = a3;
+		}
 	
 	updateChart(chart1, region, day, Iobs, Isim, "(active)");
 	updateChart(chart2, region, day, Robs, Rsim, "(recovered)",
 		err3);
+		
+	//console.log(error_series);
+	console.log(params.amin);
 }
 
 
@@ -496,70 +574,119 @@ function changeB() {
 	var Iobs = data[1];
 	var Robs = data[2];
 	
-	var b1 = params.b;
-	var b2 = b1 + 0.1 * b1;
+	var err1, err2, err3;
+	var Isim, Rsim;
 	
-	params.b = b1;
-	var sim = simulate(params);
-	var Isim = sim[2];
-	var err1 = errorOf(Iobs, Isim);
-	
-	params.b = b2;
-	var sim = simulate(params);
-	var Isim = sim[2];
-	var err2 = errorOf(Iobs, Isim);
-	
-	var eta = 0.0001;
-	var b3 = b1 - eta * (err2 - err1) / (b2 - b1);
-	
-	params.b = b3;
-	var sim = simulate(params);
-	var Isim = sim[2];
-	var err3 = errorOf(Iobs, Isim);
-	var day = sim[0]
-	var Rsim = sim[3];
+	if(params.etab == undefined) {
+		params.etab = 1E-8;
+		error_series = "";
+	}
+		
+	if(params.oldb == undefined) {
+		params.oldb = [];
+		var b1 = params.b;
+		var b2 = b1 + 0.01
+		
+		params.b = b1;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err1 = errorOf(Iobs, Isim);
+		params.oldb.push(parseFloat(b1.toFixed(3)));
+		
+		params.b = b2;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err2 = errorOf(Iobs, Isim);
+		params.oldb.push(parseFloat(b2.toFixed(3)));
+		
+		var eta = params.etab;
+		var b3 = b1 - eta * (err2 - err1) / (b2 - b1);
+		
+		params.b = b3;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err3 = errorOf(Iobs, Isim);
+		day = sim[0]
+		Rsim = sim[3];
+		params.oldb.push(parseFloat(b3.toFixed(3)));
+		
+		/*
+		error_series += b1 + "\t" + err1 + "\n";
+		error_series += b2 + "\t" + err2 + "\n";
+		error_series += b3 + "\t" + err3 + "\n";
+		*/
+		
+		if(params.bmin == undefined) {
+			params.bmin = b3;
+		}
+	} else {
+		var idx = params.oldb.length;
+		
+		var b1 = params.oldb[params.oldb.length - 2];
+		var b2 = params.oldb[params.oldb.length - 1];
+		
+		var eta = params.etab;
+		
+		params.b = b1;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err1 = errorOf(Iobs, Isim);
+		
+		params.b = b2;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err2 = errorOf(Iobs, Isim);
+
+		/**/
+		var b3;
+		if(b2 != b1) {
+			b3 = b1 - eta * (err2 - err1) / (b2 - b1);
+		} else {
+			b3 = b2;
+		}
+		if(
+			(params.oldb[params.oldb.length - 1] ==
+			params.oldb[params.oldb.length - 3])
+			&&
+			(params.oldb[params.oldb.length - 2] ==
+			params.oldb[params.oldb.length - 4])
+		) {
+			b3 = 0.5 * (b2 + b1);
+		}
+		/**/
+		
+		params.b = b3;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err3 = errorOf(Iobs, Isim);
+		day = sim[0]
+		Rsim = sim[3];
+		params.oldb.push(parseFloat(b3.toFixed(3)));
+		
+		//error_series += b3 + "\t" + err3 + "\n";
+		
+		params.b = params.bmin;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		var errmin = errorOf(Iobs, Isim);
+		if(err3 < errmin) {
+			params.bmin = b3;
+		}
+		
+		params.b = b3;
+		}
 	
 	updateChart(chart1, region, day, Iobs, Isim, "(active)");
 	updateChart(chart2, region, day, Robs, Rsim, "(recovered)",
 		err3);
+		
+	//console.log(error_series);
+	console.log(params.bmin);
 }
 
 
 // Change value of N with gradient descent
 function changeN() {
-	var region = document
-		.getElementById("region-name").value;
-	
-	var data = getAllTimeSerisFromRegion(region);
-	var Iobs = data[1];
-	var Robs = data[2];
-	
-	var N1 = params.N;
-	var N2 = N1 + 0.5 * N1;
-	
-	params.N = N1;
-	var sim = simulate(params);
-	var Isim = sim[2];
-	var err1 = errorOf(Iobs, Isim);
-	
-	params.N = N2;
-	var sim = simulate(params);
-	var Isim = sim[2];
-	var err2 = errorOf(Iobs, Isim);
-	
-	var eta = 0.1;
-	var N3 = N1 - eta * (err2 - err1) / (N2 - N1);
-	
-	params.N = N3;
-	var sim = simulate(params);
-	var Isim = sim[2];
-	var err3 = errorOf(Iobs, Isim);
-	var day = sim[0]
-	var Rsim = sim[3];
-	
-	updateChart(chart1, region, day, Iobs, Isim, "(active)");
-	updateChart(chart2, region, day, Robs, Rsim, "(recovered)",
-		err3);
 }
 
 
