@@ -1,3 +1,25 @@
+[20200513]
+2331 Capek, sholat, lalu istrirahat. Baca dulu bila memungkinkan.
+
+[17:40, 13/05/2020] dudung.github.io: https://rawcdn.githack.com/dudung/butiran.js/7a2dec627802dd426f86ed3c292b178a43820508/app/fr0sir/fr0sir2.html
+
+Ada masalah baru. Dengan data yang ada saat 2020-02-28 hampir semua data I = 0 sehingga model SIR tidak bekerja
+[17:41, 13/05/2020] dudung.github.io: Jadi perlu algoritma bahwa t = 0 bukanlah pada hari awal data, tetapi saat mulai ada yang terinfeksi.
+[17:41, 13/05/2020] dudung.github.io: Atau ad usul lain?
+[17:42, 13/05/2020] PREMISE Aristyo: kalau begitu mungkin mulai dari tanggal 2 pak... saat ada infeksi pertama?
+[17:42, 13/05/2020] dudung.github.io: Model SIR / SEIR / SEIRD harus punya I != 0 saat t = 0, bila tidak tidak ada sumber penularan.
+[17:42, 13/05/2020] dudung.github.io: Iya, tapi bisa jadi beda provinsi beda ya?
+[17:42, 13/05/2020] dudung.github.io: Saya akan coba buat, dicari dulu kapan mulai tidak nol dan itu dijadikan t = 0 untuk Region tersebut.
+[17:43, 13/05/2020] PREMISE Aristyo: betul, pak... bisa jadi setiap provinsi berbeda SEIRnya
+[17:43, 13/05/2020] dudung.github.io: Ok. Nuhun infonya.
+[18:31, 13/05/2020] PREMISE Aristyo: sama-sama, pak...
+[23:14, 13/05/2020] dudung.github.io: https://rawcdn.githack.com/dudung/butiran.js/603dee32ffb42e1669586cf211c92190599c3421/app/fr0sir/fr0sir2.html
+
+Untuk a (laju infeksi akibat kontak) sudah dapat untuk data buatan (lihat Artificial data di bawah Total), yang dua lagi masih bermasalah.
+
+Silakan dipelajari.
+
+
 [20200512]
 2258 Capek. Istrirahat dan sholat dulu.
 
@@ -19,6 +41,8 @@ Sudah jalan yang gradient descent. Bisa dicoba kedua tombolnya untuk melihat per
 [22:55, 12/05/2020] PREMISE Aristyo: soalnya masyarakat tidak bisa makan, pak..
 [22:55, 12/05/2020] dudung.github.io: Iya.
 [22:56, 12/05/2020] dudung.github.io: Sementara ilustrasinya masih pakai SIR, ya. Tinggal nanti dimodif dengan SEIR. Belum sempat saya ngoprek yang SEIR.
+
+[23:14, 12/05/2020] PREMISE Aristyo: Siap pak.. terima kasih, pak
 
 [21:44, 12/05/2020] dudung.github.io: https://rawcdn.githack.com/dudung/butiran.js/01f7568f7ced47145ee41b2aedce58cf8a2ebe42/app/fr0sir/fr0sir.html
 
