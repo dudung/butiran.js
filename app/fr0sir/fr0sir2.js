@@ -28,6 +28,9 @@
 	2034 SIR model seem to be late than the data.
 	2037 Add three buttons.
 	2146 It seems does not work either with artificial data.
+	2238 Adata params works for Bengkulu? Why?
+	2304 Finish change of a (infection rate) for now.
+	2306 Update github and tell the team.
 	
 	References
 	1. url https://github.com/dudung/butiran.js/blob/master/app
@@ -39,7 +42,7 @@
 
 // Define some global variables
 var xxx, chart1, chart2, regions, params;
-var TEST_AI_DATA = true;
+var TEST_A_DATA = true;
 
 // Execute main function
 main();
@@ -50,7 +53,7 @@ function main() {
 	// Prepare id to get region
 	regions = getRegionName(csv_a);
 
-	/* Artificial data
+	/* Artificial data, set true the TEST_A_DATA
 		a: 0.2,           // rate of infection
 		b: 0.05,          // rate of recovery
 		N: 5000,          // total population
@@ -66,7 +69,7 @@ function main() {
 	// Use SIR model to produce simulation data with Euler
 	params = {
 		model: "SIR",     // model
-		a: 0.2,           // rate of infection
+		a: 0.15,          // rate of infection
 		b: 0.05,          // rate of recovery
 		N: 5000,          // total population
 		S: 4999,          // initial susceptible population
@@ -120,7 +123,7 @@ function recalculate() {
 	}
 	/**/
 
-	if(!TEST_AI_DATA)
+	if(!TEST_A_DATA)
 	params.N = Cobs[Cobs.length - 1];
 	params.S = params.N - params.I;
 	
@@ -134,12 +137,6 @@ function recalculate() {
 	var day = sim[0]
 	var Isim = sim[2];
 	var Rsim = sim[3];
-	
-	var scale = params.N * 1 + 0;
-	for(var i = 0; i < Isim.length; i++) {
-		Isim[i] *= scale;
-		Rsim[i] *= scale;
-	}
 	
 	var err = errorOf(Iobs, Isim);
 	
@@ -316,6 +313,8 @@ function createElements() {
 						ticks: {
 							beginAtZero: true,
 							//stepSize: 10,
+							//min: 0,
+							//max: 2500,
 						},
 					},
 					{
@@ -325,6 +324,8 @@ function createElements() {
 						ticks: {
 							beginAtZero: true,
 							//stepSize: 10,
+							//min: 0,
+							//max: 2500,
 						},
 					},
 				],
@@ -416,28 +417,69 @@ function changeA() {
 	var Iobs = data[1];
 	var Robs = data[2];
 	
-	var a1 = params.a;
-	var a2 = a1 - 0.1 * a1;
+	var err1, err2, err3;
+	var Isim, Rsim;
 	
-	params.a = a1;
-	var sim = simulate(params);
-	var Isim = sim[2];
-	var err1 = errorOf(Iobs, Isim);
+	if(params.olda == undefined) {
+		params.olda = [];
+		var a1 = params.a;
+		var a2 = a1 + 0.01
+		
+		params.a = a1;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err1 = errorOf(Iobs, Isim);
+		params.olda.push(parseFloat(a1.toFixed(3)));
+		
+		params.a = a2;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err2 = errorOf(Iobs, Isim);
+		params.olda.push(parseFloat(a2.toFixed(3)));
+		
+		var eta = 1E-7;
+		var a3 = a2 - eta * (err2 - err1) / (a2 - a1);
+		
+		params.a = a3;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err3 = errorOf(Iobs, Isim);
+		day = sim[0]
+		Rsim = sim[3];
+		params.olda.push(parseFloat(a3.toFixed(3)));
+	} else {
+		var idx = params.olda.length;
+		
+		var a1 = params.olda[params.olda.length - 2];
+		var a2 = params.olda[params.olda.length - 1];
+		
+		params.a = a1;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err1 = errorOf(Iobs, Isim);
+		
+		params.a = a2;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err2 = errorOf(Iobs, Isim);
+		
+		var eta = 1E-8;
+		var a3;
+		if(a2 != a1) {
+			a3 = a2 - eta * (err2 - err1) / (a2 - a1);
+		} else {
+			a3 = a2;
+		}
+		params.a = a3;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err3 = errorOf(Iobs, Isim);
+		day = sim[0]
+		Rsim = sim[3];
+		params.olda.push(parseFloat(a3.toFixed(3)));
+	}
 	
-	params.a = a2;
-	var sim = simulate(params);
-	var Isim = sim[2];
-	var err2 = errorOf(Iobs, Isim);
-	
-	var eta = 0.01;
-	var a3 = a1 - eta * (err2 - err1) / (a2 - a1);
-	
-	params.a = a3;
-	var sim = simulate(params);
-	var Isim = sim[2];
-	var err3 = errorOf(Iobs, Isim);
-	var day = sim[0]
-	var Rsim = sim[3];
+	console.log(params.olda);
 	
 	updateChart(chart1, region, day, Iobs, Isim, "(active)");
 	updateChart(chart2, region, day, Robs, Rsim, "(recovered)",
@@ -558,7 +600,7 @@ function simulate() {
 	var II = [];
 	var RR = [];
 	
-	var S = N;
+	var S = 1;
 	var I = 0;
 	var R = 0;
 	
@@ -568,9 +610,9 @@ function simulate() {
 			var t = i * dt;
 			
 			if(t == tbeg) {
-				I = I0 / N;
+				I = I0;
 				R = 0;
-				S = (N - I - R) / N;
+				S = N - I - R;
 			}
 			
 			if(t == Math.floor(t)) {
@@ -582,8 +624,8 @@ function simulate() {
 				//console.log(t, (S + I + R) / N);
 			}
 			
-			S = S - a * S * I * dt;
-			I = I + a * S * I * dt - b * I * dt;
+			S = S - a * S * I * dt / N;
+			I = I + a * S * I * dt / N - b * I * dt;
 			R = R + b * I * dt;
 			}
 	}
@@ -665,7 +707,6 @@ function getDateFromCSV() {
 }
 
 
-
 // Get time series of a region, e.g. province, state, others
 function getRegionTimeSeriesFromCSV() {
 	var csv = arguments[0];
@@ -706,6 +747,12 @@ function unused() {
 		&initialS=100&initialI=9&initialR=11
 		&iters=105
 	*/
+	
+	var scale = params.N * 1 + 0;
+	for(var i = 0; i < Isim.length; i++) {
+		Isim[i] *= scale;
+		Rsim[i] *= scale;
+	}
 }
 
 
@@ -734,7 +781,7 @@ function createArtificialData() {
 	var Dsim = [];
 	var Csim = [];
 	
-	var scale = params.N;
+	var scale = params.N * 0 + 1;
 	for(var i = 0; i < Isim.length; i++) {
 		Isim[i] = Math.floor(Isim[i] * scale);
 		Rsim[i] = Math.floor(Rsim[i] * scale);
