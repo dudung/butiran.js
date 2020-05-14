@@ -90,10 +90,10 @@ function simulate() {
 			
 			// Record only every tdata
 			if(iM == M) {
-				tt.push(t);
-				SS.push(S);
-				II.push(I);
-				RR.push(R);
+				tt.push(t.toFixed(dop));
+				SS.push(Math.round(S));
+				II.push(Math.round(I));
+				RR.push(Math.round(R));
 				iM = 0;
 			}
 			
@@ -114,7 +114,8 @@ function simulate() {
 // Create artificial data
 function createArtificialData() {
 	// Use SIR model to produce simulation data with Euler
-	params = {
+	var params = {
+		model: "SIR",     // model
 		a: 0.2,           // rate of infection
 		b: 0.05,          // rate of recovery
 		N: 5000,          // total population
