@@ -53,6 +53,7 @@
 	Not to bad, but the sequence do give influence.
 	0727 Report to the team.
 	0745 Forget to reproduce error by changing N. Confuse.
+	Need a rest.
 	
 	References
 	1. url https://github.com/dudung/butiran.js/blob/master/app
