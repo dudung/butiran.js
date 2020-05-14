@@ -36,10 +36,6 @@ var params_artd = {
 };
 
 
-simulate(params_artd)
-
-
-
 // Perform simulation using a model with a method
 function simulate() {
 	var params = arguments[0];
@@ -75,33 +71,38 @@ function simulate() {
 	var S = N - I - R;
 	
 	var M = Math.floor(tdata / dt);
-	var iM = 0;
+	var iM = M;
 	var INFECTION_INITIALIZED = false;
-	var N = Math.ceil((tend - tbeg) / dt);
+	var Nt = Math.ceil((tend - tbeg) / dt);
 	
 	if(model == "SIR" && method == "Euler") {
 		
-		for(var i = 0; i <= N; i++) {
-			var t = i * dt;
+		for(var it = 0; it <= Nt; it++) {
+			var t = it * dt;
 			
+			// Initialize infection at t = tinf
 			if(t >= tinf && !INFECTION_INITIALIZED) {
 				I = I0;
 				R = R0;
 				S = N - I - R;
 				INFECTION_INITIALIZED = true;
-				console.log(t.toFixed(dop));
 			}
 			
-			if(t == Math.floor(t)) {
+			// Record only every tdata
+			if(iM == M) {
 				tt.push(t);
 				SS.push(S);
 				II.push(I);
 				RR.push(R);
+				iM = 0;
 			}
 			
+			// Calculate using SIR model
 			S = S - a * S * I * dt / N;
 			I = I + a * S * I * dt / N - b * I * dt;
 			R = R + b * I * dt;
+			
+			iM++;
 			}
 	} else if(true) {
 	}
@@ -134,10 +135,7 @@ function createArtificialData() {
 	var Dsim = [];
 	var Csim = [];
 	
-	var scale = params.N * 0 + 1;
 	for(var i = 0; i < Isim.length; i++) {
-		Isim[i] = Math.floor(Isim[i] * scale);
-		Rsim[i] = Math.floor(Rsim[i] * scale);
 		Dsim.push(0);
 		Csim.push(Isim[i] + Dsim[i] + Rsim[i]);
 	}
