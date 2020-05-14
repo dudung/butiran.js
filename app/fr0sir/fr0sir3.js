@@ -13,9 +13,10 @@
 	References
 	1. url https://github.com/dudung/butiran.js/blob/master/app
 	   /fr0sir/fr0sir.js [20200513].
-	1. url https://github.com/dudung/butiran.js/blob/master/app
+	2. url https://github.com/dudung/butiran.js/blob/master/app
 	   /fr0sir/fr0sir2.js [20200514].
 */
+
 
 // SIR model parameters in producing artificial data
 var params_artd = {
@@ -27,14 +28,274 @@ var params_artd = {
 	I: 1,             // initial infected population at tinf
 	R: 0,             // initial recovered population
 	method: "Euler",  // numerical method for solving ODE 
-	dt: 0.01,         // simulation time step (day)
+	dt: 0.1,          // simulation time step (day)
 	tbeg: 0,          // begin time of simulation
-	tend: 74,         // end time of simulation
-	tinf: 10,         // begin time of infection
+	tend: 5,          // end time of simulation
+	tinf: 3,          // begin time of infection
+	tdata: 1,         // time period of recording data
 };
 
 
+simulate(params_artd)
 
+
+
+// Perform simulation using a model with a method
+function simulate() {
+	var params = arguments[0];
+	
+	var method = params.method;
+	var dt = params.dt;
+	var tbeg = params.tbeg;
+	var tend = params.tend;
+	var tdata = params.tdata;
+	var tinf = params.tinf;
+	
+	var dop = getDOP(dt);
+		
+	var model = params.model;
+	// dS/dt = -aSI/N
+	// dI/dt = aSI/n - bI
+	// dR/dt = bI
+	// N = S + I + R
+	var a = params.a;
+	var b = params.b;
+	var N = params.N;
+	var S0 = params.S;
+	var I0 = params.I;
+	var R0 = params.R;
+	
+	var tt = [];
+	var SS = [];
+	var II = [];
+	var RR = [];
+	
+	var I = 0;
+	var R = 0;
+	var S = N - I - R;
+	
+	var M = Math.floor(tdata / dt);
+	var iM = 0;
+	var INFECTION_INITIALIZED = false;
+	var N = Math.ceil((tend - tbeg) / dt);
+	
+	if(model == "SIR" && method == "Euler") {
+		
+		for(var i = 0; i <= N; i++) {
+			var t = i * dt;
+			
+			if(t >= tinf && !INFECTION_INITIALIZED) {
+				I = I0;
+				R = R0;
+				S = N - I - R;
+				INFECTION_INITIALIZED = true;
+				console.log(t.toFixed(dop));
+			}
+			
+			if(t == Math.floor(t)) {
+				tt.push(t);
+				SS.push(S);
+				II.push(I);
+				RR.push(R);
+			}
+			
+			S = S - a * S * I * dt / N;
+			I = I + a * S * I * dt / N - b * I * dt;
+			R = R + b * I * dt;
+			}
+	} else if(true) {
+	}
+	
+	return [tt, SS, II, RR];
+}
+
+
+// Create artificial data
+function createArtificialData() {
+	// Use SIR model to produce simulation data with Euler
+	params = {
+		a: 0.2,           // rate of infection
+		b: 0.05,          // rate of recovery
+		N: 5000,          // total population
+		S: 4999,          // initial susceptible population
+		I: 1,             // initial infected population at tinf
+		R: 0,             // initial recovered population
+		method: "Euler",  // numerical method for solving ODE 
+		dt: 0.01,         // simulation time step (day), 0.01 day
+		tbeg: 0,          // begin time of simulation
+		tend: 74,         // end time of simulation, 0-74 day
+		tinf: 10,         // begin time of infection
+		tdata: 1,         // time period of recording data, 1 day
+	};
+	
+	var sim = simulate(params);
+	var Isim = sim[2];
+	var Rsim = sim[3];
+	var Dsim = [];
+	var Csim = [];
+	
+	var scale = params.N * 0 + 1;
+	for(var i = 0; i < Isim.length; i++) {
+		Isim[i] = Math.floor(Isim[i] * scale);
+		Rsim[i] = Math.floor(Rsim[i] * scale);
+		Dsim.push(0);
+		Csim.push(Isim[i] + Dsim[i] + Rsim[i]);
+	}
+	
+	// Show the results on console
+	console.log(Isim.toString());
+	console.log(Dsim.toString());
+	console.log(Rsim.toString());
+	console.log(Csim.toString());
+	
+	// The results must be insterted to idn-xxx-20200512.js
+	insertIfNotExist(
+		Isim,
+		Dsim,
+		Rsim,
+		Csim
+	).to("idn-xxx-20200512.js");
+	
+	// A future function
+	function insertIfNotExist() {
+		var Isim = arguments[0];
+		var Dsim = arguments[1];
+		var Rsim = arguments[2];
+		var Csim = arguments[3];
+		return {
+			to: function() {
+				var filename = arguments[0];
+			},
+		};
+	}
+}
+
+
+// Calculate error between obs and sim
+function errorOf() {
+	var obs = arguments[0];
+	var sim = arguments[1];
+	var err = 0;
+	for(var i = 0; i < obs.length; i++) {
+		err += Math.abs(obs[i] - sim[i]);
+	}
+	return err;
+}
+
+
+// Get digit of precision
+function getDOP() {
+	var x = arguments[0];
+	var maxDigit = 10
+	var digit = -1;
+	for(var d = 0; d <= maxDigit; d++) {
+		var i = Math.floor(x);
+		if(i == x) {
+			digit = d;
+			break;
+		} else {
+			x = x * 10;
+		}
+	}
+	if(digit == -1) digit = maxDigit;
+	return digit;
+}	
+
+
+// Get all time series from a region
+function getAllTimeSerisFromRegion() {
+	var region = arguments[0];
+	var date = getDateFromCSV(csv_a);
+	var I = getRegionTimeSeriesFromCSV(csv_a, region);
+	var R = getRegionTimeSeriesFromCSV(csv_r, region);
+	var D = getRegionTimeSeriesFromCSV(csv_d, region)
+	var C = getRegionTimeSeriesFromCSV(csv_c, region);	
+	return [date, I, R, D, C];
+}
+
+
+// Get region name in array
+function getRegionName() {
+	var csv = arguments[0];
+	
+	var line = csv.split("\n");
+	line.pop();
+	line.shift();
+	
+	var name = [];
+	for(var i = 1; i < line.length; i++) {
+		var column = line[i].split(",");
+		name.push(column[1]);
+	}
+	
+	return name;
+}
+
+
+// Assure that active + recovered + death = confirmed
+function checkRegionData() {
+	var region = arguments[0];
+	
+	var data_a = getRegionTimeSeriesFromCSV(csv_a, region);
+	var data_r = getRegionTimeSeriesFromCSV(csv_r, region);
+	var data_d = getRegionTimeSeriesFromCSV(csv_d, region);
+	var data_c = getRegionTimeSeriesFromCSV(csv_c, region);
+	
+	var aa = data_a.slice(-1)[0];
+	var rr = data_r.slice(-1)[0];
+	var dd = data_d.slice(-1)[0];
+	var cc = data_c.slice(-1)[0];
+	
+	var checked;
+	if((aa + rr + dd) === cc) {
+		checked = true;
+	} else {
+		checked = false;
+	}
+	return checked;
+}
+
+
+// Get date of a region, e.g. province, state, others
+function getDateFromCSV() {
+	var csv = arguments[0];
+	var region = arguments[1];
+	
+	var line = csv.split("\n");
+	line.pop();
+	line.shift();
+	
+	var series = [];
+	var column = line[0].split(",");
+	for(var j = 0; j < column.length - 2; j++) {
+		series.push(column[j + 2]);
+	}
+	
+	return series;
+}
+
+
+// Get time series of a region, e.g. province, state, others
+function getRegionTimeSeriesFromCSV() {
+	var csv = arguments[0];
+	var region = arguments[1];
+	
+	var line = csv.split("\n");
+	line.pop();
+	line.shift();
+	
+	var series = [];
+	for(var i = 0; i < line.length; i++) {
+		var column = line[i].split(",");
+		if(region == column[1]) {
+			for(var j = 0; j < column.length - 2; j++) {
+				series.push(parseInt(column[j + 2]));
+			}
+		}
+	}
+	
+	return series;
+}
 
 
 
@@ -778,239 +1039,4 @@ function changeN() {
 	console.log(params.Nmin);
 }
 
-
-// Calculate error
-function errorOf() {
-	var obs = arguments[0];
-	var sim = arguments[1];
-	var err = 0;
-	for(var i = 0; i < obs.length; i++) {
-		err += Math.abs(obs[i] - sim[i]);
-	}
-	return err;
-}
-
-// Perform simulation using a model
-function simulate() {
-	var params = arguments[0];
-	
-	var method = params.method;
-	var dt = params.dt;
-	var tbeg = params.tbeg;
-	var tend = params.tend;
-	
-	var model = params.model;
-	// dS/dt = -aSI/N
-	// dI/dt = aSI/n - bI
-	// dR/dt = bI
-	// N = S + I + R
-	var a = params.a;
-	var b = params.b;
-	var N = params.N;
-	var S0 = params.S;
-	var I0 = params.I;
-	var R0 = params.R;
-	
-	var tt = [];
-	var SS = [];
-	var II = [];
-	var RR = [];
-	
-	var S = 1;
-	var I = 0;
-	var R = 0;
-	
-	if(model == "SIR" && method == "Euler") {
-		var Ni = Math.ceil((tend - 0) / dt);
-		for(var i = 0; i <= Ni; i++) {
-			var t = i * dt;
-			
-			if(t == tbeg) {
-				I = I0;
-				R = 0;
-				S = N - I - R;
-			}
-			
-			if(t == Math.floor(t)) {
-				tt.push(t);
-				SS.push(S);
-				II.push(I);
-				RR.push(R);
-				
-				//console.log(t, (S + I + R) / N);
-			}
-			
-			S = S - a * S * I * dt / N;
-			I = I + a * S * I * dt / N - b * I * dt;
-			R = R + b * I * dt;
-			}
-	}
-	
-	return [tt, SS, II, RR];
-}
-
-
-// Get all time series from a region
-function getAllTimeSerisFromRegion() {
-	var region = arguments[0];
-	var date = getDateFromCSV(csv_a);
-	var I = getRegionTimeSeriesFromCSV(csv_a, region);
-	var R = getRegionTimeSeriesFromCSV(csv_r, region);
-	var D = getRegionTimeSeriesFromCSV(csv_d, region)
-	var C = getRegionTimeSeriesFromCSV(csv_c, region);	
-	return [date, I, R, D, C];
-}
-
-
-// Get region name in array
-function getRegionName() {
-	var csv = arguments[0];
-	
-	var line = csv.split("\n");
-	line.pop();
-	line.shift();
-	
-	var name = [];
-	for(var i = 1; i < line.length; i++) {
-		var column = line[i].split(",");
-		name.push(column[1]);
-	}
-	
-	return name;
-}
-
-
-// Assure that active + recovered + death = confirmed
-function checkRegionData() {
-	var region = arguments[0];
-	
-	var data_a = getRegionTimeSeriesFromCSV(csv_a, region);
-	var data_r = getRegionTimeSeriesFromCSV(csv_r, region);
-	var data_d = getRegionTimeSeriesFromCSV(csv_d, region);
-	var data_c = getRegionTimeSeriesFromCSV(csv_c, region);
-	
-	var aa = data_a.slice(-1)[0];
-	var rr = data_r.slice(-1)[0];
-	var dd = data_d.slice(-1)[0];
-	var cc = data_c.slice(-1)[0];
-	
-	var checked;
-	if((aa + rr + dd) === cc) {
-		checked = true;
-	} else {
-		checked = false;
-	}
-	return checked;
-}
-
-
-// Get date of a region, e.g. province, state, others
-function getDateFromCSV() {
-	var csv = arguments[0];
-	var region = arguments[1];
-	
-	var line = csv.split("\n");
-	line.pop();
-	line.shift();
-	
-	var series = [];
-	var column = line[0].split(",");
-	for(var j = 0; j < column.length - 2; j++) {
-		series.push(column[j + 2]);
-	}
-	
-	return series;
-}
-
-
-// Get time series of a region, e.g. province, state, others
-function getRegionTimeSeriesFromCSV() {
-	var csv = arguments[0];
-	var region = arguments[1];
-	
-	var line = csv.split("\n");
-	line.pop();
-	line.shift();
-	
-	var series = [];
-	for(var i = 0; i < line.length; i++) {
-		var column = line[i].split(",");
-		if(region == column[1]) {
-			for(var j = 0; j < column.length - 2; j++) {
-				series.push(parseInt(column[j + 2]));
-			}
-		}
-	}
-	
-	return series;
-}
-
-
-// Show parameters
-function showParams() {
-	var str = arguments[0];
-	var div = document.getElementById("params");
-	div.innerHTML = str;
-}
-
-
-
-
-// Save unused things
-function unused() {
-	/*
-		// SIR model benchmark
-		http://www.public.asu.edu/~hnesse/classes/sir.html?
-		Alpha=0.4&Beta=0.25
-		&initialS=100&initialI=9&initialR=11
-		&iters=105
-	*/
-	
-	var scale = params.N * 1 + 0;
-	for(var i = 0; i < Isim.length; i++) {
-		Isim[i] *= scale;
-		Rsim[i] *= scale;
-	}
-}
-
-
-
-//createArtificialData();
-
-// Create artificial data
-function createArtificialData() {
-	// Use SIR model to produce simulation data with Euler
-	params = {
-		model: "SIR",     // model
-		a: 0.2,           // rate of infection
-		b: 0.05,          // rate of recovery
-		N: 5000,          // total population
-		S: 4999,          // initial susceptible population
-		I: 1,             // initial infected population
-		R: 0,             // initial recovered population
-		method: "Euler",  // numerical method for solving ODE 
-		dt: 0.01,         // simulation time step (day)
-		tbeg: 10,         // begin time of simulation
-		tend: 74,         // end time of simulation
-	};
-	
-	var sim = simulate(params);
-	var Isim = sim[2];
-	var Rsim = sim[3];
-	var Dsim = [];
-	var Csim = [];
-	
-	var scale = params.N * 0 + 1;
-	for(var i = 0; i < Isim.length; i++) {
-		Isim[i] = Math.floor(Isim[i] * scale);
-		Rsim[i] = Math.floor(Rsim[i] * scale);
-		Dsim.push(0);
-		Csim.push(Isim[i] + Dsim[i] + Rsim[i]);
-	}
-	
-	console.log(Isim.toString());
-	console.log(Dsim.toString());
-	console.log(Rsim.toString());
-	console.log(Csim.toString());
-}
 
