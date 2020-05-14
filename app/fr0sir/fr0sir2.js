@@ -52,6 +52,7 @@
 	(0.15, 0.08, 6000) --> (0.206, 0.049, 5000.015) btn 1,2,3
 	Not to bad, but the sequence do give influence.
 	0727 Report to the team.
+	0745 Forget to reproduce error by changing N. Confuse.
 	
 	References
 	1. url https://github.com/dudung/butiran.js/blob/master/app
@@ -706,14 +707,14 @@ function changeN() {
 	var Isim, Rsim;
 	
 	if(params.etaN == undefined) {
-		params.etaN = 1E-7;
+		params.etaN = 1E-6;
 		error_series = "";
 	}
 		
 	if(params.oldN == undefined) {
 		params.oldN = [];
 		var N1 = params.N;
-		var N2 = N1 - 1500;
+		var N2 = N1 - 500;
 		
 		params.N = N1;
 		var sim = simulate(params);
