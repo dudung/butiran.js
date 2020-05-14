@@ -51,6 +51,7 @@
 	0721 Tes all buttons
 	(0.15, 0.08, 6000) --> (0.206, 0.049, 5000.015) btn 1,2,3
 	Not to bad, but the sequence do give influence.
+	0727 Report to the team.
 	
 	References
 	1. url https://github.com/dudung/butiran.js/blob/master/app
