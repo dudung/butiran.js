@@ -43,7 +43,14 @@
 	then (0.25, 0.05, 5000) --> (0.2, 0.05, 5000)    btn 1
 	then (0.02, 0.08, 5000) --> (0.2, 0.051, 5000)   btn 2
 	then (0.02, 0.03, 5000) --> (0.2, 0.05, 5000)    btn 2
-	then (0.15, 0.08, 5000) --> (0.201, 0.054, 5000) btn 1,2
+	then (0.15, 0.08, 5000) --> (0.177, 0.032, 5000) btn 1,2
+	0659 Start with the 3rd button.
+	0720 With initial -1500
+	then (0.2, 0.05, 6000) --> (0.2, 0.05, 4999.512) btn 3
+	but depends on the initial value.
+	0721 Tes all buttons
+	(0.15, 0.08, 6000) --> (0.206, 0.049, 5000.015) btn 1,2,3
+	Not to bad, but the sequence do give influence.
 	
 	References
 	1. url https://github.com/dudung/butiran.js/blob/master/app
@@ -85,8 +92,8 @@ function main() {
 		model: "SIR",     // model
 		a: 0.15,          // rate of infection 0.199985
 		b: 0.08,          // rate of recovery
-		N: 5000,          // total population
-		S: 4999,          // initial susceptible population
+		N: 6000,          // total population
+		S: 5999,          // initial susceptible population
 		I: 1,             // initial infected population
 		R: 0,             // initial recovered population
 		method: "Euler",  // numerical method for solving ODE 
@@ -277,7 +284,7 @@ function createElements() {
 	btn2.innerHTML = "Change b";
 	var btn3 = document.createElement("button");
 	btn3.innerHTML = "Change N";
-	btn3.disabled = true;
+	//btn3.disabled = true;
 	
 	btn1.addEventListener("click", changeA);
 	btn2.addEventListener("click", changeB);
@@ -687,6 +694,121 @@ function changeB() {
 
 // Change value of N with gradient descent
 function changeN() {
+	var region = document
+		.getElementById("region-name").value;
+	
+	var data = getAllTimeSerisFromRegion(region);
+	var Iobs = data[1];
+	var Robs = data[2];
+	
+	var err1, err2, err3;
+	var Isim, Rsim;
+	
+	if(params.etaN == undefined) {
+		params.etaN = 1E-7;
+		error_series = "";
+	}
+		
+	if(params.oldN == undefined) {
+		params.oldN = [];
+		var N1 = params.N;
+		var N2 = N1 - 1500;
+		
+		params.N = N1;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err1 = errorOf(Iobs, Isim);
+		params.oldN.push(parseFloat(N1.toFixed(3)));
+		
+		params.N = N2;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err2 = errorOf(Iobs, Isim);
+		params.oldN.push(parseFloat(N2.toFixed(3)));
+		
+		var eta = params.etaN;
+		var N3 = N1 - eta * (err2 - err1) / (N2 - N1);
+		
+		params.N = N3;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err3 = errorOf(Iobs, Isim);
+		day = sim[0]
+		Rsim = sim[3];
+		params.oldN.push(parseFloat(N3.toFixed(3)));
+		
+		/*
+		error_series += N1 + "\t" + err1 + "\n";
+		error_series += N2 + "\t" + err2 + "\n";
+		error_series += N3 + "\t" + err3 + "\n";
+		*/
+		
+		if(params.Nmin == undefined) {
+			params.Nmin = N3;
+		}
+	} else {
+		var idx = params.oldN.length;
+		
+		var N1 = params.oldN[params.oldN.length - 2];
+		var N2 = params.oldN[params.oldN.length - 1];
+		
+		var eta = params.etaN;
+		
+		params.N = N1;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err1 = errorOf(Iobs, Isim);
+		
+		params.N = N2;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err2 = errorOf(Iobs, Isim);
+
+		/**/
+		var N3;
+		if(N2 != N1) {
+			N3 = N1 - eta * (err2 - err1) / (N2 - N1);
+		} else {
+			N3 = N2;
+		}
+		if(
+			(params.oldN[params.oldN.length - 1] ==
+			params.oldN[params.oldN.length - 3])
+			&&
+			(params.oldN[params.oldN.length - 2] ==
+			params.oldN[params.oldN.length - 4])
+		) {
+			N3 = 0.5 * (N2 + N1);
+		}
+		/**/
+		
+		params.N = N3;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		err3 = errorOf(Iobs, Isim);
+		day = sim[0]
+		Rsim = sim[3];
+		params.oldN.push(parseFloat(N3.toFixed(3)));
+		
+		//error_series += N3 + "\t" + err3 + "\n";
+		
+		params.N = params.Nmin;
+		var sim = simulate(params);
+		var Isim = sim[2];
+		var errmin = errorOf(Iobs, Isim);
+		if(err3 < errmin) {
+			params.Nmin = N3;
+		}
+		
+		params.N = N3;
+		}
+	
+	updateChart(chart1, region, day, Iobs, Isim, "(active)");
+	updateChart(chart2, region, day, Robs, Rsim, "(recovered)",
+		err3);
+		
+	//console.log(error_series);
+	console.log(params.Nmin);
 }
 
 
