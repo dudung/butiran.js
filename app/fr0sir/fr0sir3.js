@@ -9,6 +9,10 @@
 	20200514
 	1032 Start this from fr0sir2.js [1] and fr0sir.js [2].
 	1034 Clean the code and leave only what matters.
+	1142 Finish getDOP and tested.
+	1216 Check simulate and ok.
+	1218 Check createArtificialData and ok.
+	1234 Get ready form of clean code.
 	
 	References
 	1. url https://github.com/dudung/butiran.js/blob/master/app
@@ -34,6 +38,15 @@ var params_artd = {
 	tinf: 3,          // begin time of infection
 	tdata: 1,         // time period of recording data
 };
+
+
+// Execute main function
+main();
+
+
+// Define main function
+function main() {
+}
 
 
 // Perform simulation using a model with a method
@@ -299,15 +312,23 @@ function getRegionTimeSeriesFromCSV() {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 // Define some global variables
 var xxx, chart1, chart2, regions, params;
 var TEST_A_DATA = true;
 var error_series;
 
-// Execute main function
-//main();
-
-
+/*
 // Define main function
 function main() {
 	// Prepare id to get region
@@ -337,7 +358,7 @@ function main() {
 	if(TEST_A_DATA) id = 35;
 	recalculate(id);
 }
-
+*/
 
 // Recalculate
 function recalculate() {
