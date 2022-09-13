@@ -114,6 +114,10 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/fr0sir/fr0sir3.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/fr0sir/fr0sir3.html
+28. **abm-sir.js** | Agent-based model (ABM) and susceptible-infected-recovered (SIR) model | 20200613<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/abm-sir/abm-sir.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/abm-sir/abm-sir.html
 
 
 	
