@@ -106,6 +106,10 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/gpcspp/gpcspp.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/gpcspp/gpcspp.html
+26. **gfhtgr.js** | Granular flow in a HTGR (high temperature gas-cooled reactor) -- not work | 20190618<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/gfhtgr/gfhtgr.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/gfhtgr/gfhtgr.html
 
 
 	
