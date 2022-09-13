@@ -5,6 +5,40 @@ abm-md
 abm-odm
 abm-sir
 libs
+2008 Try to complete list of app.
+
+
+abm-md
+abm-odm
+abm-sir
+abmdif ✔
+abmphasemat ✔
+agglo ✔
+ccsasir ✔
+cppcmf ✔
+fr0sir
+gcm2d ✔
+gfhtgr
+gpcspp ✔ (new)
+gmpsa ✔
+hc2sgis
+igdensity ✔
+ipendepthf ✔ (new)
+nispm ✔
+mdfcp ✔
+mdfhcp ✔
+mdsgcp ✔ (new)
+mrtatrmjs ✔
+rk2dsp ✔
+scspg ✔
+simlttcg ✔
+spfwfs ✔
+sslssgm ✔
+ssspp ✔
+vratcabm ✔
+windpend ✔
+wtrwgpmmids ✔
+
 
 [20190528]
 0239 Reduced libraries are cleaned and compiled properly.
