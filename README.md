@@ -118,6 +118,7 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/abm-sir/abm-sir.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/abm-sir/abm-sir.html
-
-
-	
+29. **abm-odm.js** | Create origin-destination matrix (ODM) using agent-based model (ABM) | 20200612<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/abm-odm/abm-odm.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/abm-odm/abm-odm.html
