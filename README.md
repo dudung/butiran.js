@@ -94,3 +94,35 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/nispm/nispm.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/nispm/nispm.html
+23. **mdsgcp.js** | Molecular dynamics simulation of self-gravity composite particles | 20190925<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/mdsgcp/mdsgcp.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/mdsgcp/mdsgcp.html
+24. **ipendepthf.js** | Intruder penetration depth in fluid immersed bed particle | 20190428<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/ipendepthf/ipendepthf.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/ipendepthf/ipendepthf.html
+25. **gpcspp.js** | Group of particle chasing a self-propelled particle | 20190602<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/gpcspp/gpcspp.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/gpcspp/gpcspp.html
+26. **gfhtgr.js** | Granular flow in a HTGR (high temperature gas-cooled reactor) -- not work | 20190618<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/gfhtgr/gfhtgr.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/gfhtgr/gfhtgr.html
+27. **fr0sir3.js** | Find R0 in SIR model for IDN data with gradient descent -- not work | 20200514<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/fr0sir/fr0sir3.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/fr0sir/fr0sir3.html
+28. **abm-sir.js** | Agent-based model (ABM) and susceptible-infected-recovered (SIR) model | 20200613<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/abm-sir/abm-sir.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/abm-sir/abm-sir.html
+29. **abm-odm.js** | Create origin-destination matrix (ODM) using agent-based model (ABM) | 20200612<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/abm-odm/abm-odm.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/abm-odm/abm-odm.html
+30. **amb-md.js** | Agent-based model (ABM) and molecular dynamics (MD) method -- still fail | 20200621<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/abm-md/abm-md.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/abm-md/abm-md.html
