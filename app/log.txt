@@ -6,19 +6,17 @@ abm-odm
 abm-sir
 libs
 2008 Try to complete list of app.
-
-
-abm-md
-abm-odm
-abm-sir
+abm-md ✔ (new) -- still fail
+abm-odm ✔ (new)
+abm-sir ✔ (new)
 abmdif ✔
 abmphasemat ✔
 agglo ✔
 ccsasir ✔
 cppcmf ✔
-fr0sir
+fr0sir ✔ (new) -- not work
 gcm2d ✔
-gfhtgr
+gfhtgr ✔ (new) -- not work
 gpcspp ✔ (new)
 gmpsa ✔
 hc2sgis
@@ -38,6 +36,7 @@ ssspp ✔
 vratcabm ✔
 windpend ✔
 wtrwgpmmids ✔
+2056 Fin editing.
 
 
 [20190528]
