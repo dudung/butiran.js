@@ -94,3 +94,7 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/nispm/nispm.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/nispm/nispm.html
+23. **mdsgcp.js** | Molecular dynamics simulation of self-gravity composite particles | 20190925<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/mdsgcp/mdsgcp.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/mdsgcp/mdsgcp.html
