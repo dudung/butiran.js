@@ -110,6 +110,10 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/gfhtgr/gfhtgr.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/gfhtgr/gfhtgr.html
+27. **fr0sir3.js** | Find R0 in SIR model for IDN data with gradient descent -- not work | 20200514<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/fr0sir/fr0sir3.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/fr0sir/fr0sir3.html
 
 
 	
