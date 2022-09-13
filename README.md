@@ -122,3 +122,7 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/abm-odm/abm-odm.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/abm-odm/abm-odm.html
+30. **amb-md.js** | Agent-based model (ABM) and molecular dynamics (MD) method | 20200621<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/abm-md/abm-md.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/abm-md/abm-md.html
