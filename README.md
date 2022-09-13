@@ -102,3 +102,10 @@ Library of butiran.js can be downloaded from
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/ipendepthf/ipendepthf.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/ipendepthf/ipendepthf.html
+25. **gpcspp.js** | Group of particle chasing a self-propelled particle | 20190602<br>
+    `refs` <br>
+    `code` https://github.com/dudung/butiran.js/blob/master/app/gpcspp/gpcspp.js <br>
+    `demo` https://raw.githack.com/dudung/butiran.js/master/app/gpcspp/gpcspp.html
+
+
+	
