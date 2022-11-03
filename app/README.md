@@ -111,11 +111,11 @@ Application of MD and ABM in $x$
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/fr0sir/fr0sir3.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/fr0sir/fr0sir3.html
-28. **abm-sir.js** | Agent-based model (ABM) and susceptible-infected-recovered (SIR) model | 20200613<br>
+28. :heavy_check_mark: **abm-sir.js** | Agent-based model (ABM) and susceptible-infected-recovered (SIR) model | 20200613<br>
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/abm-sir/abm-sir.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/abm-sir/abm-sir.html
-29. **abm-odm.js** | Create origin-destination matrix (ODM) using agent-based model (ABM) | 20200612<br>
+29. :heavy_check_mark: **abm-odm.js** | Create origin-destination matrix (ODM) using agent-based model (ABM) | 20200612<br>
     `refs` <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/abm-odm/abm-odm.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/abm-odm/abm-odm.html
