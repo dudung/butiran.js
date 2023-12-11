@@ -96,7 +96,7 @@ Application of MD and ABM in $x$
     `code` https://github.com/dudung/butiran.js/blob/master/app/mdsgcp/mdsgcp.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/mdsgcp/mdsgcp.html
 24. **ipendepthf.js** | Intruder penetration depth in fluid immersed bed particle | 20190428<br>
-    `refs` <br>
+    `refs` https://doi.org/10.1088/1742-6596/1445/1/012002 <br>
     `code` https://github.com/dudung/butiran.js/blob/master/app/ipendepthf/ipendepthf.js <br>
     `demo` https://raw.githack.com/dudung/butiran.js/master/app/ipendepthf/ipendepthf.html
 25. &times; **gfhtgr.js** | Granular flow in a HTGR (high temperature gas-cooled reactor) -- not work | 20190618<br>
