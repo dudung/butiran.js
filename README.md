@@ -1,5 +1,5 @@
 # butiran.js
-Simulation of physical system based on granular particles (en: granular particle, id: butiran) or granular-like particles, e.g. unphysical entity such as an agent.
+Simulation of systems based on granular particles (en: granular particle, id: butiran) or granular-like particles, e.g. unphysical entity such as an agent.
 
 ## Distribution
 Library of butiran.js can be downloaded from
